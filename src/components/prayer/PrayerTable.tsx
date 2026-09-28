@@ -11,22 +11,31 @@ export function PrayerTable({
   t,
   lang,
   note,
+  jumuahRows = "each",
+  shadow = true,
 }: {
   day: DaySchedule;
   jumuah: JumuahService[];
   t: Dictionary;
   lang: Lang;
   note?: string;
+  // "each": one row per Jumu'ah service (Home). "first": a single "Jumu'ah" row (Prayer Times page).
+  jumuahRows?: "each" | "first";
+  shadow?: boolean;
 }) {
   const locale = intlLocale(lang);
+  const jumuahList =
+    jumuahRows === "first"
+      ? jumuah.slice(0, 1).map((j) => ({ name: t.prayer_jumuah, adhan: j.khutbah, iqamah: j.iqamah }))
+      : jumuah.map((j) => ({ name: j.label, adhan: j.khutbah, iqamah: j.iqamah }));
   const rows = [
     ...day.prayers.map((p) => ({ name: t[`prayer_${p.key}` as MessageKey], adhan: p.adhan, iqamah: p.iqamah })),
-    ...jumuah.map((j) => ({ name: j.label, adhan: j.khutbah, iqamah: j.iqamah })),
+    ...jumuahList,
   ];
   // CSS grid rows (like the design) with ARIA table roles: one background per row, so
   // no hairline seams between cells, and screen readers still announce a table.
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${shadow ? styles.shadow : ""}`}>
       <div role="table" aria-label={t.prayer_th_prayer}>
         <div role="rowgroup">
           <div role="row" className={`${styles.grid} ${styles.head}`}>
@@ -37,7 +46,7 @@ export function PrayerTable({
         </div>
         <div role="rowgroup">
           {rows.map((r) => (
-            <div role="row" key={r.name} className={`${styles.grid} ${styles.row}`}>
+            <div role="row" key={`${r.name}-${r.adhan}`} className={`${styles.grid} ${styles.row}`}>
               <div role="rowheader" className={styles.name}>
                 {r.name}
               </div>

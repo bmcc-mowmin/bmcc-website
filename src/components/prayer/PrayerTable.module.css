@@ -3,6 +3,8 @@
   border-radius: 14px;
   overflow: hidden;
   background: var(--white);
+}
+.shadow {
   box-shadow: var(--shadow-card);
 }
 .grid {

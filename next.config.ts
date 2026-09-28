@@ -4,6 +4,12 @@ const nextConfig: NextConfig = {
   // Self-contained server bundle for the Docker image (see Dockerfile).
   output: "standalone",
   poweredByHeader: false,
+  experimental: {
+    serverActions: {
+      // Admin uploads (timetable PDFs up to 10 MB) plus multipart overhead.
+      bodySizeLimit: "11mb",
+    },
+  },
 };
 
 export default nextConfig;

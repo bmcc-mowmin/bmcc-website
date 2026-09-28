@@ -4,6 +4,8 @@ import { getActiveAnnouncements } from "@/lib/content/announcements";
 import { getTodayAndTomorrow, getUpcomingJumuah } from "@/lib/prayer/schedule";
 import { contactHref, routes } from "@/lib/routes";
 import { PrayerTable } from "@/components/prayer/PrayerTable";
+import { formatDayLabel } from "@/lib/prayer/next-prayer";
+import { intlLocale } from "@/lib/i18n/config";
 import { MemberLoginCard } from "./MemberLoginCard";
 import styles from "./home.module.css";
 
@@ -41,7 +43,7 @@ export default async function HomePage() {
           <h1 className={styles.heroH1}>{t.home_heading}</h1>
         </div>
         <div className={styles.heroTable}>
-          <PrayerTable day={today} jumuah={jumuah} t={t} lang={lang} note={t.prayer_note} />
+          <PrayerTable day={today} jumuah={jumuah} t={t} lang={lang} note={`${t.prayer_times_for} ${formatDayLabel(today.date, intlLocale(lang))} · ${t.asr_hanafi}`} />
         </div>
         <div className={styles.heroButtons}>
           <Link href={routes.donate} className={`${styles.heroBtn} ${styles.heroBtnPrimary}`}>

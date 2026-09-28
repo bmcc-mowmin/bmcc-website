@@ -1,0 +1,323 @@
+/* Admin area: plain, dense and readable. English only. */
+.shell {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--page);
+}
+.sidebar {
+  background: var(--ink);
+  color: #c5d2e4;
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--white);
+  font-weight: 800;
+  font-size: 15px;
+  margin: 0 6px 18px;
+}
+.brand img {
+  height: 30px;
+  background: #fff;
+  border-radius: 5px;
+  padding: 2px 5px;
+}
+.navGroup {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7d8794;
+  margin: 14px 8px 6px;
+}
+.navLink {
+  display: block;
+  color: #c5d2e4;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.navLink:hover {
+  background: #16233a;
+  color: var(--white);
+}
+.navLinkActive {
+  background: var(--primary);
+  color: var(--white);
+}
+.navLinkActive:hover {
+  background: var(--primary);
+}
+.navSoon {
+  display: block;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: #56637a;
+}
+.sidebarFooter {
+  margin-top: auto;
+  padding: 12px 8px 0;
+  border-top: 1px solid #1c2c40;
+  font-size: 12.5px;
+}
+.sidebarFooter a,
+.linkButton {
+  color: #c5d2e4;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.main {
+  padding: 28px clamp(16px, 3vw, 36px) 60px;
+  min-width: 0;
+}
+.pageTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+.pageLead {
+  color: var(--muted);
+  margin: 0 0 22px;
+  font-size: 14.5px;
+  max-width: 760px;
+  line-height: 1.6;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tabActive {
+  color: var(--ink);
+  border-bottom-color: var(--primary);
+}
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.cardTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+.cardLead {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: 0 0 16px;
+  line-height: 1.55;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+  min-width: 0;
+}
+.label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--body);
+}
+.hint {
+  font-size: 12px;
+  color: var(--subtle);
+}
+.input,
+.select {
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--input-border);
+  font-size: 14px;
+  background: var(--white);
+  color: var(--text);
+  min-width: 0;
+}
+.input[type="time"] {
+  width: 120px;
+}
+.input[readonly] {
+  background: var(--page);
+  color: var(--muted);
+}
+.translations {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.translations summary {
+  cursor: pointer;
+  margin: 2px 0 6px;
+}
+.translationRow {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.formFooter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.btn {
+  border: none;
+  border-radius: 7px;
+  padding: 9px 16px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.primary {
+  background: var(--primary);
+  color: var(--white);
+}
+.primary:hover {
+  background: var(--primary-hover);
+}
+.secondary {
+  background: var(--white);
+  color: var(--navy);
+  border: 1px solid var(--input-border);
+}
+.danger {
+  background: var(--white);
+  color: #a4262c;
+  border: 1px solid #f1c4c6;
+}
+.ok {
+  color: var(--success);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.err {
+  color: #a4262c;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.tableWrap {
+  overflow-x: auto;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table th {
+  text-align: start;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid #f0f1f4;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.table tr.friday td {
+  background: #f5f8fe;
+}
+.table tr.today td {
+  background: #fff8e6;
+}
+.overridden {
+  font-weight: 800;
+  color: #b25e00;
+}
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--sky-100);
+  color: var(--eyebrow);
+}
+.badgeWarn {
+  background: #fff1dc;
+  color: #b25e00;
+}
+.muted {
+  color: var(--subtle);
+}
+.monthNav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0 20px;
+}
+.prayerGrid {
+  display: grid;
+  grid-template-columns: 90px repeat(2, 140px) 1fr;
+  gap: 8px 14px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.prayerGrid .head {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+@media (max-width: 800px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .sidebarFooter {
+    margin-top: 0;
+    border-top: none;
+  }
+}

@@ -37,7 +37,9 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 
 - [ ] Restore the real Community Directory listings from the backup Google Sheet
       (local sample data is fake). Fix categories and add missing addresses.
-- [ ] Real prayer timetable / Iqamah offsets (Hanafi Asr) and Jumu'ah times.
+- [ ] Imam confirms the Fajr/Isha calculation method (ISNA by default; Asr is always Hanafi),
+      the Iqamah rules, and the Jumu'ah times — all editable in /admin/prayer-times.
+- [ ] Set the masjid's exact coordinates in admin (the default is Brentwood's center, 37.93, -121.70).
 - [ ] Real event dates and photos.
 - [ ] Food pantry hours ("Saturday 10 AM – 12 PM" is a placeholder in announcements).
 - [ ] Photos for About Us and the event cards (striped placeholders today).
@@ -51,5 +53,7 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 - [ ] Managed Postgres with automated backups; set `DATABASE_URL`.
 - [ ] File storage bucket; set `STORAGE_DRIVER=s3` and `S3_*`.
 - [ ] `APP_ENV=production`, `APP_URL=https://…` (the real domain), HTTPS certificate.
+- [ ] More than one app instance: set `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`; make sure the proxy sets
+      `X-Forwarded-For` (used for rate limiting).
 - [ ] Uptime monitor on `/api/health`.
 - [ ] Optional: Cloudflare Turnstile keys; Google Maps Embed API key.

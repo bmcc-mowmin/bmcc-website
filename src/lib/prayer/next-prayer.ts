@@ -74,3 +74,10 @@ export function formatClock(hhmm: string, intlLocale: string) {
     return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
   }
 }
+
+// "Sunday, September 27" in the visitor's language, for a masjid-local date.
+export function formatDayLabel(date: string, intlLocale: string) {
+  return new Intl.DateTimeFormat(intlLocale, { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" }).format(
+    new Date(`${date}T12:00:00Z`),
+  );
+}

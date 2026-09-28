@@ -23,7 +23,10 @@ npm run dev          # http://localhost:3000
 | What | Where |
 |---|---|
 | Website | http://localhost:3000 |
+| Admin | http://localhost:3000/admin (sign in with the test admin account) |
 | Health check | http://localhost:3000/api/health |
+| Prayer times API | http://localhost:3000/api/prayer-times?date=YYYY-MM-DD |
+| Monthly timetable PDF | http://localhost:3000/api/prayer-times/pdf?month=YYYY-MM |
 | Mailpit (local email inbox) | http://localhost:8025 |
 | Database browser | `npm run db:studio` |
 | Design prototypes | `npx serve docs/design-handoff/design -l 4000` → http://localhost:4000 |
@@ -44,6 +47,7 @@ The member account has an active membership and a 3-person household.
 | `npm run dev` | Dev server with hot reload |
 | `npm run build` / `npm start` | Production build / run it |
 | `npm run lint` / `npm run typecheck` | Checks |
+| `npm run test:unit` | Unit tests (prayer-time logic) |
 | `npm run db:migrate` | Create + apply a migration after editing `prisma/schema.prisma` |
 | `npm run db:deploy` | Apply pending migrations (what production runs) |
 | `npm run db:seed` | Reload sample data (wipes the seeded tables) |
@@ -62,6 +66,26 @@ src/lib/prayer/           prayer times — the single source for header, Home an
 src/lib/i18n/             languages, RTL, English fallback
 docs/design-handoff/      the signed-off design and spec
 ```
+
+## Prayer times
+
+One module, `src/lib/prayer/schedule.ts`, feeds the header's Next Prayer, the Home table, the
+Prayer Times page, the API and the PDF:
+
+1. **Adhan** is calculated with `adhan-js` for the masjid's coordinates, **Hanafi Asr**, and the
+   method chosen in admin (ISNA by default), in `America/Los_Angeles`.
+2. A **day override** from admin replaces any single Adhan/Iqamah (or that Friday's Jumu'ah list).
+3. **Iqamah** comes from the admin's rules — minutes after Adhan or a fixed time — where a dated rule
+   (Ramadan, DST season) takes priority over the everyday rule.
+
+Next Prayer is computed in the masjid's time zone and refreshes every 30 seconds; on Fridays the
+first Jumu'ah replaces Dhuhr; after Isha it shows tomorrow's Fajr. The monthly PDF is generated on
+request unless an admin uploaded one for that month.
+
+## Admin sign-in
+
+`AUTH_PROVIDER=dev` (local): email + password for the seeded accounts, a signed session cookie,
+rate-limited attempts. It is refused when `APP_ENV=production`. Clerk replaces it in phase 7.
 
 ## Settings
 
