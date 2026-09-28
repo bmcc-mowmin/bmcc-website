@@ -1,0 +1,418 @@
+// BMCC website — database schema.
+// Every change goes through `npm run db:migrate` (prisma migrate dev). No manual edits.
+//
+// Fields typed `Json` and commented "L10n" hold per-language text:
+//   { "en": "...", "dari": "...", "urdu": "...", "pashto": "..." }
+// Read them with `localize()` in src/lib/i18n, which falls back to English per field.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── People & access ────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  role         Role     @default(MEMBER)
+  // Set when AUTH_PROVIDER=clerk; links the Clerk account to this row.
+  clerkUserId  String?  @unique
+  // Only used by the local dev-login provider (seeded test accounts).
+  passwordHash String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  households       Household[]
+  payments         Payment[]
+  rsvps            EventRsvp[]
+  reviewedListings DirectoryListing[] @relation("ListingReviewer")
+  auditLogs        AuditLog[]
+}
+
+// ─── Prayer times ───────────────────────────────────────────────────────────
+// One source of truth: src/lib/prayer/schedule.ts combines
+//   calculated Adhan times (PrayerSettings) + Iqamah rules + per-day overrides.
+
+enum Prayer {
+  FAJR
+  DHUHR
+  ASR
+  MAGHRIB
+  ISHA
+}
+
+enum IqamahMode {
+  OFFSET // minutes after Adhan
+  FIXED // fixed clock time "HH:mm"
+}
+
+model PrayerSettings {
+  id          Int      @id @default(1)
+  latitude    Float
+  longitude   Float
+  timezone    String   @default("America/Los_Angeles")
+  // adhan-js CalculationMethod name, e.g. "NorthAmerica" (ISNA)
+  calcMethod  String   @default("NorthAmerica")
+  // Always Hanafi for BMCC; stored so it is visible in admin.
+  madhab      String   @default("Hanafi")
+  highLatRule String   @default("MiddleOfTheNight")
+  updatedAt   DateTime @updatedAt
+}
+
+model IqamahRule {
+  id            String     @id @default(cuid())
+  prayer        Prayer
+  mode          IqamahMode
+  offsetMinutes Int?
+  fixedTime     String? // "HH:mm", 24h, masjid time
+  // Inclusive date range (masjid-local dates). effectiveTo null = open-ended.
+  effectiveFrom DateTime   @db.Date
+  effectiveTo   DateTime?  @db.Date
+  createdAt     DateTime   @default(now())
+
+  @@index([prayer, effectiveFrom])
+}
+
+// Admin override for a single day. Any null field falls back to the calculated value.
+model PrayerDayOverride {
+  id            String   @id @default(cuid())
+  date          DateTime @unique @db.Date
+  fajrAdhan     String?
+  fajrIqamah    String?
+  dhuhrAdhan    String?
+  dhuhrIqamah   String?
+  asrAdhan      String?
+  asrIqamah     String?
+  maghribAdhan  String?
+  maghribIqamah String?
+  ishaAdhan     String?
+  ishaIqamah    String?
+  // Optional replacement Jumu'ah list for that Friday: [{label, khutbah, iqamah, location}]
+  jumuah        Json?
+  note          String?
+  updatedAt     DateTime @updatedAt
+}
+
+model JumuahService {
+  id          String   @id @default(cuid())
+  label       Json // L10n
+  khutbahTime String // "HH:mm"
+  iqamahTime  String // "HH:mm"
+  location    Json // L10n
+  note        Json? // L10n
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+// Optional admin-uploaded monthly timetable; replaces the generated PDF for that month.
+model TimetablePdf {
+  id           String   @id @default(cuid())
+  month        String   @unique // "YYYY-MM"
+  storageKey   String
+  uploadedById String?
+  createdAt    DateTime @default(now())
+}
+
+// ─── Content ────────────────────────────────────────────────────────────────
+
+model Announcement {
+  id        String    @id @default(cuid())
+  text      Json // L10n
+  link      String?
+  startAt   DateTime
+  endAt     DateTime?
+  sortOrder Int       @default(0)
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([active, startAt])
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  title       Json // L10n
+  description Json // L10n
+  tag         Json // L10n
+  startAt     DateTime
+  endAt       DateTime
+  allDay      Boolean     @default(false)
+  // iCalendar RRULE, e.g. "FREQ=WEEKLY;BYDAY=FR". Null = one-off.
+  rrule       String?
+  rruleUntil  DateTime?
+  location    String
+  imageKey    String?
+  published   Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  rsvps       EventRsvp[]
+
+  @@index([published, startAt])
+}
+
+model EventRsvp {
+  id              String   @id @default(cuid())
+  eventId         String
+  occurrenceStart DateTime
+  userId          String
+  partySize       Int      @default(1)
+  createdAt       DateTime @default(now())
+  event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, occurrenceStart, userId])
+}
+
+// ─── Community Directory ────────────────────────────────────────────────────
+
+enum ListingType {
+  BUSINESS
+  INDIVIDUAL
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model DirectoryListing {
+  id              String           @id @default(cuid())
+  name            String
+  listingType     ListingType
+  parentCategory  String
+  category        String
+  tags            String[]
+  description     String
+  author          String
+  phone           String?
+  email           String?
+  website         String?
+  address         String?
+  city            String?
+  state           String?
+  zip             String?
+  googleMapUrl    String?
+  status          ModerationStatus @default(PENDING)
+  submitterEmail  String?
+  reviewedById    String?
+  reviewedBy      User?            @relation("ListingReviewer", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([status, parentCategory, category])
+}
+
+// ─── Membership & household ─────────────────────────────────────────────────
+
+enum Relationship {
+  SELF
+  SPOUSE
+  CHILD
+  PARENT
+  SIBLING
+  OTHER
+}
+
+enum MembershipPlan {
+  MONTHLY
+  YEARLY
+}
+
+enum MembershipStatus {
+  PENDING_PAYMENT
+  ACTIVE
+  PAST_DUE // inside the 30-day grace period
+  PAUSED // grace period ended; coverage paused until dues are current
+  CANCELLED
+}
+
+model Household {
+  id             String            @id @default(cuid())
+  primaryUserId  String?
+  primaryUser    User?             @relation(fields: [primaryUserId], references: [id])
+  addressLine1   String
+  addressLine2   String?
+  city           String
+  state          String
+  zip            String
+  phone          String
+  email          String
+  emergencyName  String
+  emergencyPhone String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  members        HouseholdMember[]
+  memberships    Membership[]
+}
+
+// The people eligible for the Funeral Services Benefit.
+model HouseholdMember {
+  id           String       @id @default(cuid())
+  householdId  String
+  household    Household    @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  fullName     String
+  relationship Relationship
+  dateOfBirth  DateTime?    @db.Date
+  phone        String?
+  email        String?
+  createdAt    DateTime     @default(now())
+}
+
+model Membership {
+  id                     String           @id @default(cuid())
+  referenceId            String           @unique // shown on the success screen, e.g. "BMCC-7K3Q9D"
+  membershipNumber       String?          @unique // assigned by the office in admin
+  householdId            String
+  household              Household        @relation(fields: [householdId], references: [id])
+  plan                   MembershipPlan
+  status                 MembershipStatus @default(PENDING_PAYMENT)
+  appliedAt              DateTime         @default(now())
+  declarationAcceptedAt  DateTime
+  // Date of the first successful dues payment.
+  enrolledAt             DateTime?
+  // enrolledAt + 6 months. Coverage starts on this date.
+  benefitEligibleFrom    DateTime?
+  // Set when a payment is missed: due date + 30 days.
+  graceEndsAt            DateTime?
+  paymentProvider        String? // "mock" | "stripe"
+  providerCustomerId     String?
+  providerSubscriptionId String?          @unique
+  notes                  String?
+  updatedAt              DateTime         @updatedAt
+  payments               Payment[]
+}
+
+// ─── Payments (written only by the payment provider's webhook) ──────────────
+
+enum PaymentKind {
+  DONATION
+  DUES
+}
+
+enum PaymentFrequency {
+  ONE_TIME
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id                     String           @id @default(cuid())
+  kind                   PaymentKind
+  // new-bmcc | masjid-membership | construct-run | sadaqah-zakat | zakat-fitr (donations only)
+  fund                   String?
+  frequency              PaymentFrequency
+  amountCents            Int
+  currency               String           @default("usd")
+  status                 PaymentStatus    @default(PENDING)
+  donorName              String?
+  donorEmail             String
+  userId                 String?
+  user                   User?            @relation(fields: [userId], references: [id])
+  membershipId           String?
+  membership             Membership?      @relation(fields: [membershipId], references: [id])
+  provider               String // "mock" | "stripe"
+  providerCheckoutId     String?
+  providerPaymentId      String?          @unique
+  providerSubscriptionId String?
+  receiptNumber          String?          @unique
+  receiptSentAt          DateTime?
+  paidAt                 DateTime?
+  createdAt              DateTime         @default(now())
+
+  @@index([donorEmail])
+  @@index([kind, createdAt])
+}
+
+// Idempotency: each webhook event is processed once.
+model ProcessedWebhookEvent {
+  id          String   @id // provider event id
+  provider    String
+  type        String
+  processedAt DateTime @default(now())
+}
+
+// ─── Mailing list & messages ────────────────────────────────────────────────
+
+enum SubscriberStatus {
+  PENDING
+  CONFIRMED
+  UNSUBSCRIBED
+}
+
+model Subscriber {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  status           SubscriberStatus @default(PENDING)
+  source           String // "resub_bar" | "newsletter" | "membership" ...
+  lang             String           @default("en")
+  confirmTokenHash String?          @unique
+  tokenExpiresAt   DateTime?
+  unsubscribeToken String           @unique @default(cuid())
+  consentIp        String?
+  confirmedAt      DateTime?
+  unsubscribedAt   DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+enum MessageStatus {
+  NEW
+  HANDLED
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  topic     String?
+  status    MessageStatus @default(NEW)
+  createdAt DateTime      @default(now())
+  handledAt DateTime?
+}
+
+// ─── Operations ─────────────────────────────────────────────────────────────
+
+model RateLimitBucket {
+  key         String
+  windowStart DateTime
+  count       Int      @default(0)
+
+  @@id([key, windowStart])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  action    String // "create" | "update" | "delete" | "approve" ...
+  entity    String
+  entityId  String
+  diff      Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+}

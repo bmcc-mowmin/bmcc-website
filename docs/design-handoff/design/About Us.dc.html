@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#101d33">
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="600" cy="360" r="180" fill="none" stroke="#eef2f8" stroke-width="24"/>
+  <text x="600" y="620" font-family="sans-serif" font-size="90" font-weight="700" fill="#eef2f8" text-anchor="middle">BMCC</text>
+</svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f6f7f9; }
+  * { box-sizing: border-box; }
+  a { color: #101d33; text-decoration: none; }
+  a:hover { color: #2f6fed; }
+
+  @media (max-width: 900px) {
+    [data-g2] { grid-template-columns: 1fr !important; }
+    [data-g3] { grid-template-columns: 1fr !important; }
+    [data-g4a] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g4b] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g5] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-table-scroll] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+    [data-table-min] { min-width: 720px !important; }
+  }
+  @media (max-width: 620px) {
+    [data-g4a] { grid-template-columns: 1fr !important; }
+    [data-g5] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 480px) {
+    [data-table-compact] { font-size: 12.5px !important; padding: 10px 12px !important; }
+  }
+</style>
+</helmet>
+
+<div dir="{{ dir }}" style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #101828; background: #f6f7f9; min-height: 100vh;">
+
+  <dc-import name="Site Header" current="about" hint-size="100%,110">
+  </dc-import>
+
+  <section style="max-width:1180px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px) 24px;">
+    <div style="max-width:640px; margin-bottom:22px;">
+      <div style="text-transform:uppercase; letter-spacing:0.12em; font-size:13px; font-weight:700; color:#2354a6; margin-bottom:12px;">{{ t.about_eyebrow }}</div>
+      <h1 style="font-size:clamp(28px,3.6vw,42px); font-weight:800; letter-spacing:-0.02em; margin:0 0 10px 0; color:#0b1524;">{{ t.about_heading }}</h1>
+    </div>
+    <div style="display:flex; gap:8px; margin-bottom:28px; border-bottom:1px solid #e2e5ea; flex-wrap:wrap;">
+      <sc-for list="{{ resourceTabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.select }}" style="background:none; border:none; font-family:inherit; font-weight:700; font-size:14.5px; padding:12px 18px; cursor:pointer; color:{{ t.color }}; border-bottom:2.5px solid {{ t.borderColor }}; margin-bottom:-1px;">{{ t.label }}</button>
+      </sc-for>
+    </div>
+    <sc-if value="{{ activeResourceContent }}" hint-placeholder-val="{{ true }}">
+      <div data-g2 style="display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr); gap:36px; align-items:start;">
+        <div>
+          <h2 style="margin:0 0 14px 0; font-size:21px; font-weight:700; color:#0b1524;">{{ activeResourceContent.title }}</h2>
+          <sc-for list="{{ activeResourceContent.body }}" as="para" hint-placeholder-count="2">
+            <p style="font-size:15.5px; line-height:1.75; color:#384152; margin:0 0 16px 0;">{{ para }}</p>
+          </sc-for>
+          <div style="display:flex; flex-direction:column; gap:10px; margin:18px 0;">
+            <sc-for list="{{ activeResourceContent.list }}" as="item" hint-placeholder-count="4">
+              <div style="display:flex; gap:10px; align-items:flex-start;">
+                <span style="color:#2354a6; font-weight:800;">·</span>
+                <span style="font-size:14.5px; color:#384152; line-height:1.5;">{{ item }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ activeResourceContent.cta }}">
+            <a href="{{ activeResourceContent.ctaHref }}" style="display:inline-block; margin-top:8px; background:#101d33; color:#eef2f8; font-weight:700; font-size:14.5px; padding:12px 22px; border-radius:8px;">{{ activeResourceContent.cta }}</a>
+          </sc-if>
+        </div>
+        <div style="aspect-ratio:4/3; max-height:340px; border-radius:14px; background:repeating-linear-gradient(135deg,#eef0ea,#eef0ea 12px,#e4e7de 12px,#e4e7de 24px); border:1px solid #dbe1e8; display:flex; align-items:center; justify-content:center; color:#8894a3; font-family:ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; text-align:center; padding:16px;">{{ activeResourceContent.imageLabel }}</div>
+      </div>
+    </sc-if>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" style="background:#ffffff; border-top:1px solid #e2e5ea;">
+    <div data-g2 style="max-width:1180px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px); display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:36px;">
+      <div>
+        <div style="text-transform:uppercase; letter-spacing:0.12em; font-size:13px; font-weight:700; color:#2354a6; margin-bottom:12px;">{{ t.contact_eyebrow }}</div>
+        <h2 style="font-size:clamp(26px,3.2vw,38px); font-weight:800; letter-spacing:-0.02em; margin:0 0 16px 0; color:#0b1524;">{{ t.contact_heading }}</h2>
+        <p style="font-size:16px; line-height:1.7; color:#384152; margin:0 0 28px 0;">{{ t.contact_paragraph }}</p>
+        <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:28px;">
+          <div><div style="font-weight:700; font-size:14.5px; color:#0b1524;">{{ t.contact_address }}</div><div style="font-size:14.5px; color:#384152;">7701 Lone Tree Way, Brentwood, CA 94513</div></div>
+          <div><div style="font-weight:700; font-size:14.5px; color:#0b1524;">{{ t.contact_phone }}</div><div style="font-size:14.5px; color:#384152;">925-298-BMCC (2622)</div></div>
+          <div><div style="font-weight:700; font-size:14.5px; color:#0b1524;">{{ t.contact_email }}</div><div style="font-size:14.5px; color:#384152;">info@brmcc.org</div></div>
+        </div>
+        <div style="aspect-ratio:16/9; border-radius:12px; background:repeating-linear-gradient(135deg,#eef0ea,#eef0ea 12px,#e4e7de 12px,#e4e7de 24px); border:1px solid #dbe1e8; display:flex; align-items:center; justify-content:center; color:#8894a3; font-family:ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase;">{{ t.map_label }}</div>
+      </div>
+      <div style="border:1px solid #e2e5ea; border-radius:14px; padding:28px;">
+        <h2 style="margin:0 0 18px 0; font-size:18px; font-weight:700; color:#0b1524;">{{ t.send_message }}</h2>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <input placeholder="{{ t.contact_name_ph }}" style="padding:12px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px;" />
+          <input placeholder="{{ t.contact_email_ph }}" style="padding:12px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px;" />
+          <textarea placeholder="{{ t.contact_help_ph }}" rows="4" style="padding:12px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px; resize:vertical;"></textarea>
+          <button style="background:#2f6fed; color:#ffffff; font-weight:700; font-size:15px; padding:13px 0; border-radius:8px; border:none; cursor:pointer; font-family:inherit;" style-hover="background:#1d54c4;">{{ t.send_button }}</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="Site Footer" hint-size="100%,300">
+  </dc-import>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const EN_DEFAULT = {
+  about_eyebrow: 'About Us', about_heading: 'About BMCC',
+  tab_about: 'About', tab_resources: 'Resources', tab_schedule: 'Schedule & Info', tab_services: 'Services',
+  tab_about_title: 'Our Story',
+  tab_about_p1: 'Brentwood Muslim Community Center (BMCC) was established in 2010 and has grown into a second home for hundreds of culturally and socioeconomically diverse families across the Brentwood area.',
+  tab_about_p2: 'We host youth groups, religious programs and gatherings, weekday and weekend school, community outreach to those in need, festivals, counseling, and more — BMCC is the hub of everything that happens within our community.',
+  tab_about_l1: 'Established 2010', tab_about_l2: "Five daily congregational prayers & weekly Jumu'ah", tab_about_l3: 'Youth groups & religious programs', tab_about_l4: 'Community outreach, including food and support for those in need',
+  tab_resources_title: 'Community Resources',
+  tab_resources_p1: 'A growing library of recorded khutbahs, reading lists, and practical guidance for major life events, available to the whole community.',
+  tab_resources_l1: 'Recorded Friday khutbahs', tab_resources_l2: 'Janazah (funeral) guidance', tab_resources_l3: 'Marriage & Nikah preparation materials', tab_resources_l4: 'Recommended reading list',
+  tab_schedule_title: 'Masjid Hours & Facility Info',
+  tab_schedule_p1: "The masjid is open daily for all five prayers plus Jumu'ah, and the facility is available for member bookings outside of prayer times.",
+  tab_schedule_l1: 'Open daily, 30 minutes before Fajr to after Isha', tab_schedule_l2: 'Wudu facilities for men and women', tab_schedule_l3: "Dedicated women's prayer area", tab_schedule_l4: 'Wheelchair accessible entrance',
+  tab_services_title: 'Religious & Community Services',
+  tab_services_p1: "Our imams and volunteers support the community through life's major milestones and everyday questions.",
+  tab_services_l1: 'Nikah (marriage) ceremonies', tab_services_l2: 'Funeral & burial arrangements — see the Funeral Services Benefit for members', tab_services_l3: 'Zakat calculation assistance', tab_services_l4: 'Counseling & family support referrals',
+  view_funeral_benefit: 'View Funeral Services Benefit',
+  contact_eyebrow: 'Contact', contact_heading: 'Get in Touch',
+  contact_paragraph: 'Questions about membership, the Hikmah School, Nikah services, or facility rentals — reach us directly, or visit us in person.',
+  contact_address: 'Address', contact_phone: 'Phone', contact_email: 'Email', map_label: 'Map — facility location',
+  send_message: 'Send a Message', contact_name_ph: 'Your name', contact_email_ph: 'Email address', contact_help_ph: 'How can we help?', send_button: 'Send Message'
+};
+class Component extends DCLogic {
+  state = { activeResourceTab: 'about', lang: 'en', i18n: EN_DEFAULT };
+  componentDidMount() {
+    import('./i18n.js').then(m => {
+      this.i18nMod = m;
+      const lang = m.getLang();
+      if (lang !== 'en') this.setState({ lang, i18n: { ...EN_DEFAULT, ...m.t(lang) } });
+    });
+  }
+
+  renderVals() {
+    const gold = '#2f6fed';
+    const t = this.state.i18n;
+    const dir = (this.i18nMod && this.i18nMod.isRTL(this.state.lang)) ? 'rtl' : 'ltr';
+    const resourceTabsData = [
+      { id: 'about', label: t.tab_about, title: t.tab_about_title,
+        body: [t.tab_about_p1, t.tab_about_p2],
+        list: [t.tab_about_l1, t.tab_about_l2, t.tab_about_l3, t.tab_about_l4],
+        cta: null, ctaHref: null, imageLabel: 'Photo — masjid community gathering' },
+      { id: 'resources', label: t.tab_resources, title: t.tab_resources_title,
+        body: [t.tab_resources_p1],
+        list: [t.tab_resources_l1, t.tab_resources_l2, t.tab_resources_l3, t.tab_resources_l4],
+        cta: null, ctaHref: null, imageLabel: 'Photo — resource library / reading room' },
+      { id: 'schedule', label: t.tab_schedule, title: t.tab_schedule_title,
+        body: [t.tab_schedule_p1],
+        list: [t.tab_schedule_l1, t.tab_schedule_l2, t.tab_schedule_l3, t.tab_schedule_l4],
+        cta: null, ctaHref: null, imageLabel: 'Photo — masjid exterior / entrance' },
+      { id: 'services', label: t.tab_services, title: t.tab_services_title,
+        body: [t.tab_services_p1],
+        list: [t.tab_services_l1, t.tab_services_l2, t.tab_services_l3, t.tab_services_l4],
+        cta: t.view_funeral_benefit, ctaHref: 'Funeral Services.dc.html', imageLabel: 'Photo — imam / community counseling' }
+    ];
+    const resourceTabs = resourceTabsData.map(rt => ({
+      id: rt.id, label: rt.label,
+      select: () => this.setState({ activeResourceTab: rt.id }),
+      color: this.state.activeResourceTab === rt.id ? '#0b1524' : '#98a2b3',
+      borderColor: this.state.activeResourceTab === rt.id ? gold : 'transparent'
+    }));
+    const activeResourceContent = resourceTabsData.find(rt => rt.id === this.state.activeResourceTab) || null;
+    return { t, dir, resourceTabs, activeResourceContent };
+  }
+}
+</script>
+</body>
+</html>

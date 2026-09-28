@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#101d33">
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="600" cy="360" r="180" fill="none" stroke="#eef2f8" stroke-width="24"/>
+  <text x="600" y="620" font-family="sans-serif" font-size="90" font-weight="700" fill="#eef2f8" text-anchor="middle">BMCC</text>
+</svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f6f7f9; }
+  * { box-sizing: border-box; }
+  a { color: #101d33; text-decoration: none; }
+  a:hover { color: #2f6fed; }
+
+  @media (max-width: 900px) {
+    [data-g2] { grid-template-columns: 1fr !important; }
+    [data-g3] { grid-template-columns: 1fr !important; }
+    [data-g4a] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g4b] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g5] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-table-scroll] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+    [data-table-min] { min-width: 720px !important; }
+  }
+  @media (max-width: 620px) {
+    [data-g4a] { grid-template-columns: 1fr !important; }
+    [data-g5] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 480px) {
+    [data-table-compact] { font-size: 12.5px !important; padding: 10px 12px !important; }
+  }
+</style>
+</helmet>
+
+<div dir="{{ dir }}" style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #101828; background: #f6f7f9; min-height: 100vh;">
+
+  <dc-import name="Site Header" current="funeral" hint-size="100%,110">
+  </dc-import>
+
+  <!-- HERO -->
+  <section style="background:#101d33; color:#eef2f8;">
+    <div style="max-width:900px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px);">
+      <div style="text-transform:uppercase; letter-spacing:0.12em; font-size:13px; font-weight:700; color:#2f6fed; margin-bottom:14px;">{{ t.funeral_eyebrow }}</div>
+      <h1 style="font-size:clamp(30px,4vw,44px); font-weight:800; letter-spacing:-0.02em; margin:0 0 16px 0; line-height:1.1;">{{ t.funeral_heading }}</h1>
+      <p style="font-size:17px; line-height:1.7; color:#cddaf0; margin:0; max-width:680px;">{{ t.funeral_hero_paragraph }}</p>
+    </div>
+  </section>
+
+  <!-- NOTICE -->
+  <div style="background:#eaf1fe; border-bottom:1px solid #d7e4fb;">
+    <div style="max-width:900px; margin:0 auto; padding:16px clamp(20px,4vw,32px); font-size:14px; line-height:1.6; color:#2354a6;">
+{{ t.funeral_notice }}
+    </div>
+  </div>
+
+  <!-- LIABILITY DISCLAIMER -->
+  <section style="max-width:900px; margin:0 auto; padding:clamp(32px,5vw,48px) clamp(20px,4vw,32px) 0;">
+    <div style="border:1.5px solid #2f6fed; border-radius:12px; padding:24px 26px; background:#fffdf7;">
+      <h2 style="margin:0 0 12px 0; font-size:17px; font-weight:800; color:#0b1524;">{{ t.disclaimer_heading }}</h2>
+      <p style="font-size:13.5px; line-height:1.75; color:#4a5049; margin:0 0 12px 0;">{{ t.disclaimer_p1 }}</p>
+      <p style="font-size:13.5px; line-height:1.75; color:#4a5049; margin:0 0 12px 0;">{{ t.disclaimer_p2 }}</p>
+      <p style="font-size:13.5px; line-height:1.75; color:#4a5049; margin:0 0 12px 0;">{{ t.disclaimer_p3 }}</p>
+      <p style="font-size:13.5px; line-height:1.75; color:#4a5049; margin:0;">{{ t.disclaimer_p4 }}</p>
+    </div>
+  </section>
+
+  <!-- SUMMARY CARDS -->
+  <section style="max-width:900px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px) 0;">
+    <div data-g3 style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px;">
+      <div style="border:1px solid #e2e5ea; border-radius:12px; padding:20px; background:#fff;">
+        <div style="font-size:26px; font-weight:800; color:#101d33;">{{ t.stat_amount }}</div>
+        <div style="font-size:13.5px; color:#6b7280; margin-top:4px;">{{ t.stat_amount_label }}</div>
+      </div>
+      <div style="border:1px solid #e2e5ea; border-radius:12px; padding:20px; background:#fff;">
+        <div style="font-size:26px; font-weight:800; color:#101d33;">{{ t.stat_wait }}</div>
+        <div style="font-size:13.5px; color:#6b7280; margin-top:4px;">{{ t.stat_wait_label }}</div>
+      </div>
+      <div style="border:1px solid #e2e5ea; border-radius:12px; padding:20px; background:#fff;">
+        <div style="font-size:26px; font-weight:800; color:#101d33;">{{ t.stat_paid }}</div>
+        <div style="font-size:13.5px; color:#6b7280; margin-top:4px;">{{ t.stat_paid_label }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POLICY SECTIONS -->
+  <section style="max-width:900px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px);">
+    <sc-for list="{{ policySections }}" as="sec" hint-placeholder-count="6">
+      <div style="display:grid; grid-template-columns:56px 1fr; gap:20px; padding:22px 0; border-top:1px solid #e2e5ea;">
+        <div style="font-size:22px; font-weight:800; color:#2f6fed;">{{ sec.number }}</div>
+        <div>
+          <h2 style="margin:0 0 12px 0; font-size:20px; font-weight:700; color:#0b1524;">{{ sec.title }}</h2>
+          <sc-for list="{{ sec.points }}" as="pt" hint-placeholder-count="2">
+            <p style="font-size:15.5px; line-height:1.75; color:#384152; margin:0 0 10px 0;">{{ pt }}</p>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </section>
+
+  <!-- MEMBERSHIP CTA -->
+  <section style="background:#101d33; color:#eef2f8;">
+    <div style="max-width:900px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px); text-align:center;">
+      <h2 style="margin:0 0 12px 0; font-size:22px; font-weight:800; letter-spacing:-0.02em;">{{ t.not_member_heading }}</h2>
+      <p style="font-size:15.5px; line-height:1.7; color:#cddaf0; margin:0 0 24px 0; max-width:560px; margin-left:auto; margin-right:auto;">{{ t.not_member_paragraph }}</p>
+      <a href="Membership.dc.html" style="display:inline-block; background:#2f6fed; color:#ffffff; font-weight:700; font-size:15px; padding:13px 28px; border-radius:8px;" style-hover="background:#1d54c4;">{{ t.btn_become_member }}</a>
+    </div>
+  </section>
+
+  <!-- CLAIM CHECKLIST -->
+  <section style="background:#ffffff; border-top:1px solid #e2e5ea; border-bottom:1px solid #e2e5ea;">
+    <div style="max-width:900px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px);">
+      <h2 style="margin:0 0 8px 0; font-size:21px; font-weight:700; color:#0b1524;">{{ t.checklist_heading }}</h2>
+      <p style="font-size:15px; color:#6b7280; margin:0 0 20px 0;">{{ t.checklist_paragraph }}</p>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#2354a6; font-weight:800;">✓</span><span style="font-size:15px; color:#384152;">{{ t.checklist_1 }}</span></div>
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#2354a6; font-weight:800;">✓</span><span style="font-size:15px; color:#384152;">{{ t.checklist_2 }}</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT CTA -->
+  <section style="max-width:900px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px); text-align:center;">
+    <h2 style="margin:0 0 12px 0; font-size:22px; font-weight:700; color:#0b1524;">{{ t.funeral_questions_heading }}</h2>
+    <p style="font-size:15.5px; color:#384152; margin:0 0 24px 0;">{{ t.funeral_questions_paragraph }}</p>
+    <a href="About Us.dc.html#contact" style="display:inline-block; background:#2f6fed; color:#ffffff; font-weight:700; font-size:15px; padding:13px 26px; border-radius:8px;" style-hover="background:#1d54c4;">{{ t.contact_bmcc }}</a>
+  </section>
+
+  <dc-import name="Site Footer" hint-size="100%,300">
+  </dc-import>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const EN_DEFAULT = {
+  funeral_eyebrow: 'Member Benefit', funeral_heading: 'Funeral Services Benefit Policy',
+  funeral_hero_paragraph: 'A voluntary community benevolence program, funded through membership dues, that helps cover funeral and burial costs for members and their households.',
+  funeral_notice: "Please note: this benefit is a voluntary community benevolence program partially funded through membership dues. It is not an insurance policy and is not underwritten by a licensed insurer.",
+  disclaimer_heading: 'Please Read: Liability Disclaimer',
+  disclaimer_p1: 'The Funeral Services Benefit is a voluntary community benevolence program funded through member dues and offered at the sole discretion of the BMCC Board. It is not an insurance product, is not underwritten or guaranteed by any licensed insurer, and is not a contractual entitlement. Payment of the benefit is subject to available funds, verification of eligibility, and compliance with the terms described in this policy. BMCC reserves the right to modify, suspend, or discontinue this program at any time, with reasonable notice to members where practicable. BMCC, its Board, officers, and volunteers assume no legal liability for delays, denials, or changes to this benefit, and members should not rely on it as a substitute for independent life or funeral insurance. This page is provided for general informational purposes only and does not constitute legal, financial, or insurance advice.',
+  disclaimer_p2: "BMCC is not responsible for, and will not reimburse, any funeral or burial costs incurred prior to a member's enrollment date. Coverage applies only to deaths occurring after the membership start date and any applicable waiting period.",
+  disclaimer_p3: 'This benefit is available only to active BMCC members in good standing and to the household/dependent family members explicitly listed on that member\'s membership application. Any individual not listed on the household record is not covered, even if related to the member.',
+  disclaimer_p4: 'This benefit is offered as part of membership only for as long as the program remains valid and active. BMCC may modify, suspend, or discontinue the Funeral Services Benefit at any time, and will make reasonable efforts to notify members in advance if this occurs.',
+  stat_amount: '$10,000', stat_amount_label: 'Maximum benefit per household', stat_wait: '6 months', stat_wait_label: 'Waiting period after enrollment', stat_paid: 'Paid direct', stat_paid_label: 'To the funeral home or vendor',
+  ps_1_title: 'Eligibility & Waiting Period',
+  ps_1_p1: 'Coverage begins 6 months after a membership application is processed and the first payment is received.',
+  ps_1_p2: 'Only individuals listed on the membership application (the primary member and household dependents) are eligible.',
+  ps_1_p3: "The member's dues must be current (see Grace Period below) at the time of death for the benefit to apply.",
+  ps_2_title: 'Coverage Amount', ps_2_p1: 'BMCC will contribute up to $10,000 total per membership/household, shared across everyone listed on that membership.',
+  ps_3_title: 'Membership Dues & Grace Period', ps_3_p1: 'Coverage requires active, paid membership.', ps_3_p2: 'If a payment is missed, a 30-day grace period applies from the due date before coverage pauses.',
+  ps_3_p3: 'Coverage resumes once payment is brought current; the grace period does not extend the benefit amount or waive the original 6-month waiting period for new members.',
+  ps_4_title: 'How the Benefit Is Paid', ps_4_p1: "BMCC pays the funeral home or vendor directly, up to $10,000, based on the vendor's invoice or estimate.",
+  ps_4_p2: 'BMCC does not reimburse cash already paid by the family; the family should contact BMCC before finalizing funeral arrangements so payment can be coordinated directly with the vendor.',
+  ps_5_title: 'How to File a Claim', ps_5_p1: 'To request the benefit, the family or next of kin should contact the BMCC office / membership coordinator as soon as possible after the death, with a Membership ID or full name on the application, and a funeral home invoice or cost estimate.',
+  ps_6_title: 'Limitations', ps_6_p1: 'The benefit applies only to the funeral/burial costs of individuals listed on the membership at the time of death.',
+  ps_6_p2: 'BMCC reserves the right to request documentation to verify eligibility before releasing payment.', ps_6_p3: 'This policy may be amended by the BMCC Board; members will be notified of material changes.',
+  not_member_heading: 'Not a member yet?', not_member_paragraph: 'This $10,000 Funeral Services Benefit is included automatically with BMCC membership — for $100/month or $1,000/year. Join today to protect your household.',
+  btn_become_member: 'Become a Member',
+  checklist_heading: "What you'll need to file a claim", checklist_paragraph: 'Contact the BMCC office or membership coordinator as soon as possible after the death.',
+  checklist_1: "Membership ID (found on the member's original membership form), or full name on the membership application", checklist_2: 'Funeral home invoice or cost estimate',
+  funeral_questions_heading: 'Questions about this benefit?', funeral_questions_paragraph: "Contact the BMCC Funeral Services team — we're here to help members and families navigate this program.", contact_bmcc: 'Contact BMCC'
+};
+class Component extends DCLogic {
+  state = { lang: 'en', i18n: EN_DEFAULT };
+  componentDidMount() {
+    import('./i18n.js').then(m => {
+      this.i18nMod = m;
+      const lang = m.getLang();
+      if (lang !== 'en') this.setState({ lang, i18n: { ...EN_DEFAULT, ...m.t(lang) } });
+    });
+  }
+  renderVals() {
+    const t = this.state.i18n;
+    const dir = (this.i18nMod && this.i18nMod.isRTL(this.state.lang)) ? 'rtl' : 'ltr';
+    const policySections = [
+      { number: '1', title: t.ps_1_title, points: [t.ps_1_p1, t.ps_1_p2, t.ps_1_p3] },
+      { number: '2', title: t.ps_2_title, points: [t.ps_2_p1] },
+      { number: '3', title: t.ps_3_title, points: [t.ps_3_p1, t.ps_3_p2, t.ps_3_p3] },
+      { number: '4', title: t.ps_4_title, points: [t.ps_4_p1, t.ps_4_p2] },
+      { number: '5', title: t.ps_5_title, points: [t.ps_5_p1] },
+      { number: '6', title: t.ps_6_title, points: [t.ps_6_p1, t.ps_6_p2, t.ps_6_p3] }
+    ];
+    return { t, dir, policySections };
+  }
+}
+</script>
+</body>
+</html>

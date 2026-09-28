@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  @media (max-width: 900px) {
+    [data-g2] { grid-template-columns: 1fr !important; }
+    [data-g3] { grid-template-columns: 1fr !important; }
+    [data-g4a] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g4b] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g5] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-table-scroll] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+    [data-table-min] { min-width: 720px !important; }
+  }
+  @media (max-width: 620px) {
+    [data-g4a] { grid-template-columns: 1fr !important; }
+    [data-g5] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 480px) {
+    [data-table-compact] { font-size: 12.5px !important; padding: 10px 12px !important; }
+  }
+</style>
+</helmet>
+<div dir="{{ dir }}" style="font-family: Inter, ui-sans-serif, system-ui, sans-serif;">
+  <footer style="background:#0b1524; color:#b7c0cc;">
+    <div style="max-width:1180px; margin:0 auto; padding:44px clamp(20px,4vw,32px) 24px; display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr 1fr; gap:28px;" data-g5>
+      <div>
+        <div style="margin-bottom:14px;">
+          <img src="assets/bmcc-logo.jpeg" alt="Brentwood Muslim Community Center" style="height:44px; width:auto; object-fit:contain; background:#fff; border-radius:6px; padding:4px 8px;" />
+        </div>
+        <p style="font-size:13.5px; line-height:1.7; max-width:230px; margin:0;">{{ t.footer_tagline }}</p>
+      </div>
+      <div>
+        <div style="font-weight:700; color:#eef2f8; font-size:13.5px; margin-bottom:14px;">{{ t.footer_programs }}</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px;">
+          <a href="https://hikmahschool.com/" target="_blank" rel="noopener" style="color:#b7c0cc;">{{ t.nav_hikmah }}</a>
+          <a href="Events.dc.html" style="color:#b7c0cc;">{{ t.nav_events }}</a>
+          <a href="Community.dc.html" style="color:#b7c0cc;">{{ t.nav_community }}</a>
+          <a href="Prayer Times.dc.html" style="color:#b7c0cc;">{{ t.nav_prayer }}</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:700; color:#eef2f8; font-size:13.5px; margin-bottom:14px;">{{ t.footer_services }}</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px;">
+          <a href="Services.dc.html" style="color:#b7c0cc;">{{ t.footer_all_services }}</a>
+          <a href="Funeral Services.dc.html" style="color:#b7c0cc;">{{ t.nav_funeral }}</a>
+          <a href="Assistance.dc.html" style="color:#b7c0cc;">{{ t.footer_assistance }}</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:700; color:#eef2f8; font-size:13.5px; margin-bottom:14px;">{{ t.footer_about }}</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px;">
+          <a href="About Us.dc.html" style="color:#b7c0cc;">{{ t.footer_about_us }}</a>
+          <a href="Membership.dc.html" style="color:#b7c0cc;">{{ t.footer_become_member }}</a>
+          <a href="Donate.dc.html" style="color:#b7c0cc;">{{ t.footer_ways_to_give }}</a>
+          <a href="About Us.dc.html#contact" style="color:#b7c0cc;">{{ t.footer_contact_us }}</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:700; color:#eef2f8; font-size:13.5px; margin-bottom:14px;">{{ t.footer_contact }}</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px;">
+          <span>7701 Lone Tree Way, Brentwood, CA</span>
+          <span>925-298-BMCC (2622)</span>
+          <span>info@brmcc.org</span>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #1c2c40; text-align:center; padding:18px; font-size:12.5px; color:#7d8794;">{{ t.footer_rights }}</div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1180, &quot;height&quot;: 300}}">const EN_DEFAULT = {
+  footer_tagline: 'Brentwood Muslim Community Center — serving the local Muslim community through worship, education, and mutual support.',
+  footer_programs: 'Programs', footer_services: 'Services', footer_about: 'About', footer_contact: 'Contact',
+  footer_all_services: 'All Services', footer_assistance: 'Assistance', footer_about_us: 'About Us', footer_become_member: 'Become a Member',
+  footer_ways_to_give: 'Ways to Give', footer_contact_us: 'Contact Us', footer_rights: '© 2026 Brentwood Muslim Community Center. All rights reserved.',
+  nav_hikmah: 'Hikmah School', nav_events: 'Events & Calendar', nav_community: 'Community Directory', nav_prayer: 'Prayer Times', nav_funeral: 'Funeral Services Benefit'
+};
+
+class Component extends DCLogic {
+  state = { lang: 'en', i18n: EN_DEFAULT };
+  componentDidMount() {
+    import('./i18n.js').then(m => {
+      this.i18nMod = m;
+      const lang = m.getLang();
+      this.setState({ lang, i18n: { ...EN_DEFAULT, ...m.t(lang) } });
+    });
+  }
+  renderVals() {
+    const dir = (this.i18nMod && this.i18nMod.isRTL(this.state.lang)) ? 'rtl' : 'ltr';
+    return { t: this.state.i18n || {}, dir };
+  }
+}</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+.card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--white);
+  box-shadow: var(--shadow-card);
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+}
+.head {
+  background: var(--navy);
+  color: #eef2f8;
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 12px 20px;
+}
+.row {
+  padding: 13px 20px;
+  font-size: 15px;
+  border-top: 1px solid #f0eee5;
+  color: var(--body);
+}
+.name {
+  font-weight: 600;
+  color: var(--ink);
+}
+.note {
+  padding: 12px 20px;
+  font-size: 12.5px;
+  color: var(--subtle);
+  font-family: ui-monospace, Menlo, monospace;
+  border-top: 1px solid #f0eee5;
+}
+@media (max-width: 480px) {
+  .head,
+  .row {
+    font-size: 12.5px;
+    padding: 10px 12px;
+  }
+}

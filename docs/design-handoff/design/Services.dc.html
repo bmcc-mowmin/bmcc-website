@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#101d33">
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="600" cy="360" r="180" fill="none" stroke="#eef2f8" stroke-width="24"/>
+  <text x="600" y="620" font-family="sans-serif" font-size="90" font-weight="700" fill="#eef2f8" text-anchor="middle">BMCC</text>
+</svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f6f7f9; }
+  * { box-sizing: border-box; }
+  a { color: #101d33; text-decoration: none; }
+  a:hover { color: #2f6fed; }
+
+  @media (max-width: 900px) {
+    [data-g2] { grid-template-columns: 1fr !important; }
+    [data-g3] { grid-template-columns: 1fr !important; }
+    [data-g4a] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g4b] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g5] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-table-scroll] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+    [data-table-min] { min-width: 720px !important; }
+  }
+  @media (max-width: 620px) {
+    [data-g4a] { grid-template-columns: 1fr !important; }
+    [data-g5] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 480px) {
+    [data-table-compact] { font-size: 12.5px !important; padding: 10px 12px !important; }
+  }
+</style>
+</helmet>
+
+<div dir="{{ dir }}" style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #101828; background: #f6f7f9; min-height: 100vh;">
+
+  <dc-import name="Site Header" current="services" hint-size="100%,110">
+  </dc-import>
+
+  <section style="max-width:1180px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px);">
+    <div style="max-width:640px; margin-bottom:22px;">
+      <div style="text-transform:uppercase; letter-spacing:0.12em; font-size:13px; font-weight:700; color:#2354a6; margin-bottom:12px;">{{ t.services_eyebrow }}</div>
+      <h1 style="font-size:clamp(28px,3.6vw,42px); font-weight:800; letter-spacing:-0.02em; margin:0 0 10px 0; color:#0b1524;">{{ t.services_heading }}</h1>
+      <p style="font-size:16.5px; line-height:1.7; color:#384152; margin:0;">{{ t.services_paragraph }}</p>
+    </div>
+    <div data-g2 style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px;">
+      <sc-for list="{{ services }}" as="s" hint-placeholder-count="8">
+        <div style="border:1px solid #e2e5ea; border-radius:12px; background:#fff; overflow:hidden;">
+          <button onClick="{{ s.toggle }}" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; font-family:inherit; padding:22px; display:flex; flex-direction:column; gap:8px;">
+            <span style="font-size:22px;">{{ s.icon }}</span>
+            <span style="font-weight:700; font-size:15.5px; color:#0b1524; display:flex; justify-content:space-between; align-items:center;">{{ s.title }} <span style="font-size:12px; color:#98a2b3;">{{ s.toggleLabel }}</span></span>
+            <span style="font-size:13.5px; color:#6b7280; line-height:1.5;">{{ s.description }}</span>
+          </button>
+          <sc-if value="{{ s.expanded }}">
+            <div style="padding:0 22px 22px 22px; border-top:1px solid #f0eee5; margin-top:-1px;">
+              <p style="font-size:14px; line-height:1.7; color:#384152; margin:16px 0;">{{ s.detail }}</p>
+              <a href="{{ s.href }}" target="{{ s.linkTarget }}" rel="{{ s.linkRel }}" style="font-weight:700; font-size:13.5px; color:#101d33;">{{ s.cta }} →</a>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <dc-import name="Site Footer" hint-size="100%,300">
+  </dc-import>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const EN_DEFAULT = {
+  services_eyebrow: 'Services', services_heading: 'Religious & Community Services', services_paragraph: "Our imams and volunteers support the community through life's major milestones and everyday questions.",
+  svc_dua_title: "Du'a Request", svc_dua_desc: "Submit a personal prayer request for our community to make du'a for you.", svc_dua_detail: "Submit a personal prayer request through our office or contact form, and our community will make du'a for you and your family — for health, ease, or any need on your heart.", svc_dua_cta: 'Submit a request',
+  svc_counseling_title: 'Mental Health Counseling', svc_counseling_desc: 'Confidential counseling support for emotional and family wellbeing.', svc_counseling_detail: 'Confidential counseling referrals for individuals and families navigating stress, grief, or relationship challenges, in coordination with licensed professionals.', svc_counseling_cta: 'Contact the office',
+  svc_imam_title: 'Ask an Imam', svc_imam_desc: "Get answers to your fiqh and religious questions from our imams.", svc_imam_detail: 'Submit your fiqh or personal questions and receive guidance from our imams, privately or during posted office hours.', svc_imam_cta: 'Ask a question',
+  svc_immigration_title: 'Immigration Assistance', svc_immigration_desc: 'Guidance and referrals for immigration-related legal questions.', svc_immigration_detail: 'Referrals and guidance for immigration-related questions, connecting members with trusted local legal resources.', svc_immigration_cta: 'Request a referral',
+  svc_nikah_title: 'Nikah Marriage Services', svc_nikah_desc: 'Officiating Nikah ceremonies and pre-marriage guidance.', svc_nikah_detail: "Our imams officiate Nikah ceremonies and offer pre-marital guidance for couples preparing for marriage.", svc_nikah_cta: 'Schedule a Nikah',
+  svc_divorce_title: 'Islamic Divorce Services', svc_divorce_desc: 'Compassionate, Sharia-compliant separation support.', svc_divorce_detail: 'Compassionate, Sharia-compliant guidance and documentation support for members going through separation.', svc_divorce_cta: 'Request support',
+  svc_facility_title: 'Facility Rental', svc_facility_desc: 'Rent our facility for weddings, gatherings, and community events.', svc_facility_detail: "Rent BMCC's hall and classrooms for weddings, aqiqahs, and community gatherings. Contact the office for availability and pricing.", svc_facility_cta: 'Check availability',
+  svc_funeral_title: 'Funeral Services Benefit', svc_funeral_desc: 'Up to $10,000 household funeral & burial benefit for members.', svc_funeral_detail: "A membership benefit providing up to $10,000 toward funeral and burial costs for the primary member's household, paid directly to the funeral home.", svc_funeral_cta: 'View full policy',
+  more_label: 'More ▾', less_label: 'Less ▴'
+};
+class Component extends DCLogic {
+  state = { expandedId: null, lang: 'en', i18n: EN_DEFAULT };
+  componentDidMount() {
+    import('./i18n.js').then(m => {
+      this.i18nMod = m;
+      const lang = m.getLang();
+      if (lang !== 'en') this.setState({ lang, i18n: { ...EN_DEFAULT, ...m.t(lang) } });
+    });
+  }
+  toggle = (id) => this.setState(s => ({ expandedId: s.expandedId === id ? null : id }));
+
+  renderVals() {
+    const t = this.state.i18n;
+    const dir = (this.i18nMod && this.i18nMod.isRTL(this.state.lang)) ? 'rtl' : 'ltr';
+    const data = [
+      { id: 'dua', title: t.svc_dua_title, icon: '🤲', description: t.svc_dua_desc, detail: t.svc_dua_detail, href: 'About Us.dc.html#contact', cta: t.svc_dua_cta },
+      { id: 'counseling', title: t.svc_counseling_title, icon: '◐', description: t.svc_counseling_desc, detail: t.svc_counseling_detail, href: 'About Us.dc.html#contact', cta: t.svc_counseling_cta },
+      { id: 'imam', title: t.svc_imam_title, icon: '✎', description: t.svc_imam_desc, detail: t.svc_imam_detail, href: 'About Us.dc.html#contact', cta: t.svc_imam_cta },
+      { id: 'immigration', title: t.svc_immigration_title, icon: '◈', description: t.svc_immigration_desc, detail: t.svc_immigration_detail, href: 'About Us.dc.html#contact', cta: t.svc_immigration_cta },
+      { id: 'nikah', title: t.svc_nikah_title, icon: '❖', description: t.svc_nikah_desc, detail: t.svc_nikah_detail, href: 'About Us.dc.html#contact', cta: t.svc_nikah_cta },
+      { id: 'divorce', title: t.svc_divorce_title, icon: '◇', description: t.svc_divorce_desc, detail: t.svc_divorce_detail, href: 'About Us.dc.html#contact', cta: t.svc_divorce_cta },
+      { id: 'facility', title: t.svc_facility_title, icon: '⌂', description: t.svc_facility_desc, detail: t.svc_facility_detail, href: 'About Us.dc.html#contact', cta: t.svc_facility_cta },
+      { id: 'funeral', title: t.svc_funeral_title, icon: '✦', description: t.svc_funeral_desc, detail: t.svc_funeral_detail, href: 'Funeral Services.dc.html', cta: t.svc_funeral_cta }
+    ];
+    const services = data.map(s => ({
+      ...s,
+      toggle: () => this.toggle(s.id),
+      expanded: this.state.expandedId === s.id,
+      toggleLabel: this.state.expandedId === s.id ? t.less_label : t.more_label,
+      linkTarget: s.external ? '_blank' : undefined,
+      linkRel: s.external ? 'noopener' : undefined
+    }));
+    return { t, dir, services };
+  }
+}
+</script>
+</body>
+</html>

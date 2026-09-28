@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#101d33">
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="600" cy="360" r="180" fill="none" stroke="#eef2f8" stroke-width="24"/>
+  <text x="600" y="620" font-family="sans-serif" font-size="90" font-weight="700" fill="#eef2f8" text-anchor="middle">BMCC</text>
+</svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f6f7f9; }
+  * { box-sizing: border-box; }
+  a { color: #101d33; text-decoration: none; }
+  a:hover { color: #2f6fed; }
+
+  @media (max-width: 900px) {
+    [data-g2] { grid-template-columns: 1fr !important; }
+    [data-g3] { grid-template-columns: 1fr !important; }
+    [data-g4a] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g4b] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g5] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-table-scroll] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+    [data-table-min] { min-width: 720px !important; }
+  }
+  @media (max-width: 620px) {
+    [data-g4a] { grid-template-columns: 1fr !important; }
+    [data-g5] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 480px) {
+    [data-table-compact] { font-size: 12.5px !important; padding: 10px 12px !important; }
+  }
+</style>
+</helmet>
+
+<div dir="{{ dir }}" style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #101828; background: #f6f7f9; min-height: 100vh;">
+
+  <dc-import name="Site Header" current="donate" hint-size="100%,110">
+  </dc-import>
+
+  <section style="max-width:1180px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px);">
+    <div style="max-width:640px; margin-bottom:22px;">
+      <div style="text-transform:uppercase; letter-spacing:0.12em; font-size:13px; font-weight:700; color:#2354a6; margin-bottom:12px;">{{ t.donate_eyebrow }}</div>
+      <h1 style="font-size:clamp(28px,3.6vw,42px); font-weight:800; letter-spacing:-0.02em; margin:0 0 14px 0; color:#0b1524;">{{ t.donate_heading }}</h1>
+      <p style="font-size:16.5px; line-height:1.7; color:#384152; margin:0;">{{ t.donate_paragraph }}</p>
+    </div>
+    <div data-g2 style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:28px;">
+      <div style="border:1px solid #e2e5ea; border-radius:14px; padding:30px;">
+        <h3 style="margin:0 0 6px 0; font-size:19px; font-weight:700; color:#0b1524;">{{ t.donate_make_title }}</h3>
+        <p style="font-size:14.5px; color:#6b7280; margin:0 0 20px 0;">{{ t.donate_make_sub }}</p>
+
+        <div style="margin-bottom:20px;">
+          <div style="font-size:13px; font-weight:700; color:#384152; margin-bottom:10px;">{{ t.donate_choose_fund }}</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <sc-for list="{{ funds }}" as="f" hint-placeholder-count="5">
+              <button onClick="{{ f.select }}" style="text-align:left; cursor:pointer; font-family:inherit; border-radius:10px; padding:12px 14px; border:1.5px solid {{ f.borderColor }}; background:{{ f.bg }}; display:flex; flex-direction:column; gap:2px;">
+                <span style="font-weight:700; font-size:14.5px; color:#0b1524;">{{ f.name }}</span>
+                <span style="font-size:13px; color:#6b7280; line-height:1.5;">{{ f.description }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex; background:#eaf1fe; border-radius:9px; padding:4px; margin-bottom:18px; width:fit-content;">
+          <button onClick="{{ setOneTime }}" style="border:none; font-family:inherit; font-weight:700; font-size:13.5px; padding:9px 18px; border-radius:7px; cursor:pointer; background:{{ oneTimeBg }}; color:{{ oneTimeColor }};">{{ t.donate_one_time }}</button>
+          <button onClick="{{ setMonthly }}" style="border:none; font-family:inherit; font-weight:700; font-size:13.5px; padding:9px 18px; border-radius:7px; cursor:pointer; background:{{ monthlyBg }}; color:{{ monthlyColor }};">{{ t.donate_monthly }}</button>
+        </div>
+        <div data-g4b style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:18px;">
+          <sc-for list="{{ donationAmounts }}" as="amt" hint-placeholder-count="4">
+            <button onClick="{{ amt.select }}" style="border:1.5px solid {{ amt.borderColor }}; background:{{ amt.bg }}; color:{{ amt.color }}; font-weight:700; font-family:inherit; font-size:15px; padding:12px 0; border-radius:8px; cursor:pointer;">${{ amt.value }}</button>
+          </sc-for>
+        </div>
+        <a href="#" style="display:block; text-align:center; background:#2f6fed; color:#ffffff; font-weight:700; font-size:15px; padding:13px 0; border-radius:8px;" style-hover="background:#1d54c4;">{{ t.donate_button_prefix }} ${{ donationAmount }} {{ donationSuffix }} {{ t.donate_button_to }} {{ selectedFundName }} →</a>
+        <p style="font-size:12.5px; color:#98a2b3; margin:14px 0 0 0;">{{ t.donate_receipts_note }}</p>
+      </div>
+      <div style="border:1px solid #e2e5ea; border-radius:14px; padding:30px;">
+        <h3 style="margin:0 0 6px 0; font-size:19px; font-weight:700; color:#0b1524;">{{ t.donate_join_title }}</h3>
+        <p style="font-size:14.5px; color:#6b7280; margin:0 0 18px 0;">{{ t.donate_join_sub_prefix }} <a href="Funeral Services.dc.html" style="font-weight:700;">{{ t.donate_join_sub_link }}</a>.</p>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:22px;">
+          <sc-for list="{{ memberBenefits }}" as="b" hint-placeholder-count="6">
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="color:#2354a6; font-weight:800; margin-top:1px;">✓</span>
+              <span style="font-size:14.5px; color:#384152; line-height:1.5;">{{ b.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <a href="Membership.dc.html" style="display:block; text-align:center; background:transparent; border:1.5px solid #101d33; color:#101d33; font-weight:700; font-size:15px; padding:12.5px 0; border-radius:8px;" style-hover="background:#f2f0e8;">Become a Member</a>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="Site Footer" hint-size="100%,300">
+  </dc-import>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultDonationFrequency&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;monthly&quot;, &quot;options&quot;: [&quot;monthly&quot;, &quot;one-time&quot;], &quot;tsType&quot;: &quot;string&quot;}, &quot;goldAccent&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#2f6fed&quot;, &quot;options&quot;: [&quot;#2f6fed&quot;, &quot;#1d54c4&quot;, &quot;#d4af37&quot;, &quot;#2354a6&quot;], &quot;tsType&quot;: &quot;string&quot;}}">
+const EN_DEFAULT = {
+  donate_eyebrow: 'Give & Join', donate_heading: 'Support BMCC',
+  donate_paragraph: 'Your donations and membership dues sustain the masjid, the Hikmah School, and every community program we run — from Friday khutbahs to Saturday food drives.',
+  donate_make_title: 'Make a Donation', donate_make_sub: 'One-time or recurring — secured by Stripe.', donate_choose_fund: 'Choose a fund',
+  donate_one_time: 'One-time', donate_monthly: 'Monthly', donate_receipts_note: 'Receipts are generated automatically and available anytime from your member portal.',
+  donate_button_prefix: 'Donate', donate_button_to: 'to',
+  donate_join_title: 'Become a Member', donate_join_sub_prefix: '$100/month or $1,000/year (save $200). Membership sustains our long-term programs and comes with real benefits, including the',
+  donate_join_sub_link: 'Funeral Services Benefit', btn_become_member: 'Become a Member',
+  fund_new_bmcc: 'Help Us Build New BMCC', fund_new_bmcc_desc: 'Help us build a new masjid on our 8.16-acre land.',
+  fund_membership: 'Masjid Membership', fund_membership_desc: 'Sustain daily operations and receive membership benefits like reduced school tuition and the Funeral Services Benefit.',
+  fund_construct: 'Construct & Run the Masjid', fund_construct_desc: 'Support our long-term goal of a bigger, better masjid for our growing community.',
+  fund_sadaqah: 'Sadaqah / Zakat-ul-Maal', fund_sadaqah_desc: 'Help care for those in need in our community and beyond, and fulfill your Islamic obligation.',
+  fund_zakat_fitr: 'Zakat-ul-Fitr', fund_zakat_fitr_desc: 'Fulfill your Zakat-ul-Fitr obligation and help those in need before Eid.',
+  benefit1: 'Up to $10,000 Funeral Services Benefit for your household', benefit2: 'Discounted Hikmah School tuition for your children',
+  benefit3: 'Priority booking for community events and rentals', benefit4: 'Voting rights at the BMCC annual general meeting',
+  benefit5: 'Automatic tax receipts for all contributions', benefit6: 'Free listing on the Community Support directory'
+};
+
+class Component extends DCLogic {
+  state = { donationFrequency: null, donationAmount: 50, selectedFundId: 'masjid-membership', lang: 'en', i18n: EN_DEFAULT };
+  componentDidMount() {
+    import('./i18n.js').then(m => {
+      this.i18nMod = m;
+      const lang = m.getLang();
+      if (lang !== 'en') this.setState({ lang, i18n: { ...EN_DEFAULT, ...m.t(lang) } });
+    });
+  }
+  setOneTime = () => this.setState({ donationFrequency: 'one-time' });
+  setMonthly = () => this.setState({ donationFrequency: 'monthly' });
+  selectFund = (id) => this.setState({ selectedFundId: id });
+
+  renderVals() {
+    const t = this.state.i18n;
+    const dir = (this.i18nMod && this.i18nMod.isRTL(this.state.lang)) ? 'rtl' : 'ltr';
+    const fundsData = [
+      { id: 'new-bmcc', name: t.fund_new_bmcc, description: t.fund_new_bmcc_desc },
+      { id: 'masjid-membership', name: t.fund_membership, description: t.fund_membership_desc },
+      { id: 'construct-run', name: t.fund_construct, description: t.fund_construct_desc },
+      { id: 'sadaqah-zakat', name: t.fund_sadaqah, description: t.fund_sadaqah_desc },
+      { id: 'zakat-fitr', name: t.fund_zakat_fitr, description: t.fund_zakat_fitr_desc }
+    ];
+    const funds = fundsData.map(f => ({
+      ...f,
+      select: () => this.selectFund(f.id),
+      borderColor: this.state.selectedFundId === f.id ? '#101d33' : '#dbe1e8',
+      bg: this.state.selectedFundId === f.id ? '#f2f0e8' : '#fff'
+    }));
+    const selectedFundName = (fundsData.find(f => f.id === this.state.selectedFundId) || fundsData[0]).name;
+    const frequency = this.state.donationFrequency ?? (this.props.defaultDonationFrequency ?? 'monthly');
+    const isMonthly = frequency === 'monthly';
+    const donationValues = [25, 50, 100, 250];
+    const donationAmounts = donationValues.map(value => {
+      const selected = this.state.donationAmount === value;
+      return {
+        value,
+        select: () => this.setState({ donationAmount: value }),
+        bg: selected ? '#101d33' : '#fff',
+        color: selected ? '#eef2f8' : '#0b1524',
+        borderColor: selected ? '#101d33' : '#dbe1e8'
+      };
+    });
+    const memberBenefits = [
+      { text: t.benefit1 }, { text: t.benefit2 }, { text: t.benefit3 }, { text: t.benefit4 }, { text: t.benefit5 }, { text: t.benefit6 }
+    ];
+    return {
+      t, dir,
+      funds,
+      selectedFundName,
+      setOneTime: this.setOneTime,
+      setMonthly: this.setMonthly,
+      oneTimeBg: !isMonthly ? '#fff' : 'transparent',
+      oneTimeColor: !isMonthly ? '#0b1524' : '#6b7280',
+      monthlyBg: isMonthly ? '#fff' : 'transparent',
+      monthlyColor: isMonthly ? '#0b1524' : '#6b7280',
+      donationAmounts,
+      donationAmount: this.state.donationAmount,
+      donationSuffix: isMonthly ? '/mo' : 'now',
+      memberBenefits
+    };
+  }
+}
+</script>
+</body>
+</html>

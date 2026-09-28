@@ -1,0 +1,15 @@
+node_modules
+.next
+.next-build
+.git
+.env
+.env.*
+!.env.example
+uploads
+.data
+test-results
+playwright-report
+docs
+src/generated
+.claude
+*.log

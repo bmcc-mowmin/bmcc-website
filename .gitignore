@@ -1,0 +1,45 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# generated Prisma client (rebuilt by `prisma generate`)
+/src/generated/
+
+# environment — only .env.example is committed
+.env
+.env.*
+!.env.example
+
+# local data: database volume, uploads, real (non-sample) seed data
+/.data/
+/uploads/
+/prisma/seed-data/private/
+
+# testing
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# logs & OS
+npm-debug.log*
+*.log
+.DS_Store
+*.pem
+
+# editor / agent tooling
+.vercel
+.idea
+.vscode
+
+# local tooling config (machine-specific paths)
+/.claude/

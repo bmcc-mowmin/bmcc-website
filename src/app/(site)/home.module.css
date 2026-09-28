@@ -1,0 +1,297 @@
+/* ── Hero: heading → table → buttons → paragraph when stacked (≤900px) ── */
+.hero {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: clamp(36px, 5vw, 60px) var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  grid-template-areas:
+    ". table"
+    "heading table"
+    "para table"
+    "buttons table"
+    ". table";
+  grid-template-rows: 1fr auto auto auto 1fr;
+  column-gap: 56px;
+  row-gap: 20px;
+  align-items: start;
+}
+.heroHeading {
+  grid-area: heading;
+}
+.heroEyebrow {
+  margin-bottom: 16px;
+}
+.heroH1 {
+  font-size: clamp(32px, 4.2vw, 52px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ink);
+}
+.heroTable {
+  grid-area: table;
+}
+.heroButtons {
+  grid-area: buttons;
+  display: flex;
+  gap: 14px;
+  flex-wrap: nowrap;
+  align-self: start;
+  margin-top: 6px;
+}
+.heroBtn {
+  font-weight: 700;
+  font-size: 15.5px;
+  padding: 14px 20px;
+  border-radius: 9px;
+  white-space: nowrap;
+}
+.heroBtnPrimary {
+  background: var(--primary);
+  color: var(--white);
+}
+.heroBtnPrimary:hover {
+  background: var(--primary-hover);
+  color: var(--white);
+}
+.heroBtnOutline {
+  background: transparent;
+  color: var(--navy);
+  border: 1.5px solid var(--navy);
+}
+.heroBtnOutline:hover {
+  background: #f2f0e8;
+  color: var(--navy);
+}
+.heroPara {
+  grid-area: para;
+  align-self: start;
+}
+.heroPara p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--body);
+  max-width: 560px;
+  margin: 0;
+}
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    grid-template-areas: "heading" "table" "buttons" "para";
+    grid-template-rows: none;
+    gap: 20px;
+  }
+}
+@media (max-width: 420px) {
+  .heroBtn {
+    padding: 13px 14px;
+    font-size: 14px;
+  }
+}
+
+.h2 {
+  font-size: clamp(24px, 2.8vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ink);
+}
+
+/* ── Category tiles ── */
+.tilesBand {
+  background: var(--page);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.tile:hover {
+  background: #f7f4ee;
+  border-color: #dbe1e8;
+}
+.tileIcon {
+  font-size: 24px;
+}
+.tileTitle {
+  font-weight: 700;
+  font-size: 15.5px;
+  color: var(--navy);
+}
+.tileDesc {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.grow {
+  flex: 1;
+}
+
+/* ── Announcement strip ── */
+.strip {
+  background: var(--sky-100);
+  border-bottom: 1px solid var(--sky-200);
+}
+.stripInner {
+  padding-block: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--eyebrow);
+}
+.stripInner a {
+  color: var(--eyebrow);
+}
+.stripInner a:hover {
+  color: var(--primary);
+}
+
+/* ── Member portal ── */
+.portal {
+  background: var(--navy);
+  color: #eef2f8;
+  scroll-margin-top: 70px;
+}
+.portalGrid {
+  padding-block: clamp(40px, 5vw, 64px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .portalGrid {
+    grid-template-columns: 1fr;
+  }
+}
+.portalEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+.portalH2 {
+  font-size: clamp(26px, 3.2vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 16px 0;
+}
+.portalP {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #cddaf0;
+  margin: 0 0 20px 0;
+}
+.portalPoints {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.portalPoints li {
+  display: flex;
+  gap: 10px;
+  font-size: 14.5px;
+  color: #dce8e0;
+}
+.portalPoints li span:first-child {
+  color: var(--primary);
+  font-weight: 800;
+}
+.loginCard {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 30px;
+  color: var(--text);
+}
+.loginTitle {
+  margin: 0 0 18px 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+.loginFields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.loginInput {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  font-size: 14.5px;
+}
+.loginButton {
+  width: 100%;
+  background: var(--navy);
+  color: #eef2f8;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12.5px 0;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+.loginNew {
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.loginNew a {
+  color: var(--navy);
+  font-weight: 700;
+}
+
+/* ── Get involved ── */
+.g4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 900px) {
+  .g4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 620px) {
+  .g4 {
+    grid-template-columns: 1fr;
+  }
+}
+.involvedCard {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--white);
+}
+.involvedCard .tileIcon {
+  font-size: 22px;
+}
+.involvedCard .tileTitle {
+  color: var(--ink);
+}
+.involvedCta {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--navy);
+}
+:global([dir="rtl"]) .involvedCta span {
+  display: inline-block;
+  transform: scaleX(-1);
+}

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#101d33">
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="600" cy="360" r="180" fill="none" stroke="#eef2f8" stroke-width="24"/>
+  <text x="600" y="620" font-family="sans-serif" font-size="90" font-weight="700" fill="#eef2f8" text-anchor="middle">BMCC</text>
+</svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f6f7f9; }
+  * { box-sizing: border-box; }
+  a { color: #101d33; text-decoration: none; }
+  a:hover { color: #2f6fed; }
+
+  @media (max-width: 900px) {
+    [data-g2] { grid-template-columns: 1fr !important; }
+    [data-g3] { grid-template-columns: 1fr !important; }
+    [data-g4a] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g4b] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g5] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-table-scroll] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+    [data-table-min] { min-width: 720px !important; }
+  }
+  @media (max-width: 620px) {
+    [data-g4a] { grid-template-columns: 1fr !important; }
+    [data-g5] { grid-template-columns: 1fr !important; }
+  }
+  [data-mobile-cards] { display: none; }
+  @media (max-width: 700px) {
+    [data-desktop-table] { display: none !important; }
+    [data-mobile-cards] { display: flex !important; }
+  }
+  @media (max-width: 480px) {
+    [data-table-compact] { font-size: 12.5px !important; padding: 10px 12px !important; }
+  }
+</style>
+</helmet>
+
+<div dir="{{ dir }}" style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #101828; background: #f6f7f9; min-height: 100vh;">
+
+  <dc-import name="Site Header" current="community" hint-size="100%,110">
+  </dc-import>
+
+  <section style="max-width:1180px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px);">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:20px; margin-bottom:22px; flex-wrap:wrap;">
+      <div style="max-width:640px;">
+        <div style="text-transform:uppercase; letter-spacing:0.12em; font-size:13px; font-weight:700; color:#2354a6; margin-bottom:12px;">{{ t.community_eyebrow }}</div>
+        <h1 style="font-size:clamp(28px,3.6vw,42px); font-weight:800; letter-spacing:-0.02em; margin:0 0 10px 0; color:#0b1524;">{{ t.community_heading }}</h1>
+        <p style="font-size:16.5px; line-height:1.7; color:#384152; margin:0;">{{ t.community_paragraph }}</p>
+      </div>
+      <a href="#" style="font-weight:700; font-size:14.5px; color:#fff; white-space:nowrap; background:#2f6fed; padding:12px 22px; border-radius:8px;" style-hover="background:#1d54c4;">{{ t.submit_listing }}</a>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div style="background:#eaf1fe; border:1px solid #d7e4fb; border-radius:10px; padding:14px 18px; margin-bottom:20px; font-size:13px; line-height:1.65; color:#2354a6;">
+      <strong>{{ t.disclaimer_label }}</strong> {{ t.disclaimer_text }}
+    </div>
+
+    <!-- SEARCH & FILTERS -->
+    <div style="background:#fff; border:1px solid #e2e5ea; border-radius:14px; padding:20px 24px; margin-bottom:24px; display:flex; gap:14px; flex-wrap:wrap; align-items:center;">
+      <div style="position:relative; flex:1 1 240px; min-width:220px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#98a2b3" stroke-width="2.3" stroke-linecap="round" style="position:absolute; left:12px; top:50%; transform:translateY(-50%);"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.4" y2="16.4"></line></svg>
+        <input value="{{ searchQuery }}" onChange="{{ onSearchChange }}" placeholder="{{ t.search_directory }}" style="width:100%; padding:11px 14px 11px 36px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px;" />
+      </div>
+      <select value="{{ typeFilter }}" onChange="{{ onTypeChange }}" style="padding:11px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px; color:#101828; background:#fff;">
+        <sc-for list="{{ typeOptions }}" as="opt" hint-placeholder-count="4">
+          <option value="{{ opt.value }}">{{ opt.label }}</option>
+        </sc-for>
+      </select>
+      <select value="{{ categoryFilter }}" onChange="{{ onCategoryChange }}" style="padding:11px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px; color:#101828; background:#fff;">
+        <sc-for list="{{ categoryOptions }}" as="opt" hint-placeholder-count="8">
+          <option value="{{ opt.value }}">{{ opt.label }}</option>
+        </sc-for>
+      </select>
+      <sc-if value="{{ hasActiveFilters }}">
+        <button onClick="{{ clearFilters }}" style="background:none; border:none; font-family:inherit; font-weight:700; font-size:13.5px; color:#101d33; cursor:pointer; padding:8px 4px;">{{ t.clear_filters }}</button>
+      </sc-if>
+    </div>
+
+    <div style="font-size:13.5px; color:#6b7280; margin-bottom:12px;">{{ t.showing_label }} {{ resultCountLabel }} {{ t.of_label }} {{ totalCount }} {{ t.listings_label }}</div>
+
+    <!-- MOBILE CARDS -->
+    <div data-mobile-cards style="flex-direction:column; gap:12px;">
+      <sc-for list="{{ pageListings }}" as="c" hint-placeholder-count="4">
+        <div style="background:#fff; border:1px solid #e2e5ea; border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+            <div style="min-width:0;">
+              <div style="font-weight:800; color:#0b1524; font-size:16.5px; line-height:1.3;">{{ c.name }}</div>
+              <div style="font-size:14px; color:#6b7280; margin-top:3px;">{{ c.category }}</div>
+            </div>
+            <sc-if value="{{ c.hasLocation }}">
+              <span style="flex-shrink:0; font-size:12.5px; font-weight:700; color:#384152; background:#f3f4f6; padding:4px 10px; border-radius:999px;">📍 {{ c.location }}</span>
+            </sc-if>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <sc-for list="{{ c.tagList }}" as="tag" hint-placeholder-count="2">
+              <span style="background:#eaf1fe; color:#2354a6; font-size:12px; padding:3px 9px; border-radius:999px;">{{ tag.value }}</span>
+            </sc-for>
+          </div>
+          <div style="display:grid; grid-template-columns:{{ c.btnCols }}; gap:10px;">
+            <sc-if value="{{ c.phone }}">
+              <a href="{{ c.tel }}" style="display:flex; align-items:center; justify-content:center; gap:6px; min-height:46px; border-radius:9px; border:1.5px solid #101d33; color:#101d33; font-weight:700; font-size:14.5px;">☎ {{ t.call }}</a>
+            </sc-if>
+            <button onClick="{{ c.toggle }}" style="min-height:46px; background:#101d33; color:#eef2f8; font-weight:700; font-size:14.5px; border-radius:9px; border:none; cursor:pointer; font-family:inherit;">{{ t.view_details }}</button>
+          </div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ noResultsMobile }}">
+        <div style="padding:40px 20px; text-align:center; color:#6b7280; font-size:15px; background:#fff; border:1px solid #e2e5ea; border-radius:14px;">{{ t.no_results }}</div>
+      </sc-if>
+    </div>
+
+    <!-- TABLE -->
+    <div data-desktop-table style="border:1px solid #e2e5ea; border-radius:14px; overflow:hidden; background:#fff;">
+      <div data-table-scroll style="overflow-x:visible;">
+        <div data-table-min style="min-width:0;">
+          <div style="display:grid; grid-template-columns:1.5fr 1.1fr 0.9fr 1.3fr 1.1fr 0.9fr; background:#101d33; color:#eef2f8; font-weight:700; font-size:13px; padding:14px 20px; letter-spacing:0.02em;">
+            <div>{{ t.th_name }}</div><div>{{ t.th_category }}</div><div>{{ t.th_location }}</div><div>{{ t.th_tags }}</div><div>{{ t.th_phone }}</div><div></div>
+          </div>
+          <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ pageListings }}" as="c" hint-placeholder-count="5">
+              <div>
+                <div style="display:grid; grid-template-columns:1.5fr 1.1fr 0.9fr 1.3fr 1.1fr 0.9fr; align-items:center; padding:16px 20px; border-top:1px solid #f0eee5; background:{{ c.rowBg }};">
+                  <div style="font-weight:700; color:#0b1524; font-size:15px;">{{ c.name }}</div>
+                  <div style="font-size:14px; color:#384152;">{{ c.category }}</div>
+                  <div style="font-size:14px; color:#384152;">{{ c.location }}</div>
+                  <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <sc-for list="{{ c.tagList }}" as="tag" hint-placeholder-count="2">
+                      <span style="background:#eaf1fe; color:#2354a6; font-size:12px; padding:3px 9px; border-radius:999px;">{{ tag.value }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:13.5px;">
+                    <sc-if value="{{ c.phone }}" hint-placeholder-val="{{ false }}">
+                      <a href="tel:{{ c.phone }}" style="color:#384152; font-weight:600;">{{ c.phone }}</a>
+                    </sc-if>
+                    <sc-if value="{{ !c.phone }}" hint-placeholder-val="{{ true }}">
+                      <span style="color:#b7bdb5;">—</span>
+                    </sc-if>
+                  </div>
+                  <div style="text-align:right;">
+                    <button onClick="{{ c.toggle }}" style="background:#101d33; color:#eef2f8; font-weight:700; font-size:13px; padding:9px 16px; border-radius:7px; border:none; cursor:pointer; font-family:inherit;" style-hover="background:#0a1830;">{{ t.view_details }}</button>
+                  </div>
+                </div>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </sc-if>
+        </div>
+      </div>
+      <sc-if value="{{ !hasResults }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:36px 20px; text-align:center; color:#6b7280; font-size:15px;">{{ t.no_results }}</div>
+      </sc-if>
+    </div>
+
+    <!-- PAGINATION -->
+    <sc-if value="{{ showPagination }}">
+      <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:24px;">
+        <button onClick="{{ prevPage }}" disabled="{{ isFirstPage }}" style="width:36px; height:36px; border-radius:8px; border:1px solid #dbe1e8; background:#fff; color:#101d33; font-weight:700; cursor:pointer; font-family:inherit;">‹</button>
+        <sc-for list="{{ pageNumbers }}" as="pg" hint-placeholder-count="3">
+          <button onClick="{{ pg.select }}" style="width:36px; height:36px; border-radius:8px; border:1px solid {{ pg.borderColor }}; background:{{ pg.bg }}; color:{{ pg.color }}; font-weight:700; cursor:pointer; font-family:inherit;">{{ pg.label }}</button>
+        </sc-for>
+        <button onClick="{{ nextPage }}" disabled="{{ isLastPage }}" style="width:36px; height:36px; border-radius:8px; border:1px solid #dbe1e8; background:#fff; color:#101d33; font-weight:700; cursor:pointer; font-family:inherit;">›</button>
+      </div>
+    </sc-if>
+
+    <p style="font-size:13px; color:#98a2b3; margin:24px 0 0 0;">{{ t.reviewed_note }}</p>
+  </section>
+
+  <sc-if value="{{ detail }}">
+    <div dir="{{ dir }}" onClick="{{ closeDetail }}" style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; color:#101828; position:fixed; inset:0; background:rgba(11,21,36,0.6); z-index:60; display:flex; align-items:flex-start; justify-content:center; padding:clamp(36px,5vw,56px) 16px; overflow-y:auto;">
+      <div onClick="{{ stopClose }}" style="position:relative; background:#fff; border-radius:16px; width:100%; max-width:760px; overflow:hidden; box-shadow:0 30px 70px rgba(11,21,36,0.35);">
+        <button onClick="{{ closeDetail }}" aria-label="Close" style="position:absolute; top:14px; right:14px; z-index:2; width:40px; height:40px; border-radius:50%; border:none; background:rgba(16,29,51,0.8); color:#fff; font-size:20px; line-height:1; cursor:pointer;">×</button>
+        <sc-if value="{{ detail.hasMap }}">
+          <iframe src="{{ detail.mapEmbed }}" title="{{ detail.name }} map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="display:block; width:100%; height:300px; border:0; background:#e8ecf1;"></iframe>
+        </sc-if>
+        <sc-if value="{{ detail.noMap }}">
+          <div style="height:120px; background:#f3f4f6; display:flex; align-items:center; justify-content:center; color:#98a2b3; font-size:14px; border-bottom:1px solid #e2e5ea;">{{ t.no_location }}</div>
+        </sc-if>
+        <div style="padding:26px 30px 30px 30px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:6px;">
+            <h2 style="margin:0; font-size:24px; font-weight:800; letter-spacing:-0.02em; color:#0b1524;">{{ detail.name }}</h2>
+            <span style="background:#eaf1fe; color:#2354a6; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:999px;">{{ detail.category }}</span>
+          </div>
+          <div style="font-size:15px; color:#6b7280; margin-bottom:16px;">{{ detail.subline }}</div>
+          <p style="font-size:15.5px; line-height:1.75; color:#384152; margin:0 0 22px 0; text-wrap:pretty;">{{ detail.description }}</p>
+          <div style="display:flex; flex-wrap:wrap; gap:10px 22px; font-size:14px; color:#384152; padding:16px 0; border-top:1px solid #eef0f3; border-bottom:1px solid #eef0f3; margin-bottom:20px;">
+            <sc-if value="{{ detail.phone }}"><a href="{{ detail.tel }}" style="font-weight:700; color:#0b1524;">☎ {{ detail.phone }}</a></sc-if>
+            <sc-if value="{{ detail.city }}"><span><strong style="color:#0b1524;">{{ t.city_label }}</strong> {{ detail.city }}</span></sc-if>
+            <sc-if value="{{ detail.state }}"><span><strong style="color:#0b1524;">{{ t.state_label }}</strong> {{ detail.state }}</span></sc-if>
+            <sc-if value="{{ detail.zip }}"><span><strong style="color:#0b1524;">{{ t.zip_label }}</strong> {{ detail.zip }}</span></sc-if>
+            <span><strong style="color:#0b1524;">{{ t.posted_by }}</strong> {{ detail.author }}</span>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <sc-if value="{{ detail.hasMap }}">
+              <a href="{{ detail.mapLink }}" target="_blank" rel="noopener" style="background:#2f6fed; color:#fff; font-weight:700; font-size:14.5px; padding:12px 22px; border-radius:8px;" style-hover="background:#1d54c4; color:#fff;">{{ t.open_in_maps }} ↗</a>
+              <a href="{{ detail.directionsLink }}" target="_blank" rel="noopener" style="border:1.5px solid #101d33; color:#101d33; font-weight:700; font-size:14.5px; padding:10.5px 22px; border-radius:8px;" style-hover="background:#f2f0e8; color:#101d33;">{{ t.get_directions }}</a>
+            </sc-if>
+            <sc-if value="{{ detail.website }}">
+              <a href="{{ detail.website }}" target="_blank" rel="noopener" style="border:1.5px solid #d7dce3; color:#384152; font-weight:700; font-size:14.5px; padding:10.5px 22px; border-radius:8px;">{{ t.visit_website }}</a>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <dc-import name="Site Footer" hint-size="100%,300">
+  </dc-import>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const EN_DEFAULT = {
+  community_eyebrow: 'Community', community_heading: 'Community Directory', community_paragraph: 'Neighbors helping neighbors. Search or filter the moderated directory of member businesses, services, and referral requests.',
+  submit_listing: 'Submit a Listing', disclaimer_label: 'Disclaimer:', disclaimer_text: 'Listings in this directory are submitted by community members. BMCC is not affiliated or personally associated with any listed business, and does not endorse, warrant, or assume any liability or responsibility for the conduct, quality, or outcome of services provided by listed businesses. Members are encouraged to use their own judgment when engaging any listed party.',
+  search_directory: 'Search by name, service, or tag…', all_types: 'All Types', all_categories: 'All Categories', clear_filters: 'Clear filters',
+  showing_label: 'Showing', of_label: 'of', listings_label: 'listings',
+  th_name: 'Name', th_category: 'Category', th_location: 'Location', th_tags: 'Tags', th_phone: 'Phone',
+  view_details: 'View Details', call: 'Call', hide_details: 'Hide Details', no_results: 'No listings match your search. Try a different keyword or filter.',
+  posted_by: 'Posted by:', contact_label: 'Contact:', address_label: 'Address:', city_label: 'City:', state_label: 'State:', zip_label: 'Postal Code:', open_in_maps: 'Open in Google Maps', get_directions: 'Get Directions', visit_website: 'Visit Website', no_location: 'No location provided for this listing.', reviewed_note: 'All listings are reviewed by our admin team before they go live.'
+};
+class Component extends DCLogic {
+  state = {
+    searchQuery: '',
+    typeFilter: 'all',
+    categoryFilter: 'all',
+    page: 1,
+    expandedId: null,
+    lang: 'en', i18n: EN_DEFAULT
+  };
+
+  componentDidMount() {
+    import('./i18n.js').then(m => {
+      this.i18nMod = m;
+      const lang = m.getLang();
+      if (lang !== 'en') this.setState({ lang, i18n: { ...EN_DEFAULT, ...m.t(lang) } });
+    });
+  }
+
+  perPage = 5;
+
+  onSearchChange = (e) => this.setState({ searchQuery: e.target.value, page: 1 });
+  onTypeChange = (e) => this.setState({ typeFilter: e.target.value, page: 1 });
+  onCategoryChange = (e) => this.setState({ categoryFilter: e.target.value, page: 1 });
+  clearFilters = () => this.setState({ searchQuery: '', typeFilter: 'all', categoryFilter: 'all', page: 1 });
+  toggleExpand = (id) => this.setState({ expandedId: id });
+  closeDetail = () => this.setState({ expandedId: null });
+  stopClose = (e) => e.stopPropagation();
+  goToPage = (n) => this.setState({ page: n });
+  prevPage = () => this.setState(s => ({ page: Math.max(1, s.page - 1) }));
+  nextPage = () => this.setState(s => ({ page: s.page + 1 }));
+
+  renderVals() {
+    const allListings = [
+      // FAKE sample data. The real vetted listings were removed from this repository copy for privacy.
+      {"id": 1, "name": "Sample Halal Grill", "parentCategory": "Restaurant", "category": "Halal Restaurant", "location": "Brentwood", "tags": ["Halal", "Mediterranean"], "description": "Sample listing — Mediterranean grill with falafel, skewers and fresh bread.", "author": "Sample Halal Grill", "contact": "(925) 555-0110", "phone": "(925) 555-0110", "website": "https://example.com/halal-grill", "address": "7701 Lone Tree Way, Brentwood, CA 94513"},
+      {"id": 2, "name": "Sample HVAC Services", "parentCategory": "Home Services / Repair", "category": "HVACR Repair", "location": "—", "tags": ["HVACR"], "description": "Sample listing — heating, ventilation and air-conditioning repair.", "author": "Sample HVAC Services", "contact": "(925) 555-0111", "phone": "(925) 555-0111", "website": null, "address": null},
+      {"id": 3, "name": "Brother Sample A.", "parentCategory": "Home Services / Repair", "category": "HVACR Repair", "location": "—", "tags": ["HVACR"], "description": "Sample listing — no additional description provided.", "author": "Brother Sample A.", "contact": "(925) 555-0112", "phone": "(925) 555-0112", "website": null, "address": null},
+      {"id": 4, "name": "Sample Pest Control", "parentCategory": "Home Services / Repair", "category": "Pest Control", "location": "—", "tags": ["Pest Control"], "description": "Sample listing — residential pest control.", "author": "Sample Pest Control", "contact": "(925) 555-0113", "phone": "(925) 555-0113", "website": null, "address": null},
+      {"id": 5, "name": "Example Pest Solutions", "parentCategory": "Home Services / Repair", "category": "Pest Control", "location": "—", "tags": ["Pest Control"], "description": "Sample listing — no additional description provided.", "author": "Example Pest Solutions", "contact": "—", "phone": null, "website": null, "address": null},
+      {"id": 6, "name": "Test Exterminators", "parentCategory": "Home Services / Repair", "category": "Pest Control", "location": "—", "tags": ["Pest Control"], "description": "Sample listing — no additional description provided.", "author": "Test Exterminators", "contact": "(925) 555-0114", "phone": "(925) 555-0114", "website": null, "address": null},
+      {"id": 7, "name": "Sample Cabinet Repair", "parentCategory": "Home Services / Repair", "category": "Kitchen Countertop/Cabinet Repair", "location": "—", "tags": ["Countertop & Cabinet"], "description": "Sample listing — kitchen countertop and cabinet repair.", "author": "Sample Cabinet Repair", "contact": "(925) 555-0115", "phone": "(925) 555-0115", "website": null, "address": null},
+      {"id": 8, "name": "Sample Computer Help", "parentCategory": "Computer Repair", "category": "Computer Services", "location": "—", "tags": ["Computer Services"], "description": "Sample listing — computer setup and repair.", "author": "Sample Computer Help", "contact": "—", "phone": null, "website": null, "address": null},
+      {"id": 9, "name": "Sample Acupuncture Clinic", "parentCategory": "Alternate Medicine", "category": "Acupuncture", "location": "Brentwood", "tags": ["Acupuncture"], "description": "Sample listing — acupuncture and wellness.", "author": "Sample Acupuncture Clinic", "contact": "(925) 555-0116", "phone": "(925) 555-0116", "website": "https://example.com/acupuncture", "address": "7701 Lone Tree Way, Brentwood, CA 94513"},
+      {"id": 10, "name": "Sample Limo Service", "parentCategory": "Transportation and Warehousing", "category": "Limo Service", "location": "—", "tags": ["Limo Rental"], "description": "Sample listing — limousine rental for weddings and events.", "author": "Sample Limo Service", "contact": "(925) 555-0117", "phone": "(925) 555-0117", "website": null, "address": null}
+    ];
+
+    const sortedListings = [...allListings].sort((a, b) => (b.phone ? 1 : 0) - (a.phone ? 1 : 0));
+
+    const q = this.state.searchQuery.trim().toLowerCase();
+    const filtered = sortedListings.filter(l => {
+      const matchesParent = this.state.typeFilter === 'all' || l.parentCategory === this.state.typeFilter;
+      const matchesCategory = this.state.categoryFilter === 'all' || l.category === this.state.categoryFilter;
+      const haystack = (l.name + ' ' + l.category + ' ' + l.parentCategory + ' ' + l.location + ' ' + l.tags.join(' ')).toLowerCase();
+      const matchesSearch = !q || haystack.includes(q);
+      return matchesParent && matchesCategory && matchesSearch;
+    });
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / this.perPage));
+    const page = Math.min(this.state.page, totalPages);
+    const start = (page - 1) * this.perPage;
+    const pageSlice = filtered.slice(start, start + this.perPage);
+
+    const t = this.state.i18n;
+    const dir = (this.i18nMod && this.i18nMod.isRTL(this.state.lang)) ? 'rtl' : 'ltr';
+    const pageListings = pageSlice.map((l, i) => ({
+      ...l,
+      rowBg: i % 2 === 0 ? '#ffffff' : '#fcfbf8',
+      tagList: l.tags.map(tg => ({ value: tg })),
+      expanded: this.state.expandedId === l.id,
+      toggle: () => this.toggleExpand(l.id),
+      hasLocation: !!(l.location && l.location !== '—'),
+      tel: l.phone ? 'tel:' + l.phone.replace(/[^0-9+]/g, '') : null,
+      btnCols: l.phone ? '1fr 1.4fr' : '1fr',
+      toggleLabel: this.state.expandedId === l.id ? t.hide_details : t.view_details
+    }));
+
+    const sel = allListings.find(l => l.id === this.state.expandedId);
+    let detail = null;
+    if (sel) {
+      const m = sel.address ? sel.address.match(/^(.*?),\s*([^,]+),\s*([A-Z]{2})\s+(\d{5})/) : null;
+      const query = sel.address || (sel.location && sel.location !== '—' ? sel.location + ', CA' : null);
+      const enc = query ? encodeURIComponent(sel.name + ', ' + query) : null;
+      detail = {
+        name: sel.name,
+        category: sel.parentCategory,
+        subline: sel.category + (m ? ' · ' + m[1] : (sel.location && sel.location !== '—' ? ' · ' + sel.location : '')),
+        description: sel.description,
+        author: sel.author,
+        phone: sel.phone,
+        tel: sel.phone ? 'tel:' + sel.phone.replace(/[^0-9+]/g, '') : null,
+        website: sel.website,
+        city: m ? m[2] : (sel.location !== '—' ? sel.location : null),
+        state: m ? m[3] : null,
+        zip: m ? m[4] : null,
+        hasMap: !!enc,
+        noMap: !enc,
+        mapEmbed: enc ? 'https://maps.google.com/maps?q=' + enc + '&z=15&output=embed' : null,
+        mapLink: enc ? 'https://www.google.com/maps/search/?api=1&query=' + enc : null,
+        directionsLink: enc ? 'https://www.google.com/maps/dir/?api=1&destination=' + enc : null
+      };
+    }
+
+    const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1).map(n => ({
+      label: String(n),
+      select: () => this.goToPage(n),
+      bg: n === page ? '#101d33' : '#fff',
+      color: n === page ? '#eef2f8' : '#0b1524',
+      borderColor: n === page ? '#101d33' : '#dbe1e8'
+    }));
+
+    const categories = [...new Set(allListings.map(l => l.category))].sort();
+    const categoryOptions = [{ value: 'all', label: t.all_categories }, ...categories.map(cat => ({ value: cat, label: cat }))];
+    const parentCategories = [...new Set(allListings.map(l => l.parentCategory))].sort();
+    const typeOptions = [{ value: 'all', label: t.all_types }, ...parentCategories.map(p => ({ value: p, label: p }))];
+
+    return {
+      t, dir,
+      detail, closeDetail: this.closeDetail, stopClose: this.stopClose,
+      noResultsMobile: pageListings.length === 0,
+      searchQuery: this.state.searchQuery,
+      onSearchChange: this.onSearchChange,
+      typeFilter: this.state.typeFilter,
+      onTypeChange: this.onTypeChange,
+      categoryFilter: this.state.categoryFilter,
+      onCategoryChange: this.onCategoryChange,
+      typeOptions,
+      categoryOptions,
+      hasActiveFilters: !!(q || this.state.typeFilter !== 'all' || this.state.categoryFilter !== 'all'),
+      clearFilters: this.clearFilters,
+      totalCount: allListings.length,
+      resultCountLabel: filtered.length === 0 ? '0' : `${start + 1}–${start + pageSlice.length}`,
+      hasResults: filtered.length > 0,
+      pageListings,
+      showPagination: totalPages > 1,
+      pageNumbers,
+      isFirstPage: page === 1,
+      isLastPage: page === totalPages,
+      prevPage: this.prevPage,
+      nextPage: this.nextPage
+    };
+  }
+}
+</script>
+</body>
+</html>

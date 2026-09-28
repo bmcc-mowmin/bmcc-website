@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f6f7f9; }
+  a { color: #2f6fed; }
+  a:hover { color: #1d54c4; }
+  @media (max-width: 760px) {
+    [data-two] { grid-template-columns: minmax(0,1fr) !important; }
+    [data-row] { grid-template-columns: minmax(0,1fr) !important; }
+  }
+</style>
+</helmet>
+
+<div style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; color:#101828; max-width:1080px; margin:0 auto; padding:clamp(24px,4vw,56px) clamp(18px,4vw,40px); background:#fff; min-height:100vh;">
+
+  <div style="text-transform:uppercase; letter-spacing:0.12em; font-size:12.5px; font-weight:700; color:#2354a6; margin-bottom:10px;">Gap analysis · 20 Sep 2026</div>
+  <h1 style="font-size:clamp(28px,3.8vw,42px); font-weight:800; letter-spacing:-0.025em; margin:0 0 12px 0; line-height:1.1;">Prototype vs. Sprout site</h1>
+  <p style="font-size:16.5px; line-height:1.7; color:#384152; margin:0 0 8px 0; max-width:720px; text-wrap:pretty;">Comparing this redesign prototype against the current WordPress build at <a href="https://bmcc.softsprouts.tech/" target="_blank" rel="noopener">bmcc.softsprouts.tech</a>. Two directions: what the Sprout site has that we don't, and what we have that it doesn't.</p>
+  <p style="font-size:13.5px; color:#6b7280; margin:0 0 36px 0;">Sprout site read via its public pages (home, community directory). Sub-pages behind the Services/Resources menus were inventoried from navigation, not audited page-by-page.</p>
+
+  <div data-two style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-bottom:44px;">
+    <div style="background:#eaf1fe; border:1px solid #d7e4fb; border-radius:12px; padding:18px 20px;">
+      <div style="font-size:30px; font-weight:800; color:#1d54c4; letter-spacing:-0.02em;">13</div>
+      <div style="font-size:14px; color:#2354a6; font-weight:600; margin-top:4px;">Sprout-site items missing from the prototype <span style="display:block; font-weight:500; color:#4b74c0; margin-top:2px;">6 of them whole pages</span></div>
+    </div>
+    <div style="background:#f3f4f6; border:1px solid #e2e5ea; border-radius:12px; padding:18px 20px;">
+      <div style="font-size:30px; font-weight:800; color:#101d33; letter-spacing:-0.02em;">10</div>
+      <div style="font-size:14px; color:#475467; font-weight:600; margin-top:4px;">Prototype items that are net-new builds <span style="display:block; font-weight:500; color:#667085; margin-top:2px;">5 of them whole pages</span></div>
+    </div>
+    <div style="background:#fef3f2; border:1px solid #fecdca; border-radius:12px; padding:18px 20px;">
+      <div style="font-size:30px; font-weight:800; color:#b42318; letter-spacing:-0.02em;">7</div>
+      <div style="font-size:14px; color:#b42318; font-weight:600; margin-top:4px;">Blockers on the Sprout site (dummy data, broken links)</div>
+    </div>
+  </div>
+
+  <h2 style="font-size:22px; font-weight:800; letter-spacing:-0.02em; margin:0 0 6px 0;">1 · Information architecture</h2>
+  <p style="font-size:15px; color:#6b7280; margin:0 0 18px 0;">The two navs barely overlap. The Sprout site organizes by facility/program; the prototype organizes by visitor intent.</p>
+
+  <div data-two style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-bottom:40px;">
+    <div style="border:1px solid #e2e5ea; border-radius:12px; overflow:hidden;">
+      <div style="background:#101d33; color:#eef2f8; padding:12px 18px; font-size:13px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;">Sprout site nav</div>
+      <div style="padding:16px 18px; font-size:14.5px; line-height:2; color:#384152;">
+        Home<br>
+        Services → Firepit &amp; Gathering Area · Scouts Troop · Volunteer · Pantry Service<br>
+        Hikmah School <span style="color:#98a2b3;">(external)</span><br>
+        Resources → Halaq Group · Youth Group<br>
+        Community Directory <span style="color:#98a2b3;">(/community-page/)</span><br>
+        Funeral Service<br>
+        Contact Us<br>
+        <span style="color:#98a2b3;">Utility:</span> /member · Donate
+      </div>
+    </div>
+    <div style="border:1px solid #e2e5ea; border-radius:12px; overflow:hidden;">
+      <div style="background:#2f6fed; color:#fff; padding:12px 18px; font-size:13px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;">Prototype nav</div>
+      <div style="padding:16px 18px; font-size:14.5px; line-height:2; color:#384152;">
+        Home<br>
+        Prayer Times<br>
+        Programs → Hikmah School · Events &amp; Calendar · Community Directory<br>
+        Services &amp; Assistance → Services · Assistance<br>
+        Donations &amp; Memberships → Donate · Membership · Funeral Benefit<br>
+        About → About Us · Contact<br>
+        <span style="color:#98a2b3;">Utility:</span> Language switcher · Member Login · Search
+      </div>
+    </div>
+  </div>
+
+  <h2 style="font-size:22px; font-weight:800; letter-spacing:-0.02em; margin:0 0 6px 0;">2 · What the Sprout site has that the prototype does not</h2>
+  <p style="font-size:15px; color:#6b7280; margin:0 0 18px 0;">These need a home in the new IA before handoff, or an explicit decision to drop them.</p>
+
+  <div style="border:1px solid #e2e5ea; border-radius:12px; overflow:hidden; margin-bottom:40px;">
+    <div data-row style="display:grid; grid-template-columns:1.1fr 1.9fr 0.7fr; background:#f9fafb; border-bottom:1px solid #e2e5ea; padding:11px 18px; font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#475467;">
+      <div>Item</div><div>Gap</div><div>Priority</div>
+    </div>
+    <sc-for list="{{ missingFromProto }}" as="r" hint-placeholder-count="10">
+      <div data-row style="display:grid; grid-template-columns:1.1fr 1.9fr 0.7fr; gap:8px; padding:14px 18px; border-bottom:1px solid #f0f1f3; align-items:start; background:{{ r.bg }};">
+        <div style="font-size:14.5px; font-weight:700; color:#0b1524;">{{ r.item }}</div>
+        <div style="font-size:14px; color:#475467; line-height:1.6;">{{ r.gap }}</div>
+        <div><span style="display:inline-block; font-size:12px; font-weight:700; padding:3px 9px; border-radius:20px; background:{{ r.pillBg }}; color:{{ r.pillColor }};">{{ r.priority }}</span></div>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="font-size:22px; font-weight:800; letter-spacing:-0.02em; margin:0 0 6px 0;">3 · What the prototype has that the Sprout site does not</h2>
+  <p style="font-size:15px; color:#6b7280; margin:0 0 18px 0;">Net-new scope for the dev team — each of these is a build, not a migration.</p>
+
+  <div data-two style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:40px;">
+    <sc-for list="{{ newInProto }}" as="n" hint-placeholder-count="8">
+      <div style="border:1px solid #e2e5ea; border-radius:12px; padding:16px 18px;">
+        <div style="font-size:15px; font-weight:700; color:#0b1524; margin-bottom:5px;">{{ n.title }}</div>
+        <div style="font-size:14px; color:#475467; line-height:1.6;">{{ n.detail }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="font-size:22px; font-weight:800; letter-spacing:-0.02em; margin:0 0 6px 0;">4 · Sprout-site issues the redesign should fix</h2>
+  <p style="font-size:15px; color:#6b7280; margin:0 0 18px 0;">Found on the Sprout site as it renders today.</p>
+
+  <div style="border-left:3px solid #f04438; background:#fffbfa; border-radius:0 12px 12px 0; padding:6px 22px; margin-bottom:40px;">
+    <sc-for list="{{ issues }}" as="i" hint-placeholder-count="7">
+      <div style="padding:14px 0; border-bottom:1px solid #fee4e2;">
+        <div style="font-size:14.5px; font-weight:700; color:#912018; margin-bottom:3px;">{{ i.title }}</div>
+        <div style="font-size:14px; color:#667085; line-height:1.6;">{{ i.detail }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="font-size:22px; font-weight:800; letter-spacing:-0.02em; margin:0 0 6px 0;">5 · Recommended next moves</h2>
+  <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+    <sc-for list="{{ actions }}" as="a" hint-placeholder-count="5">
+      <div style="display:flex; gap:14px; align-items:flex-start; border:1px solid #e2e5ea; border-radius:10px; padding:14px 18px;">
+        <div style="width:24px; height:24px; border-radius:50%; background:#101d33; color:#fff; font-size:12.5px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">{{ a.n }}</div>
+        <div style="font-size:14.5px; color:#344054; line-height:1.6;">{{ a.text }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1080}}">
+class Component extends DCLogic {
+  renderVals() {
+    const pill = { High: ['#fee4e2', '#b42318'], Med: ['#fef0c7', '#b54708'], Low: ['#e6f4ec', '#12653a'] };
+    const rows = [
+      { item: 'Firepit & Gathering Area', gap: 'Sprout site has a dedicated facility page. Prototype has no rental/facility content anywhere.', priority: 'High' },
+      { item: 'Scouts Troop', gap: 'Standalone program page on the Sprout site. Not represented in the prototype.', priority: 'High' },
+      { item: 'Pantry Service', gap: 'Standalone page on the Sprout site; prototype folds pantry into the Assistance page only as a line item.', priority: 'Med' },
+      { item: 'Volunteer', gap: 'Sprout site has a volunteer page. Prototype has a Get Involved card but no destination page or sign-up.', priority: 'High' },
+      { item: 'Halaqa Group', gap: 'Weekly halaqa page under Resources (the Sprout site spells it “Halaq”). No prototype equivalent.', priority: 'Med' },
+      { item: 'Youth Group', gap: 'Youth program page under Resources. No prototype equivalent.', priority: 'Med' },
+      { item: 'Blog / articles', gap: 'Sprout site publishes khutbah-style articles with author, date and comment counts (3 on the homepage). Prototype Events page is calendar-only — no article post type.', priority: 'High' },
+      { item: 'Directory submit form', gap: 'Sprout site has a full "Submit Directory" modal at /community-page/: title, description, listing type, 24 parent categories, dependent sub-category, address, Google Map link, city/state/zip, phone, website, email. Prototype has only a "Submit a Listing" button pointing at #.', priority: 'High' },
+      { item: 'Zakat al Fitr tiers', gap: 'Sprout site homepage has $5/$10/$15 tabbed per-person Zakat al Fitr giving plus Zelle and PayPal logos. Prototype Donate page has no Zakat al Fitr flow and no payment-rail branding.', priority: 'High' },
+      { item: 'Enquiry form', gap: 'Sprout site "Question & Enquiries" form with topic select (Hajj & Umrah, Pilgrimage Travel, Help Required). Prototype has no contact form — only a contact block.', priority: 'Med' },
+      { item: 'Seasonal hero / campaign slider', gap: 'Sprout site runs a Slider Revolution Eid campaign hero with hadith text and a fasting-times CTA. Prototype hero is static and has no seasonal campaign slot.', priority: 'Med' },
+      { item: 'Testimonials', gap: 'Sprout site has a rated testimonial carousel. Prototype omits it — likely intentional, confirm.', priority: 'Low' },
+      { item: 'Directory detail view', gap: 'Sprout site opens each listing in a "View details" modal (JS-populated — contents not verifiable from source). Prototype uses inline row expansion; confirm which pattern the CMS supports.', priority: 'Low' }
+    ];
+    const missingFromProto = rows.map((r, i) => ({
+      ...r,
+      bg: i % 2 ? '#fcfcfd' : '#ffffff',
+      pillBg: pill[r.priority][0],
+      pillColor: pill[r.priority][1]
+    }));
+
+    const newInProto = [
+      { title: 'Five-language localization', detail: 'English, Urdu, Arabic, Dari and Pashto with RTL auto-flip and persisted choice. Sprout site is English-only with no switcher — this is the single largest build item.' },
+      { title: 'Prayer Times page + widget', detail: 'Full page plus a homepage table and Jumu\u2019ah schedule. Sprout site shows a static five-line list with no dedicated page and no iqamah/Jumu\u2019ah detail.' },
+      { title: 'Membership page', detail: '$100/mo or $1,000/yr tiers with benefits. Sprout site has a /member login route but no public membership marketing page.' },
+      { title: 'Assistance page', detail: 'Zakat, food pantry, refugee support and financial aid in one place. Sprout site scatters or omits these.' },
+      { title: 'Services page', detail: 'Nikah, counseling, Ask an Imam. Sprout site "Services" menu is facility-oriented and contains none of these.' },
+      { title: 'Funeral benefit detail', detail: 'Prototype documents the $10,000 household benefit and eligibility. Sprout site has a Funeral Service page — content depth needs a side-by-side check.' },
+      { title: 'Directory filtering', detail: 'Search, type filter, category filter, clear-filters and pagination. Sprout site renders an unfiltered flat table of all listings.' },
+      { title: 'Events & Calendar', detail: 'Dedicated upcoming-events page. Sprout site surfaces events only as blog posts under /events/.' },
+      { title: 'About Us page (rebuild, not new)', detail: 'Sprout site already has /about-us/ — "Contact Us" redirects to it — but with thinner content. Ours adds story, programs and facility.' },
+      { title: 'Site search + member login in header', detail: 'Prototype has inline search and a member-login entry in the utility bar. Sprout site has a search icon but no member entry above the fold on mobile.' }
+    ];
+
+    const issues = [
+      { title: 'Placeholder contact details in the footer', detail: 'Address reads "19-J David Road H Block, Town 21, Street 12 United States" and phone is 1800-123-456-7 — theme dummy data, sitewide on every Sprout-site page.' },
+      { title: 'Donate buttons point to the theme vendor', detail: 'Zakat al Fitr "Donate Now" and the PayPal logo both link to nauthemes.com/dummy/taqwa-modern/… — Sprout-site donations are going nowhere.' },
+      { title: 'Directory data is unclean', detail: '"It business" is filed as Restaurant → Halal Restaurant; "BAR.B.Q TONIGHT" is filed as Medical → Pediatric Dentist; several Karachi addresses are in a Brentwood directory. Six of thirteen rows have no location.' },
+      { title: 'Testimonials are fabricated', detail: 'Two reviews attributed to "Sheikh Abdul Rahman" and "Imam Yusuf Ahmed" with theme stock avatars. Ship real ones or remove.' },
+      { title: 'Enquiry form topics do not match BMCC', detail: 'Options are Hajj & Umrah / Pilgrimage Travel / Help Required — travel-agency defaults from the theme.' },
+      { title: 'Newsletter copy references the wrong organization', detail: 'Subscribe block says "receive MCC\u2019s weekly events email" — MCC East Bay\u2019s copy left in place.' },
+      { title: 'Article bylines are "admin"', detail: 'All three homepage posts are authored by admin with a Comment (0) counter — no editorial identity, and comments are probably unwanted on khutbah content.' }
+    ];
+
+    const actions = [
+      { n: 1, text: 'Decide the fate of the six orphaned Sprout-site pages (Firepit, Scouts, Volunteer, Pantry, Halaqa, Youth) — my recommendation: a Programs index page with a card per program, slotted under the existing Programs menu.' },
+      { n: 2, text: 'Add an article/blog post type to the prototype. The Sprout site is actively publishing, and losing that content in the migration would be the most visible regression.' },
+      { n: 3, text: 'Build the directory submit form against the Sprout site’s field schema — it already matches a real database, so copy it field-for-field rather than inventing one.' },
+      { n: 4, text: 'Bring Zakat al Fitr tiers, Zelle and PayPal into the Donate page, and wire them to real BMCC accounts. This is a revenue bug on the Sprout site today.' },
+      { n: 5, text: 'Get the real address, phone and office email from BMCC and purge every theme placeholder before anything goes to production.' },
+      { n: 6, text: 'Run a content clean-up pass on the directory with the BMCC admin team — miscategorized and location-less rows will look worse in our filtered UI than in the Sprout site’s flat table.' }
+    ];
+
+    return { missingFromProto, newInProto, issues, actions };
+  }
+}
+
+</script>
+</body>
+</html>

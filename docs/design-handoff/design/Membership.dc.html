@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#101d33">
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="600" cy="360" r="180" fill="none" stroke="#eef2f8" stroke-width="24"/>
+  <text x="600" y="620" font-family="sans-serif" font-size="90" font-weight="700" fill="#eef2f8" text-anchor="middle">BMCC</text>
+</svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f6f7f9; }
+  * { box-sizing: border-box; }
+  a { color: #101d33; text-decoration: none; }
+  a:hover { color: #2f6fed; }
+
+  @media (max-width: 900px) {
+    [data-g2] { grid-template-columns: 1fr !important; }
+    [data-g3] { grid-template-columns: 1fr !important; }
+    [data-g4a] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g4b] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-g5] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    [data-table-scroll] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+    [data-table-min] { min-width: 720px !important; }
+  }
+  @media (max-width: 620px) {
+    [data-g4a] { grid-template-columns: 1fr !important; }
+    [data-g5] { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 480px) {
+    [data-table-compact] { font-size: 12.5px !important; padding: 10px 12px !important; }
+  }
+</style>
+</helmet>
+
+<div dir="{{ dir }}" style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #101828; background: #f6f7f9; min-height: 100vh;">
+
+  <dc-import name="Site Header" current="membership" hint-size="100%,110">
+  </dc-import>
+
+  <section style="background:#101d33; color:#eef2f8;">
+    <div style="max-width:820px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px);">
+      <div style="text-transform:uppercase; letter-spacing:0.12em; font-size:13px; font-weight:700; color:#2f6fed; margin-bottom:14px;">{{ t.membership_eyebrow }}</div>
+      <h1 style="font-size:clamp(28px,3.6vw,40px); font-weight:800; letter-spacing:-0.02em; margin:0 0 14px 0;">{{ t.membership_heading }}</h1>
+      <p style="font-size:16px; line-height:1.7; color:#cddaf0; margin:0; max-width:640px;">{{ t.membership_hero_paragraph }}</p>
+    </div>
+  </section>
+
+  <sc-if value="{{ !submitted }}" hint-placeholder-val="{{ true }}">
+    <form onSubmit="{{ onSubmit }}">
+      <section style="max-width:820px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px);">
+
+        <!-- 1. PRIMARY MEMBER -->
+        <div style="margin-bottom:28px;">
+          <h2 style="font-size:19px; font-weight:700; color:#0b1524; margin:0 0 4px 0;">{{ t.m1_title }}</h2>
+          <p style="font-size:14px; color:#6b7280; margin:0 0 20px 0;">{{ t.m1_sub }}</p>
+          <div data-g2 style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <label style="grid-column:1/-1; display:flex; flex-direction:column; gap:6px; font-size:13.5px; font-weight:600; color:#384152;">{{ t.m1_fullname }}
+              <input required="{{ true }}" placeholder="{{ t.m1_fullname_ph }}" style="padding:12px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px;" />
+            </label>
+            <label style="grid-column:1/-1; display:flex; flex-direction:column; gap:6px; font-size:13.5px; font-weight:600; color:#384152;">{{ t.m1_address }}
+              <input required="{{ true }}" placeholder="{{ t.m1_address_ph }}" style="padding:12px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px;" />
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; font-size:13.5px; font-weight:600; color:#384152;">{{ t.m1_dob }}
+              <input required="{{ true }}" type="date" style="padding:12px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px;" />
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; font-size:13.5px; font-weight:600; color:#384152;">{{ t.m1_phone }}
+              <input required="{{ true }}" type="tel" placeholder="(925) 555-0100" style="padding:12px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px;" />
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; font-size:13.5px; font-weight:600; color:#384152;">{{ t.m1_email }}
+              <input required="{{ true }}" type="email" placeholder="you@example.com" style="padding:12px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px;" />
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; font-size:13.5px; font-weight:600; color:#384152;">{{ t.m1_emergency }}
+              <input placeholder="{{ t.m1_emergency_ph }}" style="padding:12px 14px; border-radius:8px; border:1px solid #d7dce3; font-family:inherit; font-size:14.5px;" />
+            </label>
+          </div>
+        </div>
+
+        <!-- 2. HOUSEHOLD -->
+        <div style="margin-bottom:28px;">
+          <h2 style="font-size:19px; font-weight:700; color:#0b1524; margin:0 0 4px 0;">{{ t.m2_title }}</h2>
+          <p style="font-size:14px; color:#6b7280; margin:0 0 20px 0;">{{ t.m2_sub }}</p>
+
+          <sc-for list="{{ dependents }}" as="dep" hint-placeholder-count="0">
+            <div style="border:1px solid #e2e5ea; border-radius:12px; padding:18px; margin-bottom:12px; position:relative;">
+              <button type="button" onClick="{{ dep.remove }}" aria-label="Remove" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#98a2b3; font-size:18px; cursor:pointer; line-height:1;">×</button>
+              <div data-g2 style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <label style="display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; color:#384152;">{{ t.m1_fullname }}
+                  <input placeholder="{{ t.m1_fullname }}" style="padding:10px 12px; border-radius:7px; border:1px solid #d7dce3; font-family:inherit; font-size:14px;" />
+                </label>
+                <label style="display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; color:#384152;">{{ t.m2_relationship }}
+                  <input placeholder="{{ t.m2_relationship_ph }}" style="padding:10px 12px; border-radius:7px; border:1px solid #d7dce3; font-family:inherit; font-size:14px;" />
+                </label>
+                <label style="display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; color:#384152;">{{ t.m1_dob }}
+                  <input type="date" style="padding:10px 12px; border-radius:7px; border:1px solid #d7dce3; font-family:inherit; font-size:14px;" />
+                </label>
+                <label style="display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; color:#384152;">{{ t.m1_phone }}
+                  <input type="tel" placeholder="{{ t.m2_phone_ph }}" style="padding:10px 12px; border-radius:7px; border:1px solid #d7dce3; font-family:inherit; font-size:14px;" />
+                </label>
+                <label style="grid-column:1/-1; display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; color:#384152;">{{ t.m1_email }}
+                  <input type="email" placeholder="{{ t.m2_email_ph }}" style="padding:10px 12px; border-radius:7px; border:1px solid #d7dce3; font-family:inherit; font-size:14px;" />
+                </label>
+              </div>
+            </div>
+          </sc-for>
+
+          <button type="button" onClick="{{ addDependent }}" style="background:none; border:1.5px dashed #b7c0cc; color:#101d33; font-weight:700; font-size:14px; padding:12px; border-radius:10px; width:100%; cursor:pointer; font-family:inherit;">{{ t.m2_add }}</button>
+        </div>
+
+        <!-- 3. MEMBERSHIP FEE -->
+        <div style="margin-bottom:28px;">
+          <h2 style="font-size:19px; font-weight:700; color:#0b1524; margin:0 0 4px 0;">{{ t.m3_title }}</h2>
+          <p style="font-size:14px; color:#6b7280; margin:0 0 16px 0;">{{ t.m3_sub }}</p>
+          <div data-g2 style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <button type="button" onClick="{{ selectMonthly }}" style="text-align:left; cursor:pointer; font-family:inherit; border-radius:12px; padding:18px; border:1.5px solid {{ monthlyBorder }}; background:{{ monthlyBg }};">
+              <div style="font-weight:700; font-size:16px; color:#0b1524;">{{ t.m3_monthly }}</div>
+              <div style="font-size:22px; font-weight:800; color:#101d33; margin-top:4px;">$100<span style="font-size:13px; font-weight:600; color:#6b7280;">/mo</span></div>
+            </button>
+            <button type="button" onClick="{{ selectYearly }}" style="text-align:left; cursor:pointer; font-family:inherit; border-radius:12px; padding:18px; border:1.5px solid {{ yearlyBorder }}; background:{{ yearlyBg }};">
+              <div style="font-weight:700; font-size:16px; color:#0b1524;">{{ t.m3_yearly }} <span style="background:#eaf1fe; color:#2354a6; font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px; margin-left:4px;">{{ t.m3_save }}</span></div>
+              <div style="font-size:22px; font-weight:800; color:#101d33; margin-top:4px;">$1,000<span style="font-size:13px; font-weight:600; color:#6b7280;">/yr</span></div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. FUNERAL BENEFIT -->
+        <div style="background:#eaf1fe; border-radius:12px; padding:20px 22px; margin-bottom:28px;">
+          <h3 style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#2354a6;">{{ t.m4_title }}</h3>
+          <p style="font-size:14.5px; line-height:1.7; color:#2354a6; margin:0;">{{ t.m4_text_prefix }} <a href="Funeral Services.dc.html" target="_blank" rel="noopener" style="font-weight:700; color:#2354a6; text-decoration:underline;">{{ t.m4_link }}</a> {{ t.m4_text_suffix }}</p>
+        </div>
+
+        <!-- 5. DECLARATION -->
+        <div style="margin-bottom:32px;">
+          <h2 style="font-size:19px; font-weight:700; color:#0b1524; margin:0 0 14px 0;">{{ t.m5_title }}</h2>
+          <label style="display:flex; gap:12px; align-items:flex-start; font-size:14.5px; line-height:1.6; color:#384152; cursor:pointer;">
+            <input required="{{ true }}" type="checkbox" checked="{{ agreed }}" onChange="{{ toggleAgreed }}" style="margin-top:3px; width:18px; height:18px; flex-shrink:0;" />
+            {{ t.m5_text }}
+          </label>
+        </div>
+
+        <button type="submit" style="width:100%; background:#2f6fed; color:#ffffff; font-weight:700; font-size:16px; padding:15px 0; border-radius:10px; border:none; cursor:pointer; font-family:inherit;" style-hover="background:#1d54c4;">{{ t.submit_application }}</button>
+        <p style="font-size:12.5px; color:#98a2b3; text-align:center; margin:14px 0 0 0;">{{ t.confirm_note }}</p>
+      </section>
+    </form>
+  </sc-if>
+
+  <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:640px; margin:0 auto; padding:clamp(36px,5vw,56px) clamp(20px,4vw,32px); text-align:center;">
+      <div style="width:64px; height:64px; border-radius:50%; background:#eaf1fe; color:#101d33; font-size:30px; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;">✓</div>
+      <h2 style="font-size:26px; font-weight:800; color:#0b1524; margin:0 0 12px 0;">{{ t.received_heading }}</h2>
+      <p style="font-size:16px; line-height:1.7; color:#384152; margin:0 0 8px 0;">{{ t.received_paragraph }}</p>
+      <p style="font-size:14.5px; color:#6b7280; margin:0 0 28px 0;">{{ t.reference_id }} <strong style="color:#0b1524;">{{ referenceId }}</strong></p>
+      <a href="BMCC Website.dc.html" style="display:inline-block; background:#101d33; color:#eef2f8; font-weight:700; font-size:14.5px; padding:12px 24px; border-radius:8px;">{{ t.back_home }}</a>
+    </section>
+  </sc-if>
+
+  <dc-import name="Site Footer" hint-size="100%,300">
+  </dc-import>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const EN_DEFAULT = {
+  membership_eyebrow: 'Join BMCC', membership_heading: 'Membership Application',
+  membership_hero_paragraph: 'Join our mosque community and stay informed about upcoming events, programs, and initiatives. Your information is stored securely and used only for mosque communications and community engagement.',
+  m1_title: '1. Primary Member Information', m1_sub: 'The main contact for this membership.',
+  m1_fullname: 'Full Name', m1_fullname_ph: 'Your full legal name', m1_address: 'Home Address (Street, City, State, ZIP)', m1_address_ph: 'Street, City, State, ZIP',
+  m1_dob: 'Date of Birth', m1_phone: 'Phone Number', m1_email: 'Email Address', m1_emergency: 'Emergency Contact', m1_emergency_ph: 'Name and phone number',
+  m2_title: '2. Household & Dependents', m2_sub: 'List immediate household members (spouse, children, or dependents) — this includes them in community events and the Funeral Services Benefit.',
+  m2_relationship: 'Relationship', m2_relationship_ph: 'e.g. Spouse, Child', m2_phone_ph: 'Optional', m2_email_ph: 'Optional', m2_add: '+ Add Household Member',
+  m3_title: '3. Membership Fees', m3_sub: 'Choose a billing cycle.', m3_monthly: 'Monthly', m3_yearly: 'Yearly', m3_save: 'Save $200',
+  m4_title: '4. Funeral Services Benefit — included',
+  m4_text_prefix: 'Your membership includes up to $10,000 in funeral service coverage for your household, starting 6 months after enrollment. See the',
+  m4_link: 'Funeral Services Benefit Policy ↗', m4_text_suffix: '(opens in a new tab, so your application stays right here) for full eligibility, payment, and claims details.',
+  m5_title: '5. Declaration',
+  m5_text: 'I hereby request membership with Brentwood Muslim Community Center (BMCC). I agree to uphold the values and code of conduct of the mosque and understand that my information will be used solely for mosque communications.',
+  submit_application: 'Submit Membership Application', confirm_note: 'A member of the BMCC office will confirm your application and assign your Membership ID.',
+  received_heading: 'Application received', received_paragraph: 'JazakAllah Khair for joining BMCC. A membership coordinator will confirm your details and follow up with payment setup.',
+  reference_id: 'Reference ID:', back_home: 'Back to Home'
+};
+class Component extends DCLogic {
+  state = { dependents: [], plan: 'monthly', agreed: false, submitted: false, referenceId: '', lang: 'en', i18n: EN_DEFAULT };
+  nextDepId = 1;
+  componentDidMount() {
+    import('./i18n.js').then(mod => {
+      this.i18nMod = mod;
+      const lang = mod.getLang();
+      if (lang !== 'en') this.setState({ lang, i18n: { ...EN_DEFAULT, ...mod.t(lang) } });
+    });
+  }
+
+  addDependent = () => {
+    const id = this.nextDepId++;
+    this.setState(s => ({ dependents: [...s.dependents, { id }] }));
+  };
+  removeDependent = (id) => this.setState(s => ({ dependents: s.dependents.filter(d => d.id !== id) }));
+  selectMonthly = () => this.setState({ plan: 'monthly' });
+  selectYearly = () => this.setState({ plan: 'yearly' });
+  toggleAgreed = (e) => this.setState({ agreed: e.target.checked });
+  onSubmit = (e) => {
+    e.preventDefault();
+    if (!this.state.agreed) return;
+    const ref = 'BMCC-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+    this.setState({ submitted: true, referenceId: ref });
+  };
+
+  renderVals() {
+    const t = this.state.i18n;
+    const dir = (this.i18nMod && this.i18nMod.isRTL(this.state.lang)) ? 'rtl' : 'ltr';
+    const dependents = this.state.dependents.map(d => ({ ...d, remove: () => this.removeDependent(d.id) }));
+    const isMonthly = this.state.plan === 'monthly';
+    return {
+      t, dir,
+      dependents,
+      addDependent: this.addDependent,
+      monthlyBorder: isMonthly ? '#101d33' : '#dbe1e8',
+      monthlyBg: isMonthly ? '#f2f0e8' : '#fff',
+      yearlyBorder: !isMonthly ? '#101d33' : '#dbe1e8',
+      yearlyBg: !isMonthly ? '#f2f0e8' : '#fff',
+      selectMonthly: this.selectMonthly,
+      selectYearly: this.selectYearly,
+      agreed: this.state.agreed,
+      toggleAgreed: this.toggleAgreed,
+      onSubmit: this.onSubmit,
+      submitted: this.state.submitted,
+      referenceId: this.state.referenceId
+    };
+  }
+}
+</script>
+</body>
+</html>
