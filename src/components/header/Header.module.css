@@ -210,9 +210,14 @@
 .desktopNav {
   display: flex;
   align-items: center;
-  gap: 13px;
   min-width: 0;
   flex: 1 1 auto;
+}
+.navList {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: max-content;
 }
 .navItem {
   position: relative;
@@ -339,6 +344,16 @@
   .mobileNav {
     display: none;
   }
+}
+
+/* Labels too long to fit (measured in HeaderClient): behave like the ≤1140px layout.
+   The list stays laid out (invisible) so it can be re-measured when space grows. */
+.navCollapsed .navList {
+  visibility: hidden;
+}
+.navCollapsed .mobileToggle,
+.navCollapsed .mobileNav {
+  display: flex;
 }
 .mobileLink {
   font-size: 15px;

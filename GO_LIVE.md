@@ -42,8 +42,8 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 - [ ] Food pantry hours ("Saturday 10 AM – 12 PM" is a placeholder in announcements).
 - [ ] Photos for About Us and the event cards (striped placeholders today).
 - [ ] Logo as SVG or high-resolution PNG (current one is 216×102 px).
-- [ ] Vetted human translations for Dari, Urdu and Pashto (all current non-English text is
-      machine-generated). Arabic is out of scope for launch.
+- [ ] Vetted human translations for Dari, Urdu, Pashto and Spanish (all current non-English text
+      is machine-generated). Arabic is out of scope for launch.
 - [ ] Decide whether the "Stay Connected" form stays after the re-subscribe campaign.
 
 ## Infrastructure

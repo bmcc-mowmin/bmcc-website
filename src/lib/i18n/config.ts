@@ -1,4 +1,5 @@
-// Language codes match the design handoff (i18n.js). Arabic is deferred to a later phase:
+// Language codes match the design handoff (i18n.js), plus Spanish (added after the handoff).
+// Arabic is deferred to a later phase:
 // add it here, add messages/arabic.json, and it appears in the language menu.
 
 export const LANGS = [
@@ -6,6 +7,7 @@ export const LANGS = [
   { code: "dari", label: "Dari", intl: "fa-AF", html: "fa-AF" },
   { code: "urdu", label: "Urdu", intl: "ur-PK", html: "ur-PK" },
   { code: "pashto", label: "Pashtu", intl: "ps-AF", html: "ps-AF" },
+  { code: "spanish", label: "Spanish", intl: "es-US", html: "es-US" },
 ] as const;
 
 export type Lang = (typeof LANGS)[number]["code"];

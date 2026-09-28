@@ -2,12 +2,13 @@ import en from "../../../messages/en.json";
 import dari from "../../../messages/dari.json";
 import urdu from "../../../messages/urdu.json";
 import pashto from "../../../messages/pashto.json";
+import spanish from "../../../messages/spanish.json";
 import { DEFAULT_LANG, type Lang } from "./config";
 
 export type MessageKey = keyof typeof en;
 export type Dictionary = Record<MessageKey, string>;
 
-const partials: Record<Lang, Partial<Dictionary>> = { en, dari, urdu, pashto };
+const partials: Record<Lang, Partial<Dictionary>> = { en, dari, urdu, pashto, spanish };
 
 // Same behavior as the prototype's t(lang): the chosen language merged over English,
 // so any key without a translation falls back to English.

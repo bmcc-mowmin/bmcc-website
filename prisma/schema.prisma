@@ -2,7 +2,7 @@
 // Every change goes through `npm run db:migrate` (prisma migrate dev). No manual edits.
 //
 // Fields typed `Json` and commented "L10n" hold per-language text:
-//   { "en": "...", "dari": "...", "urdu": "...", "pashto": "..." }
+//   { "en": "...", "dari": "...", "urdu": "...", "pashto": "...", "spanish": "..." }
 // Read them with `localize()` in src/lib/i18n, which falls back to English per field.
 
 generator client {

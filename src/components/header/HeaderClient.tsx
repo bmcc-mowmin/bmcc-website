@@ -95,6 +95,23 @@ export function HeaderClient({ announcements, prayer }: { announcements: TickerI
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const navListRef = useRef<HTMLDivElement>(null);
+  // True when the menu labels don't fit (longer languages such as Spanish), so the header
+  // switches to the menu button even above the 1140px breakpoint.
+  const [navCollapsed, setNavCollapsed] = useState(false);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    const list = navListRef.current;
+    if (!nav || !list) return;
+    const observer = new ResizeObserver(() => {
+      setNavCollapsed(nav.clientWidth > 0 && list.scrollWidth > nav.clientWidth + 1);
+    });
+    observer.observe(nav);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, []);
   const uid = useId();
 
   // Close menus when clicking outside the header, or on Escape.
@@ -194,52 +211,54 @@ export function HeaderClient({ announcements, prayer }: { announcements: TickerI
       </div>
 
       {/* HEADER / MEGA NAV */}
-      <header className={styles.header}>
+      <header className={`${styles.header} ${navCollapsed ? styles.navCollapsed : ""}`}>
         <div className={styles.headerInner}>
           <Link href={routes.home} className={styles.logoLink}>
             {/* eslint-disable-next-line @next/next/no-img-element -- tiny fixed-size logo */}
             <img src="/brand/bmcc-logo.jpeg" alt="Brentwood Muslim Community Center" className={styles.logo} />
           </Link>
 
-          <nav className={styles.desktopNav} aria-label="Main">
-            {menus.map((m) => {
-              const active = current === m.id || m.childIds.includes(current);
-              const cls = `${styles.navTab} ${active ? styles.navTabActive : ""}`;
-              return (
-                <div key={m.id} className={styles.navItem}>
-                  {m.items ? (
-                    <>
-                      <button
-                        type="button"
-                        className={cls}
-                        aria-expanded={openMenuId === m.id}
-                        aria-controls={`${uid}-${m.id}`}
-                        onClick={() => setOpenMenuId((id) => (id === m.id ? null : m.id))}
-                      >
-                        {m.label}{" "}
-                        <span className={styles.caret} aria-hidden>
-                          ▾
-                        </span>
-                      </button>
-                      {openMenuId === m.id && (
-                        <div id={`${uid}-${m.id}`} className={styles.dropdown}>
-                          {m.items.map((it) => (
-                            <Link key={it.id} href={it.href} className={styles.dropdownItem} {...linkProps(it)}>
-                              <div className={styles.dropdownLabel}>{it.label}</div>
-                              <div className={styles.dropdownDesc}>{it.description}</div>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <Link href={m.href!} className={cls} aria-current={active ? "page" : undefined}>
-                      {m.label}
-                    </Link>
-                  )}
-                </div>
-              );
-            })}
+          <nav ref={navRef} className={styles.desktopNav} aria-label="Main" aria-hidden={navCollapsed || undefined}>
+            <div ref={navListRef} className={styles.navList}>
+              {menus.map((m) => {
+                const active = current === m.id || m.childIds.includes(current);
+                const cls = `${styles.navTab} ${active ? styles.navTabActive : ""}`;
+                return (
+                  <div key={m.id} className={styles.navItem}>
+                    {m.items ? (
+                      <>
+                        <button
+                          type="button"
+                          className={cls}
+                          aria-expanded={openMenuId === m.id}
+                          aria-controls={`${uid}-${m.id}`}
+                          onClick={() => setOpenMenuId((id) => (id === m.id ? null : m.id))}
+                        >
+                          {m.label}{" "}
+                          <span className={styles.caret} aria-hidden>
+                            ▾
+                          </span>
+                        </button>
+                        {openMenuId === m.id && (
+                          <div id={`${uid}-${m.id}`} className={styles.dropdown}>
+                            {m.items.map((it) => (
+                              <Link key={it.id} href={it.href} className={styles.dropdownItem} {...linkProps(it)}>
+                                <div className={styles.dropdownLabel}>{it.label}</div>
+                                <div className={styles.dropdownDesc}>{it.description}</div>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <Link href={m.href!} className={cls} aria-current={active ? "page" : undefined}>
+                        {m.label}
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </nav>
 
           <div className={styles.headerTools}>

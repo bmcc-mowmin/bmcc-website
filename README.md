@@ -5,7 +5,7 @@ Public website, member portal and admin for the **Brentwood Muslim Community Cen
 [`docs/design-handoff/`](docs/design-handoff/README.md), which is the visual and behavioral spec.
 
 **Stack:** Next.js 16 (App Router, TypeScript, server-rendered) · Postgres 17 + Prisma 7 ·
-Docker Compose (Postgres, Mailpit) · 4 languages (English, Dari, Urdu, Pashto; the last three RTL).
+Docker Compose (Postgres, Mailpit) · 5 languages (English, Dari, Urdu, Pashto, Spanish; Dari, Urdu and Pashto are RTL).
 
 ## Run it locally
 
@@ -79,6 +79,10 @@ request) and in `localStorage`, so all open tabs switch together.
 
 All non-English text is machine-generated and must be replaced with vetted translations before
 launch — see [GO_LIVE.md](GO_LIVE.md).
+
+To add a language: add it to `LANGS` in `src/lib/i18n/config.ts` (and to `RTL_LANGS` if it is
+right-to-left), add `messages/<code>.json`, and add the code to `LANGS` in `prisma/seed.ts`. If its
+menu labels are too long for the desktop header, the header automatically falls back to the menu button.
 
 ## Deployment
 

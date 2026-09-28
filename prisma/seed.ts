@@ -19,7 +19,7 @@ const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.
 const TZ = process.env.MASJID_TIMEZONE || "America/Los_Angeles";
 
 // ── Translations: build { en, dari, urdu, pashto } for a message key ────────
-const LANGS = ["en", "dari", "urdu", "pashto"] as const;
+const LANGS = ["en", "dari", "urdu", "pashto", "spanish"] as const;
 const messages = Object.fromEntries(
   LANGS.map((l) => [l, JSON.parse(readFileSync(`messages/${l}.json`, "utf8")) as Record<string, string>]),
 );
