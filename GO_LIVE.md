@@ -48,8 +48,10 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 
 ## Content from BMCC (README "Content blockers")
 
-- [ ] Restore the real Community Directory listings from the backup Google Sheet
-      (local sample data is fake). Fix categories and add missing addresses.
+- [ ] Restore the real Community Directory listings: export the backup Google Sheet as CSV and use
+      Admin → Directory → *Import listings from a CSV* (local sample data is fake). Fix categories
+      and add missing addresses first — only listings with an address or city get a map.
+- [ ] Decide who receives "new listing to review" emails (currently `CONTACT_INBOX`).
 - [ ] Imam confirms the Fajr/Isha calculation method (ISNA by default; Asr is always Hanafi),
       the Iqamah rules, and the Jumu'ah times — all editable in /admin/prayer-times.
 - [ ] Set the masjid's exact coordinates in admin (the default is Brentwood's center, 37.93, -121.70).

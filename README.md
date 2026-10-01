@@ -104,6 +104,23 @@ Calendar link. Photos are uploaded in admin and served from `/media/…`.
 Announcements show in the header ticker only between their start and end times and while active;
 the ticker disappears when none are showing.
 
+## Community Directory
+
+`/community` shows **approved** listings only (pending/rejected never reach the browser), filtered
+instantly by free text (name, categories, city, tags), main category and specific category, 10 per
+page, listings with a phone number first. Filters and an open listing are kept in the address bar
+(`?q=…&type=…&category=…&page=…&listing=…`) so a view can be shared. "View Details" is a native modal
+dialog (focus stays inside, Escape closes, focus returns) with a Google Maps embed when the listing
+has an address or city (`GOOGLE_MAPS_EMBED_API_KEY` switches to the Maps Embed API). Below 700px the
+table becomes cards with a full-width Call button.
+
+`/community/submit` → listing saved as **pending**, the office (`CONTACT_INBOX`) and the submitter are
+emailed. Admin → Directory approves (submitter emailed), rejects with an optional reason, edits, adds,
+deletes, and **imports/exports CSV** — use the import to restore the real vetted listings at go-live.
+
+**Every public form** uses a hidden honeypot field, a minimum fill-in time and a Postgres-backed
+rate limit (`RATE_LIMIT_MAX` per `RATE_LIMIT_WINDOW_SEC` per visitor IP).
+
 ## Admin portal
 
 `/admin` (production: `ADMIN_HOST`, e.g. admin.brmcc.org — `/admin` on the main site redirects there,

@@ -8,7 +8,7 @@ import { requireSection, type CurrentUser } from "@/lib/auth";
 import { ADMIN_ROLES, ROLE_INFO, type AdminRole } from "@/lib/auth/permissions";
 import { createToken } from "@/lib/auth/tokens";
 import { audit } from "@/lib/audit";
-import { buttonHtml, layoutHtml, sendMail } from "@/lib/mail";
+import { buttonHtml, escapeHtml, layoutHtml, sendMail } from "@/lib/mail";
 import { done, fail, text } from "@/lib/admin/forms";
 import type { ActionResult } from "@/components/admin/ActionForm";
 
@@ -34,7 +34,7 @@ async function sendInvite(user: { id: string; email: string; name: string | null
     text: `Assalamu alaikum${user.name ? ` ${user.name}` : ""},\n\n${by} invited you to the Brentwood Muslim Community Center admin portal.\n\nSet your password here (the link works once and expires in ${INVITE_HOURS} hours):\n${link}\n\nIf you weren't expecting this, you can ignore this email.`,
     html: layoutHtml(
       "You're invited to the BMCC admin portal",
-      `<p>Assalamu alaikum${user.name ? ` ${user.name}` : ""},</p><p>${by} invited you to the Brentwood Muslim Community Center admin portal.</p>${buttonHtml(link, "Set your password")}<p style="color:#6b7280;font-size:13px">The link works once and expires in ${INVITE_HOURS} hours. If you weren't expecting this, you can ignore this email.</p>`,
+      `<p>Assalamu alaikum${user.name ? ` ${escapeHtml(user.name)}` : ""},</p><p>${escapeHtml(by)} invited you to the Brentwood Muslim Community Center admin portal.</p>${buttonHtml(link, "Set your password")}<p style="color:#6b7280;font-size:13px">The link works once and expires in ${INVITE_HOURS} hours. If you weren't expecting this, you can ignore this email.</p>`,
     ),
   });
   return link;

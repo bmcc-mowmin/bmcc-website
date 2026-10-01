@@ -65,9 +65,14 @@ export async function sendMail(mail: Mail) {
   }
 }
 
+// Escape user-supplied text before putting it in an email's HTML.
+export function escapeHtml(s: string) {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+}
+
 // Minimal, readable HTML wrapper for transactional emails.
 export function layoutHtml(title: string, bodyHtml: string) {
-  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+  const esc = escapeHtml;
   return `<!doctype html><html><body style="margin:0;background:#f6f7f9;font-family:Inter,Arial,sans-serif;color:#101828">
 <div style="max-width:560px;margin:0 auto;padding:28px 20px">
 <div style="background:#101d33;color:#eef2f8;padding:16px 22px;border-radius:12px 12px 0 0;font-weight:800">Brentwood Muslim Community Center</div>
