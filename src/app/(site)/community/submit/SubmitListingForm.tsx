@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { Fragment, useActionState, useState } from "react";
 import Link from "next/link";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { HoneypotFields } from "@/components/forms/HoneypotFields";
@@ -65,13 +65,15 @@ export function SubmitListingForm({ parents }: { parents: string[] }) {
   };
 
   return (
-    <form action={action} className={styles.form} key={formKey} noValidate>
+    <form action={action} className={styles.form} noValidate>
+      {/* The spam timer stays outside the part that remounts after an error (remounting would restart it). */}
+      <HoneypotFields />
+      <Fragment key={formKey}>
       {state.status === "error" && (
         <p role="alert" className={styles.formError}>
           {state.message}
         </p>
       )}
-      <HoneypotFields />
 
       <fieldset className={styles.fieldset}>
         <legend className={styles.label}>{t.f_listing_type}</legend>
@@ -153,6 +155,7 @@ export function SubmitListingForm({ parents }: { parents: string[] }) {
       <button type="submit" disabled={pending} className={styles.submit}>
         {pending ? t.f_sending : t.f_submit}
       </button>
+      </Fragment>
     </form>
   );
 }

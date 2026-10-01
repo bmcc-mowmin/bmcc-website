@@ -154,6 +154,50 @@
   padding: 13px 0;
   width: 100%;
 }
+.input[aria-invalid="true"] {
+  border-color: #b42318;
+}
+select.input {
+  background: var(--white);
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--text);
+}
+.fieldStack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--body);
+}
+.fieldError {
+  margin-top: -8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b42318;
+}
+.formError {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fef3f2;
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 600;
+}
+.doneText {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--body);
+}
+.again {
+  font-weight: 700;
+  color: var(--primary);
+}
 
 @media (max-width: 900px) {
   .panel,

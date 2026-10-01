@@ -9,10 +9,12 @@ import { intlLocale } from "@/lib/i18n/config";
 import { getUpcomingEvents, formatEventWhen } from "@/lib/events";
 import { masjidClock } from "@/lib/prayer/schedule";
 import { EventsCarousel, type CarouselCard } from "@/components/events/EventsCarousel";
+import { ResubBar } from "@/components/mailing-list/ResubBar";
+import { NewsletterBand } from "@/components/mailing-list/NewsletterBand";
+import { env } from "@/lib/env";
 import { MemberLoginCard } from "./MemberLoginCard";
 import styles from "./home.module.css";
 
-// Sections still to come: re-subscribe bar + newsletter (phase 6).
 export default async function HomePage() {
   const { t, lang } = await getI18n();
   const [{ today }, jumuah, announcements, events, { timeZone }] = await Promise.all([
@@ -45,6 +47,9 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* RE-SUBSCRIBE BAR (in the layout instead when it shows on every page) */}
+      {!env.SHOW_RESUB_BAR_SITEWIDE && <ResubBar />}
+
       {/* HERO */}
       <section className={styles.hero}>
         <div className={styles.heroHeading}>
@@ -169,6 +174,9 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* STAY CONNECTED */}
+      <NewsletterBand />
     </>
   );
 }

@@ -152,6 +152,28 @@ are emailed (numbered `BMCC-YYYY-000001` from a database sequence).
 - **Test tools** (mock provider only): *Next payment succeeds / fails* and *Grace period ends now*
   stand in for what Stripe does on its own schedule.
 
+## Mailing list and contact form
+
+**Mailing list (double opt-in).** The re-subscribe bar at the top of Home and the "Stay Connected"
+band at the bottom both add to the **new** list (`src/lib/mailing-list`). Signing up emails a
+confirmation link (Mailpit locally) in the visitor's language; the person is on the list only after
+pressing **Confirm my subscription** on that page (a button, because mail scanners open links on
+their own). The link works once, for 7 days. Confirming sends a welcome email with an unsubscribe
+link and `List-Unsubscribe` headers (one-click unsubscribe in mail apps, `/api/unsubscribe`).
+The form answers the same way whether or not an address is already subscribed, and one address gets
+at most 3 confirmation emails a day. Dismissing the bar lasts for the browser session
+(`bmcc_resub_dismissed`); `SHOW_RESUB_BAR_SITEWIDE=true` shows it on every page during the campaign.
+
+**Admin → Subscribers** (Content editor): confirmed / waiting / unsubscribed, search, unsubscribe or
+delete an address, and **Export confirmed (CSV)** — with each person's unsubscribe link — for the
+newsletter tool chosen at go-live.
+
+**Contact form** (About Us → `#contact`): name, email, message and "What is this about?", preselected
+from `?topic=` (the Services, Assistance and Home links). Each message is saved, emailed to
+`CONTACT_INBOX` with the visitor as reply-to, and acknowledged to the visitor (without repeating
+what they wrote). **Admin → Messages** (Content editor, Membership coordinator): New / Handled,
+reply by email, mark handled, delete.
+
 ## Admin portal
 
 `/admin` (production: `ADMIN_HOST`, e.g. admin.brmcc.org — `/admin` on the main site redirects there,

@@ -49,6 +49,17 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 - [ ] Choose the provider, verify the sending domain (SPF, DKIM, DMARC) for `MAIL_FROM`.
 - [ ] Set `MAIL_TRANSPORT`, `MAIL_PROVIDER_API_KEY` (or SMTP settings), `CONTACT_INBOX`.
 
+## Mailing list and contact form
+
+- [ ] Choose the newsletter tool (Mailchimp, Buttondown, Listmonk…). Either import Admin → Subscribers →
+      *Export confirmed (CSV)* before each send, or add a small sync to that tool. Every newsletter
+      must include the person's unsubscribe link (in the CSV) and BMCC's postal address (CAN-SPAM).
+- [ ] Re-subscribe campaign: announce it (Jumu'ah, old list's final email pointing to the site), and
+      decide whether to set `SHOW_RESUB_BAR_SITEWIDE=true` for its duration. Retire the old list after.
+- [ ] Decide who answers contact messages and whether `CONTACT_INBOX` is info@brmcc.org or a
+      ticketing inbox.
+- [ ] Optional: Cloudflare Turnstile on the public forms if spam gets past the honeypot + rate limits.
+
 ## Content from BMCC (README "Content blockers")
 
 - [ ] Copy the 10 initial directory listings (already imported locally from the vetted sheet) into

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { Fragment, useActionState, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { HoneypotFields } from "@/components/forms/HoneypotFields";
 import type { MessageKey } from "@/lib/i18n/dictionary";
@@ -52,8 +52,10 @@ export function MembershipForm() {
 
   const formKey = state ? JSON.stringify([values, errors]) : "fresh";
   return (
-    <form action={action} key={formKey} noValidate className={styles.form}>
+    <form action={action} noValidate className={styles.form}>
+      {/* The spam timer stays outside the part that remounts after an error (remounting would restart it). */}
       <HoneypotFields />
+      <Fragment key={formKey}>
       {state?.message && (
         <p role="alert" className={styles.formError}>
           {state.message}
@@ -190,6 +192,7 @@ export function MembershipForm() {
       </button>
       <p className={styles.note}>{t.m_payment_note}</p>
       <p className={styles.note}>{t.confirm_note}</p>
+      </Fragment>
     </form>
   );
 }

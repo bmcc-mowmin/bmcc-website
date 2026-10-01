@@ -26,6 +26,12 @@ export async function cleanTestData() {
   await sql(`DELETE FROM "CheckoutSession" WHERE email LIKE 'e2e-%' OR "membershipId" IN (SELECT m.id FROM "Membership" m JOIN "Household" h ON h.id = m."householdId" WHERE h.email LIKE 'e2e-%')`);
   await sql(`DELETE FROM "Membership" WHERE "householdId" IN (SELECT id FROM "Household" WHERE email LIKE 'e2e-%')`);
   await sql(`DELETE FROM "Household" WHERE email LIKE 'e2e-%'`);
+  await sql(`DELETE FROM "Subscriber" WHERE email LIKE 'e2e-%'`);
+  await sql(`DELETE FROM "ContactMessage" WHERE email LIKE 'e2e-%'`);
+}
+
+export async function subscriberStatus(email: string) {
+  return (await sql<{ status: string; source: string; lang: string }>('SELECT status, source, lang FROM "Subscriber" WHERE email = $1', [email]))[0];
 }
 
 // Inserts an approved (or pending) listing directly, for tests that must not depend on seed data.

@@ -3,16 +3,16 @@ const API = process.env.MAILPIT_API_URL ?? "http://localhost:8025";
 
 type Summary = { ID: string; Subject: string; To: { Address: string }[]; Created: string };
 
-// The newest email to `to` received after `since`, waiting up to `timeoutMs`.
-export async function waitForEmail(to: string, since: Date, timeoutMs = 10_000) {
+// The newest email to `to` received after `since` (optionally with this subject), waiting up to `timeoutMs`.
+export async function waitForEmail(to: string, since: Date, timeoutMs = 10_000, subject?: string) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     const res = await fetch(`${API}/api/v1/search?query=${encodeURIComponent(`to:"${to}"`)}`);
     const { messages } = (await res.json()) as { messages: Summary[] };
-    const fresh = messages.find((m) => new Date(m.Created) >= new Date(since.getTime() - 1000));
+    const fresh = messages.find((m) => new Date(m.Created) >= new Date(since.getTime() - 1000) && (!subject || m.Subject === subject));
     if (fresh) {
       const full = await (await fetch(`${API}/api/v1/message/${fresh.ID}`)).json();
-      return { subject: fresh.Subject, text: full.Text as string, html: full.HTML as string };
+      return { id: fresh.ID, subject: fresh.Subject, text: full.Text as string, html: full.HTML as string, replyTo: ((full.ReplyTo ?? []) as { Address: string }[]).map((r) => r.Address) };
     }
     await new Promise((r) => setTimeout(r, 300));
   }
@@ -29,4 +29,9 @@ export function firstLink(text: string, contains: string) {
 export async function subjectsFor(to: string) {
   const res = await fetch(`${API}/api/v1/search?query=${encodeURIComponent(`to:"${to}"`)}`);
   return ((await res.json()) as { messages: Summary[] }).messages.map((m) => m.Subject);
+}
+
+// Raw headers of one email, e.g. List-Unsubscribe.
+export async function emailHeaders(id: string) {
+  return (await (await fetch(`${API}/api/v1/message/${id}/headers`)).json()) as Record<string, string[]>;
 }
