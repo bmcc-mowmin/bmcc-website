@@ -160,21 +160,9 @@ test("spam: a filled honeypot looks successful but saves nothing", async ({ brow
   await context.close();
 });
 
-test("CSV import adds valid rows, reports bad ones, skips duplicates; paging appears past 10", async ({ page, browser }) => {
+test("paging appears past 10 listings, and Export CSV includes the listings", async ({ page, browser }) => {
   await deleteListings("E2E");
-  test.info().annotations.push({ type: "note", description: "11 = 2 imported + 9 fillers, all named E2E…" });
-  await page.goto("/admin/directory");
-  const importer = page.locator("section", { has: page.getByRole("heading", { name: "Import listings from a CSV" }) });
-  await importer.getByLabel("CSV file").setInputFiles("e2e/fixtures/listings.csv");
-  await importer.getByRole("button", { name: "Import" }).click();
-  await expect(importer.getByRole("status")).toContainText("Imported 2 listings as approved; skipped 0 duplicates. 1 row(s) need fixing: Row 4 (no name): name");
-
-  await importer.getByLabel("CSV file").setInputFiles("e2e/fixtures/listings.csv");
-  await importer.getByRole("button", { name: "Import" }).click();
-  await expect(importer.getByRole("status")).toContainText("Imported 0 listings as approved; skipped 2 duplicates.");
-
-  // Paging appears once there are more than 10 listings (add filler listings if the data is small).
-  for (let i = 1; i <= 9; i++) await insertListing({ name: `E2E Filler ${i}`, parentCategory: "E2E Filler", category: "E2E Filler" });
+  for (let i = 1; i <= 11; i++) await insertListing({ name: `E2E Filler ${String(i).padStart(2, "0")}`, parentCategory: "E2E Filler", category: "E2E Filler", tags: ["E2E Tag"] });
   const context = await browser.newContext(anon);
   const visitor = await context.newPage();
   await visitor.goto("/community?q=E2E");
@@ -184,11 +172,9 @@ test("CSV import adds valid rows, reports bad ones, skips duplicates; paging app
   await expect(visitor).toHaveURL(/page=2/);
   await context.close();
 
-  // Export includes them, in the import format.
   const csv = await (await page.request.get("/admin/directory/export")).text();
   expect(csv.split("\r\n")[0]).toBe("name,listing type,main category,category,tags,description,author,phone,email,website,address,city,state,zip,google map url,status,submitter email,created");
-  expect(csv).toContain("E2E Import Bakery,business,Restaurant,Bakery,Halal; Bakery");
-
+  expect(csv).toContain("E2E Filler 01,business,E2E Filler,E2E Filler,E2E Tag");
   await deleteListings("E2E");
 });
 

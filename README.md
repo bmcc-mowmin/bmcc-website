@@ -117,18 +117,13 @@ table becomes cards with a full-width Call button.
 
 `/community/submit` → listing saved as **pending**, the office (`CONTACT_INBOX`) and the submitter are
 emailed. Admin → Directory approves (submitter emailed), rejects with an optional reason, edits, adds,
-deletes, and **imports/exports CSV** — use the import to restore the real vetted listings at go-live.
+deletes, and exports a CSV backup.
 
-**Source of truth:** the vetted Google Sheet is only the *initial feed*. After it is imported, the
-website's database is the source of truth — new listings arrive through **Submit a Listing** and are
-approved/edited in Admin → Directory. Nothing syncs back from or to the sheet; use **Export CSV** for
-backups or to share the list.
-
-*Locally,* the initial feed lives at `prisma/seed-data/private/directory.csv` (git-ignored — it never
-reaches GitHub): `npm run db:seed` (full reset) loads it, and `npm run db:seed:directory` adds any of
-its rows that are missing without deleting or changing anything. Without that file the seed uses fake
-sample listings. *In production,* the initial feed is imported once with Admin → Directory → Import.
-The browser tests create and remove their own "E2E…" listings, so they pass with either.
+**Source of truth:** the website's database. BMCC's initial listings were imported once from the
+vetted sheet; from now on every new listing comes in through **Submit a Listing** and is approved or
+edited in Admin → Directory (there is no import). **Export CSV** gives a backup copy. The seed never
+deletes or changes existing listings — only an empty directory (a fresh clone) gets fake samples —
+and the browser tests create and remove their own "E2E…" listings.
 
 **Every public form** uses a hidden honeypot field, a minimum fill-in time and a Postgres-backed
 rate limit (`RATE_LIMIT_MAX` per `RATE_LIMIT_WINDOW_SEC` per visitor IP).

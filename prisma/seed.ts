@@ -51,7 +51,7 @@ async function main() {
     db.membership.deleteMany(),
     db.householdMember.deleteMany(),
     db.household.deleteMany(),
-    db.directoryListing.deleteMany(),
+    db.directoryListing.updateMany({ data: { reviewedById: null } }),
     db.authToken.deleteMany(),
     db.user.deleteMany(),
     db.event.deleteMany(),
@@ -209,8 +209,8 @@ async function main() {
     },
   });
 
-  // ── Community Directory (real listings from the git-ignored CSV if present, else fake samples) ─
-  const directory = await seedDirectory(db, admin.id, { replace: true });
+  // ── Community Directory: existing listings are never touched (see directory-seed.ts) ─
+  const directory = await seedDirectory(db, admin.id);
 
   console.log("Seeded: prayer settings, 2 Jumu'ah services, 5 announcements (1 expired), 4 events,");
   console.log(`        ${directory}, admin + member test accounts${staffPassword ? ", 4 role test accounts" : ""}.`);

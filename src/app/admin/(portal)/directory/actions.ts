@@ -8,8 +8,6 @@ import { requireSection } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { done, fail, text } from "@/lib/admin/forms";
 import { fieldErrors, listingSchema } from "@/lib/directory/listing";
-import { csvToObjects } from "@/lib/directory/csv";
-import { rowToListing } from "@/lib/directory/import";
 import { escapeHtml, layoutHtml, sendMail } from "@/lib/mail";
 import type { ActionResult } from "@/components/admin/ActionForm";
 
@@ -108,52 +106,4 @@ export async function deleteListing(_prev: ActionResult, form: FormData): Promis
   await audit(admin.id, "delete", "DirectoryListing", id, { name: listing.name });
   refresh();
   redirect("/admin/directory?status=APPROVED&deleted=1");
-}
-
-// CSV import, e.g. restoring the vetted Google Sheet at go-live. Header names are matched loosely
-// (name, listing type, main category / parent category, category, tags, description, author /
-// contact name, phone, email, website, address, city, state, zip, google map url).
-const MAX_CSV_BYTES = 2 * 1024 * 1024;
-
-export async function importListings(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireSection("directory");
-  const file = form.get("file");
-  if (!(file instanceof File) || file.size === 0) return fail("Choose a CSV file.");
-  if (file.size > MAX_CSV_BYTES) return fail("The CSV must be 2 MB or smaller.");
-  const status = form.get("asPending") === "on" ? "PENDING" : "APPROVED";
-  const rows = csvToObjects(await file.text());
-  if (!rows.length) return fail("No rows found. The first line must be the column headers.");
-
-  const problems: string[] = [];
-  let created = 0;
-  let skipped = 0;
-  for (const [i, row] of rows.entries()) {
-    const { candidate, googleMapUrl } = rowToListing(row);
-    const parsed = listingSchema.safeParse(candidate);
-    if (!parsed.success) {
-      problems.push(`Row ${i + 2} (${candidate.name || "no name"}): ${Object.keys(fieldErrors(parsed.error)).join(", ")}`);
-      continue;
-    }
-    // Skip exact duplicates (same name and phone) so an import can be re-run safely.
-    const exists = await db.directoryListing.findFirst({ where: { name: parsed.data.name, phone: parsed.data.phone } });
-    if (exists) {
-      skipped++;
-      continue;
-    }
-    await db.directoryListing.create({
-      data: {
-        ...parsed.data,
-        googleMapUrl,
-        status,
-        ...(status === "APPROVED" ? { reviewedById: admin.id, reviewedAt: new Date() } : {}),
-      },
-    });
-    created++;
-  }
-  await audit(admin.id, "import", "DirectoryListing", "csv", { created, skipped, failed: problems.length, status });
-  refresh();
-  const summary = `Imported ${created} listing${created === 1 ? "" : "s"} as ${status.toLowerCase()}; skipped ${skipped} duplicate${skipped === 1 ? "" : "s"}.`;
-  return problems.length
-    ? { ok: created > 0, message: `${summary} ${problems.length} row(s) need fixing: ${problems.slice(0, 8).join("; ")}${problems.length > 8 ? "; …" : ""}` }
-    : done(summary);
 }

@@ -5,7 +5,7 @@ import { requireSection } from "@/lib/auth";
 import { masjidClock } from "@/lib/prayer/schedule";
 import { ActionForm } from "@/components/admin/ActionForm";
 import styles from "@/components/admin/admin.module.css";
-import { approveListing, importListings, rejectListing } from "./actions";
+import { approveListing, rejectListing } from "./actions";
 
 export const metadata: Metadata = { title: "Directory" };
 
@@ -43,8 +43,8 @@ export default async function DirectoryAdmin({ searchParams }: PageProps<"/admin
         </span>
       </div>
       <p className={styles.pageLead}>
-        Submissions from the public form wait here until someone approves them; only approved listings appear on the site.
-        Approving or rejecting emails the person who submitted it.
+        New listings come in through the public “Submit a Listing” form and wait here until someone approves them; only
+        approved listings appear on the site. Approving or rejecting emails the person who submitted it.
       </p>
       {params.deleted && <p className={styles.ok}>Listing deleted.</p>}
 
@@ -167,23 +167,6 @@ export default async function DirectoryAdmin({ searchParams }: PageProps<"/admin
         </section>
       )}
 
-      <section className={styles.card}>
-        <h2 className={styles.cardTitle}>Import listings from a CSV</h2>
-        <p className={styles.cardLead}>
-          For restoring the vetted listings (e.g. exported from Google Sheets as CSV). The first row must be column headers;
-          recognized columns: <em>name, listing type, main category, category, tags, description, author, phone, email,
-          website, address, city, state, zip, google map url</em>. Rows with the same name and phone as an existing listing
-          are skipped, so an import can be repeated safely. Use “Export CSV” to see the exact format.
-        </p>
-        <ActionForm action={importListings} submitLabel="Import" resetOnSuccess>
-          <div className={styles.row}>
-            <input type="file" name="file" accept=".csv,text/csv" required aria-label="CSV file" />
-            <label style={{ display: "flex", gap: 6, fontSize: 14 }}>
-              <input type="checkbox" name="asPending" /> Import as “waiting for review” instead of approved
-            </label>
-          </div>
-        </ActionForm>
-      </section>
     </>
   );
 }

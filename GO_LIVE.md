@@ -48,10 +48,10 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 
 ## Content from BMCC (README "Content blockers")
 
-- [ ] One-time initial feed of the Community Directory: export the vetted Google Sheet as CSV and use
-      Admin → Directory → *Import listings from a CSV*. From then on the website is the source of
-      truth (new listings come from *Submit a Listing*); retire the sheet or keep it only as an archive. Fix categories
-      and add missing addresses first — only listings with an address or city get a map.
+- [ ] Copy the 10 initial directory listings (already imported locally from the vetted sheet) into
+      the production database once, as part of the deployment. After that, new listings come only
+      from *Submit a Listing*; the sheet is retired. Optionally fill in missing descriptions and
+      addresses in Admin → Directory — only listings with an address or city get a map.
 - [ ] Decide who receives "new listing to review" emails (currently `CONTACT_INBOX`).
 - [ ] Imam confirms the Fajr/Isha calculation method (ISNA by default; Asr is always Hanafi),
       the Iqamah rules, and the Jumu'ah times — all editable in /admin/prayer-times.
