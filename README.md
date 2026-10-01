@@ -128,6 +128,30 @@ and the browser tests create and remove their own "E2E…" listings.
 **Every public form** uses a hidden honeypot field, a minimum fill-in time and a Postgres-backed
 rate limit (`RATE_LIMIT_MAX` per `RATE_LIMIT_WINDOW_SEC` per visitor IP).
 
+## Donations and membership
+
+**Payments** go through one provider interface (`src/lib/payments`). `PAYMENT_PROVIDER=mock` (local)
+sends visitors to a clearly-labelled **test checkout** at `/checkout/<id>` — no card details, no money —
+with *Pay*, *Simulate a declined card* and *Cancel*. `stripe` (go-live) swaps in Stripe Checkout and
+its webhook. Both produce the same provider-neutral events, handled in **one place**
+(`src/lib/payments/events.ts`): each event is applied exactly once and all-or-nothing, then receipts
+are emailed (numbered `BMCC-YYYY-000001` from a database sequence).
+
+- **Donate** (`/donate`): five funds, one-time or monthly (`DEFAULT_DONATION_FREQUENCY`), $25–$250
+  presets or a custom amount ($5–$25,000), thank-you page with the receipt number.
+- **Membership** (`/membership`): the 5-step application stores the household as structured records
+  (the primary member and everyone listed are the people covered by the Funeral Services Benefit),
+  then checkout for $100/month or $1,000/year. The **first dues payment** activates the membership:
+  `enrolledAt` = that payment, `benefitEligibleFrom` = 6 calendar months later on the masjid's
+  calendar. A failed renewal starts a **30-day grace period**; after it coverage is **paused**, and
+  paying resumes it (never skipping the waiting period). Coverage is computed when read
+  (`src/lib/membership/coverage.ts`), so no scheduled job is needed.
+- **Admin → Memberships** (Membership coordinator): coverage status, benefit dates, Membership ID,
+  notes, household members (add/edit/remove), payments, cancel. **Admin → Donations** (Treasurer,
+  read-only): totals, by fund, filters, recurring donors, CSV export.
+- **Test tools** (mock provider only): *Next payment succeeds / fails* and *Grace period ends now*
+  stand in for what Stripe does on its own schedule.
+
 ## Admin portal
 
 `/admin` (production: `ADMIN_HOST`, e.g. admin.brmcc.org — `/admin` on the main site redirects there,

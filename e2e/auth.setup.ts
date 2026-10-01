@@ -35,7 +35,7 @@ setup("sign in as the seeded accounts", async ({ browser }) => {
     throw new Error("SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD and SEED_STAFF_PASSWORD must be set in .env (npm run setup)");
   }
   await signIn(browser, SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD, ADMIN_STATE);
-  for (const role of ["editor", "prayer", "treasurer"]) {
+  for (const role of ["editor", "prayer", "treasurer", "membership"]) {
     await signIn(browser, `${role}@bmcc.local`, SEED_STAFF_PASSWORD, roleState(role));
   }
 });

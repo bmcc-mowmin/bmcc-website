@@ -10,6 +10,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { addDays, weekdayOf, zonedDate, zonedToUtc } from "../src/lib/time";
 import { seedDirectory } from "./directory-seed";
+import { benefitEligibleFrom } from "../src/lib/membership/coverage";
 
 if (process.env.APP_ENV === "production") {
   console.error("Refusing to seed: APP_ENV=production.");
@@ -48,6 +49,9 @@ async function main() {
     db.auditLog.deleteMany(),
     db.eventRsvp.deleteMany(),
     db.payment.deleteMany(),
+    db.subscription.deleteMany(),
+    db.checkoutSession.deleteMany(),
+    db.processedWebhookEvent.deleteMany(),
     db.membership.deleteMany(),
     db.householdMember.deleteMany(),
     db.household.deleteMany(),
@@ -172,8 +176,7 @@ async function main() {
 
   // Existing member with an active membership, for testing the portal (phase 7).
   const enrolledAt = at(addDays(today, -60), "10:00");
-  const eligible = new Date(enrolledAt);
-  eligible.setMonth(eligible.getMonth() + 6);
+  const eligible = benefitEligibleFrom(enrolledAt, TZ);
   const household = await db.household.create({
     data: {
       primaryUserId: member.id,
@@ -194,7 +197,7 @@ async function main() {
       },
     },
   });
-  await db.membership.create({
+  const membership = await db.membership.create({
     data: {
       referenceId: "BMCC-TEST01",
       membershipNumber: "M-0001",
@@ -206,6 +209,64 @@ async function main() {
       enrolledAt,
       benefitEligibleFrom: eligible,
       paymentProvider: "mock",
+      providerCustomerId: "mock_cus_seed_member",
+      providerSubscriptionId: "mock_sub_seed_member",
+    },
+  });
+
+  // Payment history (mock provider): two months of dues, a one-time and a monthly donation.
+  // Receipt numbers restart so local receipts begin at BMCC-<year>-000001.
+  await db.$executeRawUnsafe("ALTER SEQUENCE receipt_number_seq RESTART WITH 1");
+  const receipt = async (at: Date) => {
+    const [{ n }] = await db.$queryRaw<{ n: bigint }[]>`SELECT nextval('receipt_number_seq') AS n`;
+    return `BMCC-${at.getUTCFullYear()}-${String(n).padStart(6, "0")}`;
+  };
+  const secondDues = at(addDays(today, -30), "10:00");
+  await db.subscription.create({
+    data: {
+      provider: "mock",
+      providerSubscriptionId: "mock_sub_seed_member",
+      providerCustomerId: "mock_cus_seed_member",
+      kind: "DUES",
+      membershipId: membership.id,
+      amountCents: 100_00,
+      interval: "MONTH",
+      currentPeriodEnd: at(addDays(today, 1), "10:00"),
+      email: member.email,
+      name: member.name,
+      userId: member.id,
+    },
+  });
+  for (const [i, paidAt] of [enrolledAt, secondDues].entries()) {
+    await db.payment.create({
+      data: {
+        kind: "DUES", frequency: "MONTHLY", amountCents: 100_00, status: "SUCCEEDED", donorName: member.name, donorEmail: member.email,
+        userId: member.id, membershipId: membership.id, provider: "mock", providerPaymentId: `mock_pi_seed_dues_${i}`,
+        providerSubscriptionId: "mock_sub_seed_member", receiptNumber: await receipt(paidAt), receiptSentAt: paidAt, paidAt,
+      },
+    });
+  }
+  const donatedAt = at(addDays(today, -12), "19:30");
+  await db.payment.create({
+    data: {
+      kind: "DONATION", fund: "new-bmcc", frequency: "ONE_TIME", amountCents: 250_00, status: "SUCCEEDED", donorName: member.name,
+      donorEmail: member.email, userId: member.id, provider: "mock", providerPaymentId: "mock_pi_seed_donation",
+      receiptNumber: await receipt(donatedAt), receiptSentAt: donatedAt, paidAt: donatedAt,
+    },
+  });
+  const donor = await db.user.create({ data: { email: "donor@example.com", name: "Sample Monthly Donor" } });
+  const monthlyAt = at(addDays(today, -5), "08:00");
+  await db.subscription.create({
+    data: {
+      provider: "mock", providerSubscriptionId: "mock_sub_seed_donor", kind: "DONATION", fund: "sadaqah-zakat", amountCents: 50_00,
+      interval: "MONTH", currentPeriodEnd: at(addDays(today, 25), "08:00"), email: donor.email, name: donor.name, userId: donor.id,
+    },
+  });
+  await db.payment.create({
+    data: {
+      kind: "DONATION", fund: "sadaqah-zakat", frequency: "MONTHLY", amountCents: 50_00, status: "SUCCEEDED", donorName: donor.name,
+      donorEmail: donor.email, userId: donor.id, provider: "mock", providerPaymentId: "mock_pi_seed_monthly",
+      providerSubscriptionId: "mock_sub_seed_donor", receiptNumber: await receipt(monthlyAt), receiptSentAt: monthlyAt, paidAt: monthlyAt,
     },
   });
 

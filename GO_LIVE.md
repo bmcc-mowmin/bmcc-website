@@ -9,7 +9,10 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 - [ ] Create the membership Products/Prices ($100/month, $1,000/year) and set
       `STRIPE_PRICE_MEMBERSHIP_MONTHLY` / `STRIPE_PRICE_MEMBERSHIP_YEARLY`.
 - [ ] Set `PAYMENT_PROVIDER=stripe`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
-- [ ] Register the webhook endpoint (added in phase 5) and set `STRIPE_WEBHOOK_SECRET`.
+- [ ] Implement the Stripe adapter in `src/lib/payments/provider.ts` (Checkout Sessions for donations
+      and dues; subscriptions for monthly) and the webhook route that maps Stripe events to the
+      provider-neutral events in `src/lib/payments/types.ts` — everything else already works with them.
+- [ ] Register the webhook endpoint in Stripe and set `STRIPE_WEBHOOK_SECRET`.
 - [ ] Run one real low-value donation and one membership signup end to end, then refund them.
 - [ ] Decide whether Zelle / PayPal / Zakat al-Fitr per-person tiers will be offered (Gap Analysis).
 

@@ -46,6 +46,7 @@ model User {
   reviewedListings DirectoryListing[] @relation("ListingReviewer")
   auditLogs        AuditLog[]
   authTokens       AuthToken[]
+  subscriptions    Subscription[]
 }
 
 // One-time links, e.g. an admin invite's "set your password" link. Only a hash is stored.
@@ -319,6 +320,8 @@ model Membership {
   notes                  String?
   updatedAt              DateTime         @updatedAt
   payments               Payment[]
+  checkoutSessions       CheckoutSession[]
+  subscriptions          Subscription[]
 }
 
 // ─── Payments (written only by the payment provider's webhook) ──────────────
@@ -367,6 +370,68 @@ model Payment {
 
   @@index([donorEmail])
   @@index([kind, createdAt])
+}
+
+enum CheckoutStatus {
+  OPEN
+  COMPLETED
+  CANCELED
+  EXPIRED
+}
+
+enum SubscriptionInterval {
+  MONTH
+  YEAR
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+// A checkout started on the site (donation or membership dues). With PAYMENT_PROVIDER=mock this is
+// the whole checkout; with Stripe it mirrors the Stripe Checkout Session.
+model CheckoutSession {
+  id                String           @id @default(cuid())
+  provider          String // "mock" | "stripe"
+  providerSessionId String?          @unique
+  kind              PaymentKind
+  fund              String?
+  frequency         PaymentFrequency
+  amountCents       Int
+  currency          String           @default("usd")
+  membershipId      String?
+  membership        Membership?      @relation(fields: [membershipId], references: [id])
+  email             String?
+  name              String?
+  lang              String           @default("en")
+  status            CheckoutStatus   @default(OPEN)
+  createdAt         DateTime         @default(now())
+  completedAt       DateTime?
+  expiresAt         DateTime
+}
+
+// A recurring donation or recurring membership dues.
+model Subscription {
+  id                     String               @id @default(cuid())
+  provider               String
+  providerSubscriptionId String               @unique
+  providerCustomerId     String?
+  kind                   PaymentKind
+  fund                   String?
+  membershipId           String?
+  membership             Membership?          @relation(fields: [membershipId], references: [id])
+  amountCents            Int
+  interval               SubscriptionInterval
+  status                 SubscriptionStatus   @default(ACTIVE)
+  currentPeriodEnd       DateTime
+  email                  String
+  name                   String?
+  userId                 String?
+  user                   User?                @relation(fields: [userId], references: [id])
+  createdAt              DateTime             @default(now())
+  canceledAt             DateTime?
 }
 
 // Idempotency: each webhook event is processed once.

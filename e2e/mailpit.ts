@@ -24,3 +24,9 @@ export function firstLink(text: string, contains: string) {
   if (!link) throw new Error(`No link containing "${contains}" in the email`);
   return link;
 }
+
+// All subjects sent to an address (newest first).
+export async function subjectsFor(to: string) {
+  const res = await fetch(`${API}/api/v1/search?query=${encodeURIComponent(`to:"${to}"`)}`);
+  return ((await res.json()) as { messages: Summary[] }).messages.map((m) => m.Subject);
+}

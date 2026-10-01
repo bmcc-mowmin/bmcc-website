@@ -20,6 +20,12 @@ export async function cleanTestData() {
   await sql(`DELETE FROM "Announcement" WHERE text->>'en' LIKE 'E2E%'`);
   await sql(`DELETE FROM "Event" WHERE slug LIKE 'e2e-%'`);
   await sql(`UPDATE "User" SET "adminRoles" = '{}', disabled = true WHERE email LIKE 'e2e-%@example.com'`);
+  // Payments, subscriptions, checkouts and memberships made with e2e-… emails.
+  await sql(`DELETE FROM "Payment" WHERE "donorEmail" LIKE 'e2e-%'`);
+  await sql(`DELETE FROM "Subscription" WHERE email LIKE 'e2e-%'`);
+  await sql(`DELETE FROM "CheckoutSession" WHERE email LIKE 'e2e-%' OR "membershipId" IN (SELECT m.id FROM "Membership" m JOIN "Household" h ON h.id = m."householdId" WHERE h.email LIKE 'e2e-%')`);
+  await sql(`DELETE FROM "Membership" WHERE "householdId" IN (SELECT id FROM "Household" WHERE email LIKE 'e2e-%')`);
+  await sql(`DELETE FROM "Household" WHERE email LIKE 'e2e-%'`);
 }
 
 // Inserts an approved (or pending) listing directly, for tests that must not depend on seed data.
@@ -50,4 +56,11 @@ export async function insertListing(l: {
       l.status ?? "APPROVED",
     ],
   );
+}
+
+export async function latestPayment(email: string) {
+  return (await sql<{ receiptNumber: string; amountCents: number; fund: string | null; frequency: string; kind: string }>(
+    'SELECT "receiptNumber", "amountCents", fund, frequency, kind FROM "Payment" WHERE "donorEmail" = $1 ORDER BY "createdAt" DESC LIMIT 1',
+    [email],
+  ))[0];
 }

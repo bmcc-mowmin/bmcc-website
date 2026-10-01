@@ -32,13 +32,13 @@ test.describe("roles", () => {
     await context.close();
   });
 
-  test("treasurer only gets the dashboard so far, with the donations card", async ({ browser }) => {
+  test("treasurer gets the dashboard and Donations only", async ({ browser }) => {
     const context = await browser.newContext({ storageState: roleState("treasurer") });
     const page = await context.newPage();
     await page.goto("/admin");
     await expect(page.getByText("Donations this month")).toBeVisible();
     await expect(page.getByText("Upcoming events")).toHaveCount(0);
-    await expect(sidebar(page).getByRole("link")).toHaveText(["Dashboard"]);
+    await expect(sidebar(page).getByRole("link")).toHaveText(["Dashboard", "Donations"]);
     await context.close();
   });
 });
