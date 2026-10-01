@@ -210,7 +210,7 @@ async function main() {
   });
 
   // ── Community Directory (real listings from the git-ignored CSV if present, else fake samples) ─
-  const directory = await seedDirectory(db, admin.id);
+  const directory = await seedDirectory(db, admin.id, { replace: true });
 
   console.log("Seeded: prayer settings, 2 Jumu'ah services, 5 announcements (1 expired), 4 events,");
   console.log(`        ${directory}, admin + member test accounts${staffPassword ? ", 4 role test accounts" : ""}.`);

@@ -61,7 +61,7 @@ The member account has an active membership and a 3-person household.
 | `npm run db:migrate` | Create + apply a migration after editing `prisma/schema.prisma` |
 | `npm run db:deploy` | Apply pending migrations (what production runs) |
 | `npm run db:seed` | Reload sample data (wipes the seeded tables) |
-| `npm run db:seed:directory` | Reload only the directory listings (real CSV if present, else fake) |
+| `npm run db:seed:directory` | Add initial-feed listings from the private CSV that are missing (never deletes) |
 | `npm run db:reset` | Drop everything, re-migrate, re-seed |
 
 ## How it is organized
@@ -119,10 +119,16 @@ table becomes cards with a full-width Call button.
 emailed. Admin → Directory approves (submitter emailed), rejects with an optional reason, edits, adds,
 deletes, and **imports/exports CSV** — use the import to restore the real vetted listings at go-live.
 
-**Real listings locally:** put the vetted sheet, exported as CSV, at
-`prisma/seed-data/private/directory.csv` (git-ignored — it never reaches GitHub) and run
-`npm run db:seed:directory`. Without that file the seed uses fake sample listings. The browser tests
-create and remove their own "E2E…" listings, so they pass with either.
+**Source of truth:** the vetted Google Sheet is only the *initial feed*. After it is imported, the
+website's database is the source of truth — new listings arrive through **Submit a Listing** and are
+approved/edited in Admin → Directory. Nothing syncs back from or to the sheet; use **Export CSV** for
+backups or to share the list.
+
+*Locally,* the initial feed lives at `prisma/seed-data/private/directory.csv` (git-ignored — it never
+reaches GitHub): `npm run db:seed` (full reset) loads it, and `npm run db:seed:directory` adds any of
+its rows that are missing without deleting or changing anything. Without that file the seed uses fake
+sample listings. *In production,* the initial feed is imported once with Admin → Directory → Import.
+The browser tests create and remove their own "E2E…" listings, so they pass with either.
 
 **Every public form** uses a hidden honeypot field, a minimum fill-in time and a Postgres-backed
 rate limit (`RATE_LIMIT_MAX` per `RATE_LIMIT_WINDOW_SEC` per visitor IP).

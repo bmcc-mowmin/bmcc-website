@@ -1,6 +1,7 @@
-// Replaces ONLY the Community Directory listings (keeps events, admins, settings, etc.):
+// Adds the initial-feed listings from prisma/seed-data/private/directory.csv that aren't in the
+// database yet. ADD-ONLY: never deletes or changes anything, so listings that came in through the
+// "Submit a Listing" form or were edited in admin are always kept. Local only.
 //   npm run db:seed:directory
-// Uses prisma/seed-data/private/directory.csv when present, else fake samples. Local only.
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
@@ -14,7 +15,7 @@ const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.
 async function main() {
   const reviewer = await db.user.findFirst({ where: { adminRoles: { has: "SUPER_ADMIN" } }, orderBy: { createdAt: "asc" } });
   if (!reviewer) throw new Error("No super admin found — run npm run db:seed first.");
-  console.log(`Directory: ${await seedDirectory(db, reviewer.id)}.`);
+  console.log(`Directory: ${await seedDirectory(db, reviewer.id, { replace: false })}.`);
 }
 main()
   .catch((e) => {

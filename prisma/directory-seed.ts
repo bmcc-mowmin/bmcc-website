@@ -1,8 +1,14 @@
 // Directory listings for the local seed.
 //
-// If prisma/seed-data/private/directory.csv exists (git-ignored — e.g. the vetted Google Sheet
-// exported as CSV), its rows are loaded as APPROVED listings. Otherwise fake sample listings are
-// used, so a fresh clone never contains real people's details.
+// The vetted Google Sheet is only the INITIAL feed. After that, the website's database is the source
+// of truth: new listings come from the public "Submit a Listing" form and are managed in
+// Admin → Directory. Nothing syncs back from the sheet.
+//
+// If prisma/seed-data/private/directory.csv exists (git-ignored), its rows are loaded as APPROVED
+// listings; otherwise fake sample listings are used, so a fresh clone never contains real details.
+//   replace: true  → full local reset (npm run db:seed): delete all listings, then load
+//   replace: false → add-only (npm run db:seed:directory): load rows not already present
+//                    (same name + phone) and never delete anything
 import { existsSync, readFileSync } from "node:fs";
 import type { PrismaClient } from "../src/generated/prisma/client";
 import { csvToObjects } from "../src/lib/directory/csv";
@@ -11,14 +17,15 @@ import { listingSchema } from "../src/lib/directory/listing";
 
 export const PRIVATE_DIRECTORY_CSV = "prisma/seed-data/private/directory.csv";
 
-export async function seedDirectory(db: PrismaClient, reviewerId: string) {
-  await db.directoryListing.deleteMany();
+export async function seedDirectory(db: PrismaClient, reviewerId: string, { replace }: { replace: boolean }) {
+  if (replace) await db.directoryListing.deleteMany();
   const approved = { status: "APPROVED" as const, reviewedById: reviewerId, reviewedAt: new Date() };
 
   let summary: string;
   if (existsSync(PRIVATE_DIRECTORY_CSV)) {
     const rows = csvToObjects(readFileSync(PRIVATE_DIRECTORY_CSV, "utf8"));
     let loaded = 0;
+    let kept = 0;
     for (const [i, row] of rows.entries()) {
       const { candidate, googleMapUrl } = rowToListing(row);
       const parsed = listingSchema.safeParse(candidate);
@@ -26,10 +33,16 @@ export async function seedDirectory(db: PrismaClient, reviewerId: string) {
         console.warn(`  directory.csv row ${i + 2} (${candidate.name || "no name"}) skipped: ${parsed.error.issues.map((x) => `${String(x.path[0])} ${x.message}`).join(", ")}`);
         continue;
       }
+      if (!replace && (await db.directoryListing.findFirst({ where: { name: parsed.data.name, phone: parsed.data.phone } }))) {
+        kept++;
+        continue;
+      }
       await db.directoryListing.create({ data: { ...parsed.data, googleMapUrl, ...approved } });
       loaded++;
     }
-    summary = `${loaded} REAL directory listings (from ${PRIVATE_DIRECTORY_CSV})`;
+    summary = `${loaded} REAL directory listings added from ${PRIVATE_DIRECTORY_CSV}${kept ? ` (${kept} already present, left as they are)` : ""}`;
+  } else if (!replace) {
+    return "no private CSV found — nothing added";
   } else {
     // FAKE sample listings (same shape as the vetted CSV).
       const masjidAddress = { address: "7701 Lone Tree Way", city: "Brentwood", state: "CA", zip: "94513" };
@@ -50,6 +63,8 @@ export async function seedDirectory(db: PrismaClient, reviewerId: string) {
     }
     summary = `${listings.length} FAKE sample directory listings`;
   }
+
+  if (!replace) return summary;
 
   // Two submissions waiting in the admin approval queue (never public).
   await db.directoryListing.createMany({

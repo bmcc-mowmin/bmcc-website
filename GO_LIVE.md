@@ -48,8 +48,9 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 
 ## Content from BMCC (README "Content blockers")
 
-- [ ] Restore the real Community Directory listings: export the backup Google Sheet as CSV and use
-      Admin → Directory → *Import listings from a CSV* (local sample data is fake). Fix categories
+- [ ] One-time initial feed of the Community Directory: export the vetted Google Sheet as CSV and use
+      Admin → Directory → *Import listings from a CSV*. From then on the website is the source of
+      truth (new listings come from *Submit a Listing*); retire the sheet or keep it only as an archive. Fix categories
       and add missing addresses first — only listings with an address or city get a map.
 - [ ] Decide who receives "new listing to review" emails (currently `CONTACT_INBOX`).
 - [ ] Imam confirms the Fajr/Isha calculation method (ISNA by default; Asr is always Hanafi),
