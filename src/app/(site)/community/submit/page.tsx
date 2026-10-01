@@ -5,7 +5,10 @@ import { getParentCategories } from "@/lib/directory";
 import { SubmitListingForm } from "./SubmitListingForm";
 import styles from "./submit.module.css";
 
-export const metadata: Metadata = { title: "Submit a listing", description: "Add your business or service to the BMCC Community Directory." };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.submit_heading, description: t.submit_paragraph };
+}
 
 export default async function SubmitListingPage() {
   const [{ t }, parents] = await Promise.all([getI18n(), getParentCategories()]);

@@ -7,7 +7,10 @@ import { DEFAULT_FUND, isFund } from "@/lib/payments/catalog";
 import { DonateForm } from "./DonateForm";
 import styles from "./donate.module.css";
 
-export const metadata: Metadata = { title: "Donate", description: "Give once or monthly to support the Brentwood Muslim Community Center." };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.nav_donate, description: t.donate_paragraph };
+}
 
 export default async function DonatePage({ searchParams }: PageProps<"/donate">) {
   const [{ t }, params] = await Promise.all([getI18n(), searchParams]);

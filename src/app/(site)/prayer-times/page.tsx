@@ -7,10 +7,13 @@ import { addDays } from "@/lib/time";
 import { PrayerTable } from "@/components/prayer/PrayerTable";
 import styles from "./prayer.module.css";
 
-export const metadata: Metadata = {
-  title: "Prayer Times",
-  description: "Daily Adhan and Iqamah times for the Brentwood Muslim Community Center (Hanafi Asr), plus Jumu'ah services.",
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return {
+  title: t.nav_prayer,
+  description: t.prayer_page_paragraph,
 };
+}
 
 export default async function PrayerTimesPage() {
   const { t, lang } = await getI18n();

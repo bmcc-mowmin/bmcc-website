@@ -47,9 +47,15 @@ export async function SiteFooter() {
         <div>
           <div className={styles.heading}>{t.footer_contact}</div>
           <address className={styles.links}>
-            <span>{org.addressShort}</span>
-            <a href={org.phoneHref}>{org.phone}</a>
-            <a href={`mailto:${org.email}`}>{org.email}</a>
+            <span>
+              <bdi dir="ltr">{org.addressShort}</bdi>
+            </span>
+            <a href={org.phoneHref}>
+              <bdi dir="ltr">{org.phone}</bdi>
+            </a>
+            <a href={`mailto:${org.email}`}>
+              <bdi dir="ltr">{org.email}</bdi>
+            </a>
           </address>
         </div>
       </div>

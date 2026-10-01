@@ -3,7 +3,10 @@ import { getI18n } from "@/lib/i18n/server";
 import { contactHref, routes } from "@/lib/routes";
 import { ExpandableCards, type ExpandableCard } from "@/components/cards/ExpandableCards";
 
-export const metadata: Metadata = { title: "Assistance" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.nav_assistance };
+}
 
 export default async function AssistancePage() {
   const { t } = await getI18n();

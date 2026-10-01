@@ -107,7 +107,7 @@ export function SubmitListingForm({ parents }: { parents: string[] }) {
               —
             </option>
             {parents.map((p) => (
-              <option key={p} value={p}>
+              <option key={p} value={p} dir="auto">
                 {p}
               </option>
             ))}

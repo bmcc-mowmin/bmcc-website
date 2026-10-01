@@ -8,7 +8,10 @@ import { routes } from "@/lib/routes";
 import { resumeDuesPayment } from "../actions";
 import styles from "../membership.module.css";
 
-export const metadata: Metadata = { title: "Membership", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.nav_membership, robots: { index: false } };
+}
 
 const maskEmail = (e: string) => e.replace(/^(.)[^@]*/, "$1***");
 

@@ -4,7 +4,10 @@ import { getI18n } from "@/lib/i18n/server";
 import { routes } from "@/lib/routes";
 import styles from "./funeral.module.css";
 
-export const metadata: Metadata = { title: "Funeral Services Benefit" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.nav_funeral };
+}
 
 export default async function FuneralServicesPage() {
   const { t } = await getI18n();

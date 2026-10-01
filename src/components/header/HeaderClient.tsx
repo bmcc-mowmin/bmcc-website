@@ -184,7 +184,7 @@ export function HeaderClient({ announcements, prayer }: { announcements: TickerI
                 </span>
               </button>
               {langOpen && (
-                <div id={`${uid}-lang`} className={styles.langMenu} role="group" aria-label="Language">
+                <div id={`${uid}-lang`} className={styles.langMenu} role="group" aria-label={t.aria_language}>
                   {LANGS.map((l) => (
                     <button
                       key={l.code}
@@ -218,7 +218,7 @@ export function HeaderClient({ announcements, prayer }: { announcements: TickerI
             <img src="/brand/bmcc-logo.jpeg" alt="Brentwood Muslim Community Center" className={styles.logo} />
           </Link>
 
-          <nav ref={navRef} className={styles.desktopNav} aria-label="Main" aria-hidden={navCollapsed || undefined}>
+          <nav ref={navRef} className={styles.desktopNav} aria-label={t.aria_main_nav} aria-hidden={navCollapsed || undefined}>
             <div ref={navListRef} className={styles.navList}>
               {menus.map((m) => {
                 const active = current === m.id || m.childIds.includes(current);
@@ -276,7 +276,7 @@ export function HeaderClient({ announcements, prayer }: { announcements: TickerI
               )}
               <button
                 type={searchOpen && searchQuery.trim() ? "submit" : "button"}
-                aria-label="Search"
+                aria-label={t.aria_search}
                 aria-expanded={searchOpen}
                 className={styles.searchButton}
                 onClick={(e) => {
@@ -295,7 +295,7 @@ export function HeaderClient({ announcements, prayer }: { announcements: TickerI
             <button
               type="button"
               className={styles.mobileToggle}
-              aria-label="Menu"
+              aria-label={t.aria_menu}
               aria-expanded={mobileNavOpen}
               aria-controls={`${uid}-mobile`}
               onClick={() => setMobileNavOpen((o) => !o)}
@@ -306,7 +306,7 @@ export function HeaderClient({ announcements, prayer }: { announcements: TickerI
         </div>
 
         {mobileNavOpen && (
-          <nav id={`${uid}-mobile`} className={styles.mobileNav} aria-label="Main">
+          <nav id={`${uid}-mobile`} className={styles.mobileNav} aria-label={t.aria_main_nav}>
             {menus.map((m) => (
               <div key={m.id}>
                 {m.items ? (

@@ -6,10 +6,13 @@ import { getApprovedListings } from "@/lib/directory";
 import { DirectoryBrowser } from "@/components/directory/DirectoryBrowser";
 import styles from "@/components/directory/directory.module.css";
 
-export const metadata: Metadata = {
-  title: "Community Directory",
-  description: "Businesses, services and referrals from the BMCC community, reviewed by our admin team.",
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return {
+  title: t.nav_community,
+  description: t.community_paragraph,
 };
+}
 
 export default async function CommunityPage({ searchParams }: PageProps<"/community">) {
   const [{ t }, listings, params] = await Promise.all([getI18n(), getApprovedListings(), searchParams]);

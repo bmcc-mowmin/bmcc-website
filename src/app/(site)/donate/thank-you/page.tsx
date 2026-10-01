@@ -8,7 +8,10 @@ import { FUNDS, usd } from "@/lib/payments/catalog";
 import { routes } from "@/lib/routes";
 import styles from "../donate.module.css";
 
-export const metadata: Metadata = { title: "Thank you", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.donate_thanks_heading, robots: { index: false } };
+}
 
 // "j***@example.com" — the page address is shareable, so don't print the full email.
 const maskEmail = (e: string) => e.replace(/^(.)[^@]*/, "$1***");

@@ -53,43 +53,49 @@ export function ListingDialog({ listing, onClose, mapsKey }: { listing: PublicLi
             ×
           </button>
           {maps ? (
-            <iframe src={maps.embed} title={`${listing.name} — map`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" className={styles.map} />
+            <iframe src={maps.embed} title={t.listing_map_label.replace("{name}", listing.name)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" className={styles.map} />
           ) : (
             <div className={styles.noMap}>{t.no_location}</div>
           )}
           <div className={styles.dialogBody}>
             <div className={styles.dialogHead}>
               <h2 id="listing-title" className={styles.dialogTitle}>
-                {listing.name}
+                <bdi>{listing.name}</bdi>
               </h2>
-              <span className={styles.pill}>{listing.parentCategory}</span>
+              <span className={styles.pill}>
+                <bdi>{listing.parentCategory}</bdi>
+              </span>
             </div>
-            <div className={styles.subline}>{subline}</div>
-            <p className={styles.dialogDescription}>{listing.description}</p>
+            <div className={styles.subline}>
+              <bdi>{subline}</bdi>
+            </div>
+            <p className={styles.dialogDescription} dir="auto">
+              {listing.description}
+            </p>
             <div className={styles.facts}>
               {tel && (
                 <a href={tel} className={styles.factPhone}>
-                  ☎ {listing.phone}
+                  ☎ <bdi dir="ltr">{listing.phone}</bdi>
                 </a>
               )}
               {listing.email && <a href={`mailto:${listing.email}`}>{listing.email}</a>}
               {listing.city && (
                 <span>
-                  <strong>{t.city_label}</strong> {listing.city}
+                  <strong>{t.city_label}</strong> <bdi>{listing.city}</bdi>
                 </span>
               )}
               {listing.state && (
                 <span>
-                  <strong>{t.state_label}</strong> {listing.state}
+                  <strong>{t.state_label}</strong> <bdi>{listing.state}</bdi>
                 </span>
               )}
               {listing.zip && (
                 <span>
-                  <strong>{t.zip_label}</strong> {listing.zip}
+                  <strong>{t.zip_label}</strong> <bdi>{listing.zip}</bdi>
                 </span>
               )}
               <span>
-                <strong>{t.posted_by}</strong> {listing.author}
+                <strong>{t.posted_by}</strong> <bdi>{listing.author}</bdi>
               </span>
             </div>
             <div className={styles.dialogActions}>

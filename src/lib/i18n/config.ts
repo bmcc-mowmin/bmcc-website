@@ -2,11 +2,13 @@
 // Arabic is deferred to a later phase:
 // add it here, add messages/arabic.json, and it appears in the language menu.
 
+// `intl` is the locale for dates, times and numbers. Dari and Pashto default to the Afghan solar
+// calendar (e.g. year 1405), so they are pinned to the Gregorian calendar used in the US.
 export const LANGS = [
   { code: "en", label: "English (US)", intl: "en-US", html: "en" },
-  { code: "dari", label: "Dari", intl: "fa-AF", html: "fa-AF" },
+  { code: "dari", label: "Dari", intl: "fa-AF-u-ca-gregory", html: "fa-AF" },
   { code: "urdu", label: "Urdu", intl: "ur-PK", html: "ur-PK" },
-  { code: "pashto", label: "Pashtu", intl: "ps-AF", html: "ps-AF" },
+  { code: "pashto", label: "Pashtu", intl: "ps-AF-u-ca-gregory", html: "ps-AF" },
   { code: "spanish", label: "Spanish", intl: "es-US", html: "es-US" },
 ] as const;
 

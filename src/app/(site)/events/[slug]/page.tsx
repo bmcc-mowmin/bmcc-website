@@ -9,9 +9,9 @@ import styles from "../events.module.css";
 
 export async function generateMetadata({ params }: PageProps<"/events/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const { lang } = await getI18n();
+  const { t, lang } = await getI18n();
   const event = await getEventBySlug(slug, lang);
-  return event ? { title: event.title, description: event.description.slice(0, 160) } : { title: "Event not found" };
+  return event ? { title: event.title, description: event.description.slice(0, 160) } : { title: t.event_not_found };
 }
 
 export default async function EventPage({ params }: PageProps<"/events/[slug]">) {

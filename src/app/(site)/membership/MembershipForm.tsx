@@ -143,7 +143,7 @@ export function MembershipForm() {
           <button type="button" role="radio" aria-checked={plan === "MONTHLY"} className={`${styles.plan} ${plan === "MONTHLY" ? styles.planSelected : ""}`} onClick={() => setPlan("MONTHLY")}>
             <span className={styles.planName}>{t.m3_monthly}</span>
             <span className={styles.planPrice}>
-              $100<span>/mo</span>
+              $100<span>{t.per_month_short}</span>
             </span>
           </button>
           <button type="button" role="radio" aria-checked={plan === "YEARLY"} className={`${styles.plan} ${plan === "YEARLY" ? styles.planSelected : ""}`} onClick={() => setPlan("YEARLY")}>
@@ -151,7 +151,7 @@ export function MembershipForm() {
               {t.m3_yearly} <span className={styles.save}>{t.m3_save}</span>
             </span>
             <span className={styles.planPrice}>
-              $1,000<span>/yr</span>
+              $1,000<span>{t.per_year_short}</span>
             </span>
           </button>
         </div>

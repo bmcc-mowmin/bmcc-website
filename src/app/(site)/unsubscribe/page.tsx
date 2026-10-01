@@ -5,7 +5,10 @@ import { findByUnsubscribeToken } from "@/lib/mailing-list";
 import styles from "@/components/mailing-list/mailing-list.module.css";
 import { unsubscribeAction } from "./actions";
 
-export const metadata: Metadata = { title: "Unsubscribe", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.unsub_title, robots: { index: false } };
+}
 
 // The unsubscribe link in every mailing-list email. Mail apps' one-click "Unsubscribe" button
 // goes to /api/unsubscribe instead.

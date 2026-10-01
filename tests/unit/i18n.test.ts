@@ -20,3 +20,11 @@ test("times keep their order inside right-to-left text", () => {
   assert.equal(ltrIsolate("6:09 AM", "en-US"), "6:09 AM");
   assert.equal(ltrIsolate("6:09 a. m.", "es-US"), "6:09 a. m.");
 });
+
+test("Dari and Pashto dates use the Gregorian calendar (not the Afghan solar calendar)", () => {
+  const date = new Date("2026-10-17T19:00:00Z");
+  for (const { code, intl } of LANGS) {
+    const year = new Intl.DateTimeFormat(intl, { year: "numeric", timeZone: "UTC" }).format(date);
+    assert.equal(year.replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d))).replace(/\D/g, ""), "2026", code);
+  }
+});

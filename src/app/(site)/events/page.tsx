@@ -5,10 +5,13 @@ import { formatEventWhen, getUpcomingEvents } from "@/lib/events";
 import { masjidClock } from "@/lib/prayer/schedule";
 import styles from "./events.module.css";
 
-export const metadata: Metadata = {
-  title: "Events & Calendar",
-  description: "Upcoming programs and community gatherings at the Brentwood Muslim Community Center.",
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return {
+  title: t.nav_events,
+  description: t.events_paragraph,
 };
+}
 
 export default async function EventsPage() {
   const { t, lang } = await getI18n();

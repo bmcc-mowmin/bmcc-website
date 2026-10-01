@@ -6,7 +6,10 @@ import { AboutTabs, type AboutTab } from "./AboutTabs";
 import { ContactForm } from "./ContactForm";
 import styles from "./about.module.css";
 
-export const metadata: Metadata = { title: "About Us" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.nav_about_us };
+}
 
 export default async function AboutPage({ searchParams }: PageProps<"/about">) {
   const { t } = await getI18n();
@@ -19,7 +22,7 @@ export default async function AboutPage({ searchParams }: PageProps<"/about">) {
       title: t.tab_about_title,
       body: [t.tab_about_p1, t.tab_about_p2],
       list: [t.tab_about_l1, t.tab_about_l2, t.tab_about_l3, t.tab_about_l4],
-      imageLabel: "Photo — masjid community gathering",
+      imageLabel: t.about_photo_story,
     },
     {
       id: "resources",
@@ -27,7 +30,7 @@ export default async function AboutPage({ searchParams }: PageProps<"/about">) {
       title: t.tab_resources_title,
       body: [t.tab_resources_p1],
       list: [t.tab_resources_l1, t.tab_resources_l2, t.tab_resources_l3, t.tab_resources_l4],
-      imageLabel: "Photo — resource library / reading room",
+      imageLabel: t.about_photo_resources,
     },
     {
       id: "schedule",
@@ -35,7 +38,7 @@ export default async function AboutPage({ searchParams }: PageProps<"/about">) {
       title: t.tab_schedule_title,
       body: [t.tab_schedule_p1],
       list: [t.tab_schedule_l1, t.tab_schedule_l2, t.tab_schedule_l3, t.tab_schedule_l4],
-      imageLabel: "Photo — masjid exterior / entrance",
+      imageLabel: t.about_photo_exterior,
     },
     {
       id: "services",
@@ -44,7 +47,7 @@ export default async function AboutPage({ searchParams }: PageProps<"/about">) {
       body: [t.tab_services_p1],
       list: [t.tab_services_l1, t.tab_services_l2, t.tab_services_l3, t.tab_services_l4],
       cta: { label: t.view_funeral_benefit, href: routes.funeral },
-      imageLabel: "Photo — imam / community counseling",
+      imageLabel: t.about_photo_counseling,
     },
   ];
 
@@ -67,18 +70,24 @@ export default async function AboutPage({ searchParams }: PageProps<"/about">) {
             <dl className={styles.contactDetails}>
               <div>
                 <dt>{t.contact_address}</dt>
-                <dd>{org.address}</dd>
+                <dd>
+                  <bdi dir="ltr">{org.address}</bdi>
+                </dd>
               </div>
               <div>
                 <dt>{t.contact_phone}</dt>
                 <dd>
-                  <a href={org.phoneHref}>{org.phone}</a>
+                  <a href={org.phoneHref}>
+              <bdi dir="ltr">{org.phone}</bdi>
+            </a>
                 </dd>
               </div>
               <div>
                 <dt>{t.contact_email}</dt>
                 <dd>
-                  <a href={`mailto:${org.email}`}>{org.email}</a>
+                  <a href={`mailto:${org.email}`}>
+              <bdi dir="ltr">{org.email}</bdi>
+            </a>
                 </dd>
               </div>
             </dl>

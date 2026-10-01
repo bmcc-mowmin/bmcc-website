@@ -3,10 +3,13 @@ import { getI18n } from "@/lib/i18n/server";
 import { MembershipForm } from "./MembershipForm";
 import styles from "./membership.module.css";
 
-export const metadata: Metadata = {
-  title: "Become a Member",
-  description: "Join BMCC for $100/month or $1,000/year — includes the $10,000 household Funeral Services Benefit.",
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return {
+  title: t.nav_membership,
+  description: t.membership_hero_paragraph,
 };
+}
 
 export default async function MembershipPage() {
   const { t } = await getI18n();

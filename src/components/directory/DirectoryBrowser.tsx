@@ -76,7 +76,7 @@ export function DirectoryBrowser({ listings, initial, mapsKey }: { listings: Pub
         <select value={f.type} onChange={(e) => update({ type: e.target.value, category: "", page: 1 })} aria-label={t.dir_type_label} className={styles.select}>
           <option value="">{t.all_types}</option>
           {parents.map((p) => (
-            <option key={p} value={p}>
+            <option key={p} value={p} dir="auto">
               {p}
             </option>
           ))}
@@ -84,7 +84,7 @@ export function DirectoryBrowser({ listings, initial, mapsKey }: { listings: Pub
         <select value={f.category} onChange={(e) => update({ category: e.target.value, page: 1 })} aria-label={t.dir_category_label} className={styles.select}>
           <option value="">{t.all_categories}</option>
           {categories.map((c) => (
-            <option key={c} value={c}>
+            <option key={c} value={c} dir="auto">
               {c}
             </option>
           ))}
@@ -106,16 +106,20 @@ export function DirectoryBrowser({ listings, initial, mapsKey }: { listings: Pub
           <article key={l.id} className={styles.card}>
             <div className={styles.cardHead}>
               <div style={{ minWidth: 0 }}>
-                <h3 className={styles.cardName}>{l.name}</h3>
-                <div className={styles.cardCategory}>{l.category}</div>
+                <h3 className={styles.cardName}>
+                  <bdi>{l.name}</bdi>
+                </h3>
+                <div className={styles.cardCategory}>
+                  <bdi>{l.category}</bdi>
+                </div>
               </div>
-              {l.city && <span className={styles.cardLocation}>📍 {l.city}</span>}
+              {l.city && <span className={styles.cardLocation}>📍 <bdi>{l.city}</bdi></span>}
             </div>
             {l.tags.length > 0 && (
               <div className={styles.tags}>
                 {l.tags.map((tag) => (
                   <span key={tag} className={styles.tag}>
-                    {tag}
+                    <bdi>{tag}</bdi>
                   </span>
                 ))}
               </div>
@@ -128,7 +132,9 @@ export function DirectoryBrowser({ listings, initial, mapsKey }: { listings: Pub
               )}
               <button type="button" className={styles.detailsButton} onClick={() => open(l.id)}>
                 {t.view_details}
-                <span className="visually-hidden">: {l.name}</span>
+                <span className="visually-hidden">
+                  : <bdi>{l.name}</bdi>
+                </span>
               </button>
             </div>
           </article>
@@ -154,28 +160,32 @@ export function DirectoryBrowser({ listings, initial, mapsKey }: { listings: Pub
           {slice.map((l, i) => (
             <div role="row" key={l.id} className={`${styles.row} ${i % 2 ? styles.rowAlt : ""}`}>
               <div role="cell" className={styles.name}>
-                {l.name}
+                <bdi>{l.name}</bdi>
               </div>
               <div role="cell" className={styles.cellText}>
-                {l.category}
+                <bdi>{l.category}</bdi>
               </div>
               <div role="cell" className={styles.cellText}>
-                {l.city ?? "—"}
+                {l.city ? <bdi>{l.city}</bdi> : "—"}
               </div>
               <div role="cell" className={styles.tags}>
                 {l.tags.map((tag) => (
                   <span key={tag} className={styles.tag}>
-                    {tag}
+                    <bdi>{tag}</bdi>
                   </span>
                 ))}
               </div>
               <div role="cell" className={styles.phone}>
-                {l.phone ? <a href={tel(l.phone)}>{l.phone}</a> : <span className={styles.dash}>—</span>}
+                {l.phone ? <a href={tel(l.phone)}>
+                    <bdi dir="ltr">{l.phone}</bdi>
+                  </a> : <span className={styles.dash}>—</span>}
               </div>
               <div role="cell" className={styles.actionCell}>
                 <button type="button" className={styles.rowButton} onClick={() => open(l.id)}>
                   {t.view_details}
-                  <span className="visually-hidden">: {l.name}</span>
+                  <span className="visually-hidden">
+                  : <bdi>{l.name}</bdi>
+                </span>
                 </button>
               </div>
             </div>

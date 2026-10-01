@@ -5,7 +5,10 @@ import { peekConfirmation } from "@/lib/mailing-list";
 import styles from "@/components/mailing-list/mailing-list.module.css";
 import { confirmAction } from "./actions";
 
-export const metadata: Metadata = { title: "Confirm your subscription", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.sub_confirm_title, robots: { index: false } };
+}
 
 // The link in the confirmation email lands here. Confirming takes a button press, because mail
 // security scanners open links automatically and must not confirm on someone's behalf.
