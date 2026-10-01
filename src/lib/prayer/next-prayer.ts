@@ -1,6 +1,8 @@
 // Pure helpers shared by the server and the browser (the header recomputes every 30s).
 // All clock times are "HH:mm" in the MASJID's time zone, never the visitor's.
 
+import { ltrIsolate } from "@/lib/i18n/config";
+
 export type PrayerKey = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha" | "jumuah";
 
 export type PrayerTime = { key: PrayerKey; adhan: string; iqamah: string };
@@ -67,9 +69,7 @@ export function nextPrayer(today: DaySchedule, tomorrow: DaySchedule, minutesNow
 export function formatClock(hhmm: string, intlLocale: string) {
   const [h, m] = hhmm.split(":").map(Number);
   try {
-    return new Intl.DateTimeFormat(intlLocale, { hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(
-      new Date(Date.UTC(2000, 0, 1, h, m)),
-    );
+    return ltrIsolate(new Intl.DateTimeFormat(intlLocale, { hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(new Date(Date.UTC(2000, 0, 1, h, m))), intlLocale);
   } catch {
     return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
   }

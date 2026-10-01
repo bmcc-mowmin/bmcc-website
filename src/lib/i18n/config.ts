@@ -34,3 +34,11 @@ export function intlLocale(lang: Lang) {
 export function htmlLang(lang: Lang) {
   return LANGS.find((l) => l.code === lang)?.html ?? "en";
 }
+
+// Keeps left-to-right text such as "6:09 AM" in its own order inside right-to-left text (without
+// this, Urdu/Dari/Pashto pages show "AM 6:09"). Uses Unicode isolate marks, so it works in any
+// string, including ones joined with other words.
+export function ltrIsolate(text: string, intl: string) {
+  const rtl = LANGS.some((l) => l.intl === intl && RTL_LANGS.includes(l.code));
+  return rtl && text ? `\u2066${text}\u2069` : text;
+}

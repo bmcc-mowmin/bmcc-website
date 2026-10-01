@@ -2,7 +2,7 @@ import "server-only";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { localize, type Dictionary } from "@/lib/i18n/dictionary";
-import { intlLocale, type Lang } from "@/lib/i18n/config";
+import { intlLocale, ltrIsolate, type Lang } from "@/lib/i18n/config";
 import { org } from "@/lib/org";
 import { getCalcSettings } from "@/lib/prayer/schedule";
 import { upcomingOccurrences, weeklyDay, type Occurrence } from "./recurrence";
@@ -98,7 +98,7 @@ export function formatEventWhen(e: PublicEvent, occ: Occurrence, lang: Lang, t: 
       : new Intl.DateTimeFormat(locale, { weekday: "short", month: "short", day: "numeric", timeZone }).format(occ.start);
   const fullDate = new Intl.DateTimeFormat(locale, { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone }).format(occ.start);
   const clock = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit", timeZone });
-  const startTime = e.allDay ? "" : clock.format(occ.start);
-  const timeRange = e.allDay ? "" : `${startTime} – ${clock.format(occ.end)}`;
+  const startTime = e.allDay ? "" : ltrIsolate(clock.format(occ.start), locale);
+  const timeRange = e.allDay ? "" : ltrIsolate(`${clock.format(occ.start)} – ${clock.format(occ.end)}`, locale);
   return { date, fullDate, startTime, timeRange };
 }
