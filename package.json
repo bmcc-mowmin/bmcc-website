@@ -19,7 +19,8 @@
     "i18n:import": "node scripts/import-i18n.mjs",
     "test:unit": "tsx --test tests/unit/*.test.ts",
     "test:e2e": "playwright test",
-    "admin:create": "tsx scripts/create-admin.ts"
+    "admin:create": "tsx scripts/create-admin.ts",
+    "db:seed:directory": "tsx scripts/seed-directory.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1141.0",

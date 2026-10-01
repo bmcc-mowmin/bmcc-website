@@ -9,6 +9,7 @@ import { audit } from "@/lib/audit";
 import { done, fail, text } from "@/lib/admin/forms";
 import { fieldErrors, listingSchema } from "@/lib/directory/listing";
 import { csvToObjects } from "@/lib/directory/csv";
+import { rowToListing } from "@/lib/directory/import";
 import { escapeHtml, layoutHtml, sendMail } from "@/lib/mail";
 import type { ActionResult } from "@/components/admin/ActionForm";
 
@@ -113,7 +114,6 @@ export async function deleteListing(_prev: ActionResult, form: FormData): Promis
 // (name, listing type, main category / parent category, category, tags, description, author /
 // contact name, phone, email, website, address, city, state, zip, google map url).
 const MAX_CSV_BYTES = 2 * 1024 * 1024;
-const pick = (row: Record<string, string>, ...keys: string[]) => keys.map((k) => row[k]).find((v) => v) ?? "";
 
 export async function importListings(_prev: ActionResult, form: FormData): Promise<ActionResult> {
   const admin = await requireSection("directory");
@@ -128,23 +128,7 @@ export async function importListings(_prev: ActionResult, form: FormData): Promi
   let created = 0;
   let skipped = 0;
   for (const [i, row] of rows.entries()) {
-    const type = pick(row, "listingtype", "type").toLowerCase();
-    const candidate = {
-      listingType: type.startsWith("ind") ? "INDIVIDUAL" : "BUSINESS",
-      name: pick(row, "name", "businessname"),
-      parentCategory: pick(row, "parentcategory", "maincategory"),
-      category: pick(row, "category", "subcategory"),
-      tags: pick(row, "tags"),
-      description: pick(row, "description") || "No additional description provided — contact the BMCC office for details.",
-      author: pick(row, "author", "contactname", "postedby") || pick(row, "name", "businessname"),
-      phone: pick(row, "phone", "contact"),
-      email: pick(row, "email"),
-      website: pick(row, "website", "url"),
-      address: pick(row, "address", "streetaddress"),
-      city: pick(row, "city", "location"),
-      state: pick(row, "state"),
-      zip: pick(row, "zip", "zipcode", "postalcode"),
-    };
+    const { candidate, googleMapUrl } = rowToListing(row);
     const parsed = listingSchema.safeParse(candidate);
     if (!parsed.success) {
       problems.push(`Row ${i + 2} (${candidate.name || "no name"}): ${Object.keys(fieldErrors(parsed.error)).join(", ")}`);
@@ -156,11 +140,10 @@ export async function importListings(_prev: ActionResult, form: FormData): Promi
       skipped++;
       continue;
     }
-    const map = pick(row, "googlemapurl", "mapurl");
     await db.directoryListing.create({
       data: {
         ...parsed.data,
-        googleMapUrl: /^https:\/\//.test(map) ? map : null,
+        googleMapUrl,
         status,
         ...(status === "APPROVED" ? { reviewedById: admin.id, reviewedAt: new Date() } : {}),
       },

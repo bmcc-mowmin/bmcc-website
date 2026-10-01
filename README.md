@@ -61,6 +61,7 @@ The member account has an active membership and a 3-person household.
 | `npm run db:migrate` | Create + apply a migration after editing `prisma/schema.prisma` |
 | `npm run db:deploy` | Apply pending migrations (what production runs) |
 | `npm run db:seed` | Reload sample data (wipes the seeded tables) |
+| `npm run db:seed:directory` | Reload only the directory listings (real CSV if present, else fake) |
 | `npm run db:reset` | Drop everything, re-migrate, re-seed |
 
 ## How it is organized
@@ -117,6 +118,11 @@ table becomes cards with a full-width Call button.
 `/community/submit` → listing saved as **pending**, the office (`CONTACT_INBOX`) and the submitter are
 emailed. Admin → Directory approves (submitter emailed), rejects with an optional reason, edits, adds,
 deletes, and **imports/exports CSV** — use the import to restore the real vetted listings at go-live.
+
+**Real listings locally:** put the vetted sheet, exported as CSV, at
+`prisma/seed-data/private/directory.csv` (git-ignored — it never reaches GitHub) and run
+`npm run db:seed:directory`. Without that file the seed uses fake sample listings. The browser tests
+create and remove their own "E2E…" listings, so they pass with either.
 
 **Every public form** uses a hidden honeypot field, a minimum fill-in time and a Postgres-backed
 rate limit (`RATE_LIMIT_MAX` per `RATE_LIMIT_WINDOW_SEC` per visitor IP).

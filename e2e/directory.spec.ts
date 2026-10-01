@@ -1,42 +1,52 @@
 import { test, expect, type Page } from "@playwright/test";
-import { countListings, deleteListings } from "./db";
+import { countListings, deleteListings, insertListing } from "./db";
 import { waitForEmail } from "./mailpit";
 
 const anon = { storageState: { cookies: [], origins: [] } };
 const table = (page: Page) => page.getByRole("table", { name: "Community Directory" });
 
+// These tests create their own "E2E…" listings, so they work with the fake samples or the real data.
 test.describe("public directory", () => {
   test.use(anon);
 
+  test.beforeAll(async () => {
+    await deleteListings("E2E");
+    await insertListing({ name: "E2E Grill", parentCategory: "E2E Food", category: "E2E Halal Grill", phone: "(925) 555-0181", address: "7701 Lone Tree Way", city: "Brentwood", tags: ["E2E Halal"] });
+    await insertListing({ name: "E2E Plumber", parentCategory: "E2E Home", category: "E2E Plumbing", phone: "(925) 555-0182" });
+    await insertListing({ name: "E2E Painter", parentCategory: "E2E Home", category: "E2E Painting" });
+    await insertListing({ name: "E2E Hidden Pending", parentCategory: "E2E Home", category: "E2E Painting", status: "PENDING" });
+  });
+  test.afterAll(() => deleteListings("E2E"));
+
   test("search, filters and the shareable address", async ({ page }) => {
     await page.goto("/community");
-    await expect(page.getByRole("status").filter({ hasText: "Showing" })).toHaveText(/Showing 1–10 of 10 listings/);
-    // Listings with a phone number come first: the two without one are last.
-    const names = await table(page).getByRole("row").locator('[role="cell"]:first-child').allInnerTexts();
-    expect(names.slice(-2).sort()).toEqual(["Example Pest Solutions", "Sample Computer Help"]);
-
-    await page.getByRole("searchbox", { name: "Search the directory" }).fill("pest");
+    await page.getByRole("searchbox", { name: "Search the directory" }).fill("E2E");
+    await expect(page).toHaveURL(/\?q=E2E/);
+    // 3 approved test listings; the one without a phone number comes last.
+    const names = () => table(page).getByRole("row").locator('[role="cell"]:first-child').allInnerTexts();
     await expect(table(page).getByRole("row")).toHaveCount(1 + 3);
-    await expect(page).toHaveURL(/\?q=pest/);
+    expect((await names()).at(-1)).toBe("E2E Painter");
+
+    await page.getByLabel("Filter by main category").selectOption("E2E Home");
+    await expect(table(page).getByRole("row")).toHaveCount(1 + 2);
+    // Specific categories narrow to the chosen main category.
+    await expect(page.getByLabel("Filter by specific category").locator("option")).toHaveText(["All Categories", "E2E Painting", "E2E Plumbing"]);
+    await page.getByLabel("Filter by specific category").selectOption("E2E Plumbing");
+    await expect(table(page).getByRole("row")).toHaveCount(1 + 1);
 
     await page.getByRole("button", { name: "Clear filters" }).click();
-    await page.getByLabel("Filter by main category").selectOption("Restaurant");
-    await expect(table(page).getByRole("row")).toHaveCount(2);
-    // Specific categories narrow to the chosen main category.
-    await expect(page.getByLabel("Filter by specific category").locator("option")).toHaveText(["All Categories", "Halal Restaurant"]);
-
     await page.getByRole("searchbox", { name: "Search the directory" }).fill("zzz-nothing");
     await expect(table(page).getByText("No listings match your search.")).toBeVisible();
   });
 
   test("View Details popup: map, keyboard, Escape and focus return", async ({ page }) => {
-    await page.goto("/community");
-    const opener = table(page).getByRole("row", { name: /Sample Halal Grill/ }).getByRole("button", { name: /View Details/ });
+    await page.goto("/community?q=E2E");
+    const opener = table(page).getByRole("row", { name: /E2E Grill/ }).getByRole("button", { name: /View Details/ });
     await opener.focus();
     await page.keyboard.press("Enter");
-    const dialog = page.getByRole("dialog", { name: "Sample Halal Grill" });
+    const dialog = page.getByRole("dialog", { name: "E2E Grill" });
     await expect(dialog).toBeVisible();
-    await expect(dialog.locator("iframe")).toHaveAttribute("src", /maps\.google\.com\/maps\?q=Sample%20Halal%20Grill.*output=embed/);
+    await expect(dialog.locator("iframe")).toHaveAttribute("src", /maps\.google\.com\/maps\?q=E2E%20Grill.*output=embed/);
     await expect(dialog.getByRole("link", { name: /Open in Google Maps/ })).toHaveAttribute("href", /maps\/search\/\?api=1&query=/);
     await expect(dialog.getByRole("link", { name: "Get Directions" })).toHaveAttribute("href", /maps\/dir\/\?api=1&destination=/);
     await expect(page).toHaveURL(/listing=/);
@@ -51,8 +61,8 @@ test.describe("public directory", () => {
     await expect(page).not.toHaveURL(/listing=/);
 
     // A listing with no address or city shows "No location provided" instead of a map.
-    await table(page).getByRole("row", { name: /Sample HVAC Services/ }).getByRole("button", { name: /View Details/ }).click();
-    const noMap = page.getByRole("dialog", { name: "Sample HVAC Services" });
+    await table(page).getByRole("row", { name: /E2E Plumber/ }).getByRole("button", { name: /View Details/ }).click();
+    const noMap = page.getByRole("dialog", { name: "E2E Plumber" });
     await expect(noMap.getByText("No location provided for this listing.")).toBeVisible();
     await noMap.getByRole("button", { name: "Close" }).click();
     await expect(noMap).toBeHidden();
@@ -61,18 +71,19 @@ test.describe("public directory", () => {
   test("phones get stacked cards with a full-width Call button", async ({ browser }) => {
     const context = await browser.newContext({ ...anon, viewport: { width: 375, height: 800 } });
     const page = await context.newPage();
-    await page.goto("/community");
+    await page.goto("/community?q=E2E");
     await expect(table(page)).toBeHidden();
-    const card = page.locator("article", { hasText: "Sample Halal Grill" });
-    await expect(card.getByRole("link", { name: /Call/ })).toHaveAttribute("href", "tel:9255550110");
+    const card = page.locator("article", { hasText: "E2E Grill" });
+    await expect(card.getByRole("link", { name: /Call/ })).toHaveAttribute("href", "tel:9255550181");
+    await expect(page.locator("article", { hasText: "E2E Painter" }).getByRole("link", { name: /Call/ })).toHaveCount(0);
     await card.getByRole("button", { name: /View Details/ }).click();
-    await expect(page.getByRole("dialog", { name: "Sample Halal Grill" })).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "E2E Grill" })).toBeVisible();
     await context.close();
   });
 
   test("only approved listings are ever sent to the page", async ({ page }) => {
-    await page.goto("/community?q=Pending");
-    expect(await page.content()).not.toContain("Pending Sample Tutoring");
+    await page.goto("/community");
+    expect(await page.content()).not.toContain("E2E Hidden Pending");
   });
 });
 
@@ -151,6 +162,7 @@ test("spam: a filled honeypot looks successful but saves nothing", async ({ brow
 
 test("CSV import adds valid rows, reports bad ones, skips duplicates; paging appears past 10", async ({ page, browser }) => {
   await deleteListings("E2E");
+  test.info().annotations.push({ type: "note", description: "11 = 2 imported + 9 fillers, all named E2E…" });
   await page.goto("/admin/directory");
   const importer = page.locator("section", { has: page.getByRole("heading", { name: "Import listings from a CSV" }) });
   await importer.getByLabel("CSV file").setInputFiles("e2e/fixtures/listings.csv");
@@ -161,12 +173,14 @@ test("CSV import adds valid rows, reports bad ones, skips duplicates; paging app
   await importer.getByRole("button", { name: "Import" }).click();
   await expect(importer.getByRole("status")).toContainText("Imported 0 listings as approved; skipped 2 duplicates.");
 
+  // Paging appears once there are more than 10 listings (add filler listings if the data is small).
+  for (let i = 1; i <= 9; i++) await insertListing({ name: `E2E Filler ${i}`, parentCategory: "E2E Filler", category: "E2E Filler" });
   const context = await browser.newContext(anon);
   const visitor = await context.newPage();
-  await visitor.goto("/community");
-  await expect(visitor.getByRole("status").filter({ hasText: "Showing" })).toHaveText(/Showing 1–10 of 12 listings/);
+  await visitor.goto("/community?q=E2E");
+  await expect(visitor.getByRole("status").filter({ hasText: "Showing" })).toHaveText(/Showing 1–10 of 11 listings/);
   await visitor.getByRole("button", { name: "Page 2" }).click();
-  await expect(visitor.getByRole("status").filter({ hasText: "Showing" })).toHaveText(/Showing 11–12 of 12 listings/);
+  await expect(visitor.getByRole("status").filter({ hasText: "Showing" })).toHaveText(/Showing 11–11 of 11 listings/);
   await expect(visitor).toHaveURL(/page=2/);
   await context.close();
 
@@ -175,7 +189,7 @@ test("CSV import adds valid rows, reports bad ones, skips duplicates; paging app
   expect(csv.split("\r\n")[0]).toBe("name,listing type,main category,category,tags,description,author,phone,email,website,address,city,state,zip,google map url,status,submitter email,created");
   expect(csv).toContain("E2E Import Bakery,business,Restaurant,Bakery,Halal; Bakery");
 
-  await deleteListings("E2E Import");
+  await deleteListings("E2E");
 });
 
 test("directory export is refused without the directory role", async ({ browser }) => {

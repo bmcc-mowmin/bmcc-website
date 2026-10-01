@@ -21,3 +21,33 @@ export async function cleanTestData() {
   await sql(`DELETE FROM "Event" WHERE slug LIKE 'e2e-%'`);
   await sql(`UPDATE "User" SET "adminRoles" = '{}', disabled = true WHERE email LIKE 'e2e-%@example.com'`);
 }
+
+// Inserts an approved (or pending) listing directly, for tests that must not depend on seed data.
+export async function insertListing(l: {
+  name: string;
+  parentCategory: string;
+  category: string;
+  phone?: string | null;
+  address?: string | null;
+  city?: string | null;
+  tags?: string[];
+  status?: "APPROVED" | "PENDING";
+}) {
+  await sql(
+    `INSERT INTO "DirectoryListing" (id, name, "listingType", "parentCategory", category, tags, description, author, phone, address, city, state, zip, status, "createdAt", "updatedAt")
+     VALUES ($1, $2, 'BUSINESS', $3, $4, $5, 'Test listing created by the end-to-end tests.', $2, $6, $7, $8, $9, $10, $11, now(), now())`,
+    [
+      `e2e${Math.random().toString(36).slice(2, 12)}`,
+      l.name,
+      l.parentCategory,
+      l.category,
+      l.tags ?? [],
+      l.phone ?? null,
+      l.address ?? null,
+      l.city ?? null,
+      l.address ? "CA" : null,
+      l.address ? "94513" : null,
+      l.status ?? "APPROVED",
+    ],
+  );
+}
