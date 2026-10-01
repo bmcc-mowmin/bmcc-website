@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireSection } from "@/lib/auth";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCalculatedDay, getMonthSchedule, masjidClock } from "@/lib/prayer/schedule";
@@ -16,6 +17,7 @@ const NAMES: Record<string, string> = { fajr: "Fajr", dhuhr: "Dhuhr", asr: "Asr"
 const t12 = (hhmm: string) => formatClock(hhmm, "en-US");
 
 export default async function PrayerTimesAdmin({ searchParams }: PageProps<"/admin/prayer-times">) {
+  await requireSection("prayer");
   const params = await searchParams;
   const { date: today } = await masjidClock();
   const month = typeof params.month === "string" && /^\d{4}-\d{2}$/.test(params.month) ? params.month : today.slice(0, 7);

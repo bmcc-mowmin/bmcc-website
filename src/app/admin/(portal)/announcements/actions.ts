@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth";
+import { requireSection } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { done, fail, readL10n, text } from "@/lib/admin/forms";
 import { getCalcSettings } from "@/lib/prayer/schedule";
@@ -12,7 +12,7 @@ import type { ActionResult } from "@/components/admin/ActionForm";
 const LOCAL = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})$/; // <input type="datetime-local">
 
 export async function saveAnnouncement(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("announcements");
   const id = text(form, "id") || undefined;
   const textL10n = readL10n(form, "text");
   if (!textL10n.en) return fail("The English text is required.");
@@ -48,7 +48,7 @@ export async function saveAnnouncement(_prev: ActionResult, form: FormData): Pro
 }
 
 export async function deleteAnnouncement(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("announcements");
   const id = text(form, "id");
   await db.announcement.deleteMany({ where: { id } });
   await audit(admin.id, "delete", "Announcement", id);

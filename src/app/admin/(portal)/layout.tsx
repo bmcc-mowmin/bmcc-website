@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { requireAdmin } from "@/lib/auth";
-import { logout } from "@/app/(site)/login/actions";
+import { requireStaff } from "@/lib/auth";
+import { navFor, ROLE_INFO } from "@/lib/auth/permissions";
+import { env } from "@/lib/env";
+import { adminLogout } from "../login/actions";
 import { AdminNav } from "@/components/admin/AdminNav";
 import styles from "@/components/admin/admin.module.css";
 
 export const metadata: Metadata = { title: { default: "Admin", template: "%s · BMCC Admin" }, robots: { index: false } };
 
-// Every admin page is behind this check: signed in, and role = ADMIN.
+// Every portal page is behind this: signed in, not disabled, at least one admin role.
+// Each page and server action additionally checks its own section (requireSection).
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
-  const user = await requireAdmin();
+  const user = await requireStaff();
+  const nav = navFor(user.adminRoles).map(({ href, label, built }) => ({ href, label, built }));
   return (
     <div className={styles.shell} dir="ltr" lang="en">
       <aside className={styles.sidebar}>
@@ -18,12 +22,13 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
           <img src="/brand/bmcc-logo.jpeg" alt="" />
           BMCC Admin
         </Link>
-        <AdminNav />
+        <AdminNav items={nav} />
         <div className={styles.sidebarFooter}>
-          <div>{user.email}</div>
-          <div style={{ display: "flex", gap: 12, marginTop: 6 }}>
-            <Link href="/">View site</Link>
-            <form action={logout}>
+          <div style={{ fontWeight: 700, color: "#eef2f8" }}>{user.name ?? user.email}</div>
+          <div className={styles.roleList}>{user.adminRoles.map((r) => ROLE_INFO[r].label).join(" · ")}</div>
+          <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+            <a href={env.APP_URL}>View site</a>
+            <form action={adminLogout}>
               <button type="submit" className={styles.linkButton}>
                 Sign out
               </button>

@@ -14,3 +14,7 @@ export function masjidDate(daysFromToday = 0) {
 }
 
 export const unique = (prefix: string) => `${prefix} ${Date.now().toString(36)}`;
+
+// Saved signed-in sessions written by auth.setup.ts.
+export const ADMIN_STATE = "playwright/.auth/admin.json";
+export const roleState = (role: string) => `playwright/.auth/${role}.json`;

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireSection } from "@/lib/auth";
 import { db } from "@/lib/db";
 import type { L10n } from "@/lib/i18n/dictionary";
 import { masjidClock } from "@/lib/prayer/schedule";
@@ -20,6 +21,7 @@ function statusOf(a: Row, now: Date) {
 }
 
 export default async function AnnouncementsAdmin() {
+  await requireSection("announcements");
   const [rows, { timeZone, date }] = await Promise.all([
     db.announcement.findMany({ orderBy: [{ sortOrder: "asc" }, { startAt: "asc" }] }),
     masjidClock(),

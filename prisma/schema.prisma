@@ -16,16 +16,23 @@ datasource db {
 
 // ─── People & access ────────────────────────────────────────────────────────
 
-enum Role {
-  ADMIN
-  MEMBER
+// Admin portal roles. A person can hold several; no roles = no admin access.
+enum AdminRole {
+  SUPER_ADMIN // everything, including admin users and settings
+  CONTENT_EDITOR // events, announcements, (later) site text and media
+  PRAYER_MANAGER // prayer times
+  MEMBERSHIP_COORDINATOR // members, households, directory queue
+  TREASURER // donations (read-only)
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String      @id @default(cuid())
+  email        String      @unique
   name         String?
-  role         Role     @default(MEMBER)
+  adminRoles   AdminRole[] @default([])
+  // A disabled user cannot sign in (kept for the activity log instead of deleting).
+  disabled     Boolean     @default(false)
+  lastLoginAt  DateTime?
   // Set when AUTH_PROVIDER=clerk; links the Clerk account to this row.
   clerkUserId  String?  @unique
   // Only used by the local dev-login provider (seeded test accounts).
@@ -38,6 +45,19 @@ model User {
   rsvps            EventRsvp[]
   reviewedListings DirectoryListing[] @relation("ListingReviewer")
   auditLogs        AuditLog[]
+  authTokens       AuthToken[]
+}
+
+// One-time links, e.g. an admin invite's "set your password" link. Only a hash is stored.
+model AuthToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose   String // "set_password"
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 }
 
 // ─── Prayer times ───────────────────────────────────────────────────────────
@@ -67,6 +87,9 @@ model PrayerSettings {
   // Always Hanafi for BMCC; stored so it is visible in admin.
   madhab      String   @default("Hanafi")
   highLatRule String   @default("MiddleOfTheNight")
+  // Where daily times come from: "builtin" (calculated + admin overrides) or an external
+  // provider such as "masjidi" once it offers API access. See src/lib/prayer/sources.
+  source      String   @default("builtin")
   updatedAt   DateTime @updatedAt
 }
 

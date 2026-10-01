@@ -7,6 +7,7 @@ import type { Lang } from "@/lib/i18n/config";
 import { addDays, weekdayOf } from "@/lib/time";
 import { masjidNow, type DaySchedule, type JumuahService } from "./next-prayer";
 import { isClock, resolveDay, type CalcSettings, type DayOverrideInput, type IqamahRuleInput } from "./calculate";
+import { externalSource } from "./sources";
 
 // THE single source of truth for prayer times. The header's Next Prayer, the Home table,
 // the Prayer Times page, the API and the monthly PDF all come from here:
@@ -14,9 +15,10 @@ import { isClock, resolveDay, type CalcSettings, type DayOverrideInput, type Iqa
 
 const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 
-export const getCalcSettings = cache(async (): Promise<CalcSettings> => {
+export const getCalcSettings = cache(async (): Promise<CalcSettings & { source: string }> => {
   const s = await db.prayerSettings.findUnique({ where: { id: 1 } });
   return {
+    source: s?.source ?? "builtin",
     latitude: s?.latitude ?? env.MASJID_LAT,
     longitude: s?.longitude ?? env.MASJID_LNG,
     timezone: s?.timezone ?? env.MASJID_TIMEZONE,
@@ -63,7 +65,18 @@ export type ResolvedDay = DaySchedule & { overridden: string[]; note: string | n
 async function buildDay(date: string, lang: Lang, override: OverrideRow | undefined): Promise<ResolvedDay> {
   const [settings, rules, jumuahRows] = await Promise.all([getCalcSettings(), getIqamahRules(), getJumuahRows()]);
   const weekday = weekdayOf(date);
-  const { prayers, overridden } = resolveDay(date, settings, rules, (override ?? null) as DayOverrideInput | null);
+  let { prayers, overridden } = resolveDay(date, settings, rules, (override ?? null) as DayOverrideInput | null);
+  // An external provider, when one is connected and selected, supplies the daily times instead.
+  // If it fails, the calculated times above are kept so the site never goes blank.
+  const external = settings.source !== "builtin" ? externalSource(settings.source) : null;
+  if (external) {
+    try {
+      ({ prayers } = await external.getDay(date));
+      overridden = [];
+    } catch (e) {
+      console.error(`prayer source "${external.id}" failed; using built-in times`, e);
+    }
+  }
   let jumuah: JumuahService[] = [];
   if (weekday === 5) {
     const custom = overrideJumuah(override);

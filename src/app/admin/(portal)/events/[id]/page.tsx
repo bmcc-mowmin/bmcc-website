@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireSection } from "@/lib/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
@@ -10,6 +11,7 @@ import { EventForm } from "../EventForm";
 export const metadata: Metadata = { title: "Edit event" };
 
 export default async function EditEvent({ params, searchParams }: PageProps<"/admin/events/[id]">) {
+  await requireSection("events");
   const [{ id }, { status }] = await Promise.all([params, searchParams]);
   const [event, { date, timeZone }] = await Promise.all([db.event.findUnique({ where: { id } }), masjidClock()]);
   if (!event) notFound();

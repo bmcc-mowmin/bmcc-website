@@ -14,6 +14,8 @@ const schema = z
   .object({
     APP_ENV: z.enum(["local", "staging", "production"]).default("local"),
     APP_URL: z.url().default("http://localhost:3000"),
+    // Production: the admin portal's own host, e.g. "admin.brmcc.org". Blank = served at /admin.
+    ADMIN_HOST: optional,
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 
     DATABASE_URL: z.string().min(1),
@@ -110,3 +112,10 @@ function load() {
 
 export const env = load();
 export const isProduction = env.APP_ENV === "production";
+
+// Absolute URL of an admin page (used in invite emails).
+export function adminUrl(path: string) {
+  if (!env.ADMIN_HOST) return `${env.APP_URL}${path}`;
+  const protocol = new URL(env.APP_URL).protocol;
+  return `${protocol}//${env.ADMIN_HOST}${path}`;
+}

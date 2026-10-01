@@ -1,0 +1,91 @@
+/* Admin sign-in and set-password pages (no site header, no portal sidebar). */
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--navy);
+}
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--white);
+  border-radius: 14px;
+  padding: 32px 30px;
+  box-shadow: var(--shadow-popup);
+}
+.logo {
+  height: 40px;
+  width: auto;
+  display: block;
+  margin-bottom: 18px;
+}
+.title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.note {
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+}
+.label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.input {
+  padding: 11px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  font-size: 14.5px;
+  margin-bottom: 14px;
+}
+.hint {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: -8px 0 14px;
+}
+.button {
+  margin-top: 4px;
+  background: var(--primary);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px 0;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+.button:hover {
+  background: var(--primary-hover);
+}
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.error {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fdecec;
+  color: #a4262c;
+  font-size: 14px;
+}
+.ok {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--success-bg);
+  color: var(--success);
+  font-size: 14px;
+}

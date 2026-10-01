@@ -23,7 +23,7 @@ npm run dev          # http://localhost:3000
 | What | Where |
 |---|---|
 | Website | http://localhost:3000 |
-| Admin | http://localhost:3000/admin (sign in with the test admin account) |
+| Admin portal | http://localhost:3000/admin (in production: its own host, `ADMIN_HOST`) |
 | Health check | http://localhost:3000/api/health |
 | Prayer times API | http://localhost:3000/api/prayer-times?date=YYYY-MM-DD |
 | Monthly timetable PDF | http://localhost:3000/api/prayer-times/pdf?month=YYYY-MM |
@@ -36,8 +36,17 @@ To run the **production build** locally instead of the dev server:
 
 ### Test accounts (local only)
 
-Created by the seed. Emails and passwords are in your `.env`
-(`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`, `SEED_MEMBER_EMAIL` / `SEED_MEMBER_PASSWORD`).
+Created by the seed; passwords are in your `.env`.
+
+| Account | Role | Password setting |
+|---|---|---|
+| `SEED_ADMIN_EMAIL` (admin@bmcc.local) | Super admin | `SEED_ADMIN_PASSWORD` |
+| editor@bmcc.local | Content editor | `SEED_STAFF_PASSWORD` |
+| prayer@bmcc.local | Prayer times manager | `SEED_STAFF_PASSWORD` |
+| membership@bmcc.local | Membership coordinator | `SEED_STAFF_PASSWORD` |
+| treasurer@bmcc.local | Treasurer | `SEED_STAFF_PASSWORD` |
+| `SEED_MEMBER_EMAIL` (member@bmcc.local) | Member (no admin access) | `SEED_MEMBER_PASSWORD` |
+
 The member account has an active membership and a 3-person household.
 
 ## Commands
@@ -95,10 +104,29 @@ Calendar link. Photos are uploaded in admin and served from `/media/…`.
 Announcements show in the header ticker only between their start and end times and while active;
 the ticker disappears when none are showing.
 
-## Admin sign-in
+## Admin portal
 
-`AUTH_PROVIDER=dev` (local): email + password for the seeded accounts, a signed session cookie,
-rate-limited attempts. It is refused when `APP_ENV=production`. Clerk replaces it in phase 7.
+`/admin` (production: `ADMIN_HOST`, e.g. admin.brmcc.org — `/admin` on the main site redirects there,
+and the admin host serves nothing else). Pages get `X-Frame-Options: DENY`, `noindex` and no caching.
+
+- **Roles** (`src/lib/auth/permissions.ts`): Super admin, Content editor, Prayer times manager,
+  Membership coordinator, Treasurer. A person can hold several. Each page *and* each server action
+  checks its section, and the sidebar shows only what the person may open.
+- **Admin users** (Super admin): invite by email with a one-time set-password link (72 hours), change
+  roles, disable (signs them out immediately), remove access. There is always at least one active
+  Super admin, and nobody can demote or disable themselves.
+- **Dashboard** and an **activity log** of every admin change (who, what, when, details).
+- **First admin in production** (the seed never runs there): `npm run admin:create -- email "Name"`
+  from a checkout whose `DATABASE_URL` points at production; it prints a set-password link.
+- **Sign-in:** `AUTH_PROVIDER=dev` is email + password with a signed session cookie and rate-limited
+  attempts; it is refused when `APP_ENV=production`, where Clerk takes over (member-login phase).
+
+### Prayer-times source
+
+Admin → Prayer times → *Iqamah rules, Jumu'ah & settings* chooses where daily times come from:
+**Built-in** (calculated + overrides) or an external provider. **Masjidi** is listed but unavailable
+until Masjidi provides API access; if a selected provider fails, the site falls back to the built-in
+times. Adding a provider = one adapter in `src/lib/prayer/sources/`.
 
 ## Settings
 

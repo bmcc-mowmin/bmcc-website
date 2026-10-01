@@ -25,8 +25,21 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 
 - [ ] Create the Clerk production instance and set `AUTH_PROVIDER=clerk`,
       `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET`.
-- [ ] Create the real admin accounts. The seeded test accounts never exist in production
+- [ ] Create the first Super admin with `npm run admin:create -- email "Name"`; they invite the rest
+      from Admin users and assign roles. The seeded test accounts never exist in production
       (the seed refuses to run and dev login is disabled when `APP_ENV=production`).
+
+## Admin portal
+
+- [ ] DNS: point `admin.brmcc.org` at the app, with a TLS certificate; set `ADMIN_HOST=admin.brmcc.org`.
+- [ ] Decide who gets which role (Super admin, Content editor, Prayer times manager, Membership
+      coordinator, Treasurer).
+
+## Prayer times from Masjidi
+
+- [ ] Ask Masjidi (support@masjidi.app) for API or data-feed access to BMCC's times. When they
+      provide it, a Masjidi adapter is added in `src/lib/prayer/sources/` and switched on in admin.
+      Until then the built-in calculated times (with admin overrides) are used.
 
 ## Email
 

@@ -51,6 +51,7 @@ async function main() {
     db.householdMember.deleteMany(),
     db.household.deleteMany(),
     db.directoryListing.deleteMany(),
+    db.authToken.deleteMany(),
     db.user.deleteMany(),
     db.event.deleteMany(),
     db.announcement.deleteMany(),
@@ -141,7 +142,7 @@ async function main() {
     data: {
       email: process.env.SEED_ADMIN_EMAIL || "admin@bmcc.local",
       name: "BMCC Admin (test)",
-      role: "ADMIN",
+      adminRoles: ["SUPER_ADMIN"],
       passwordHash: await bcrypt.hash(adminPassword, 10),
     },
   });
@@ -149,10 +150,24 @@ async function main() {
     data: {
       email: process.env.SEED_MEMBER_EMAIL || "member@bmcc.local",
       name: "Test Member",
-      role: "MEMBER",
       passwordHash: await bcrypt.hash(memberPassword, 10),
     },
   });
+
+  // One local test account per admin role (shared password SEED_STAFF_PASSWORD), to try permissions.
+  const staffPassword = process.env.SEED_STAFF_PASSWORD;
+  if (staffPassword) {
+    const hash = await bcrypt.hash(staffPassword, 10);
+    const staff = [
+      ["editor@bmcc.local", "Content Editor (test)", "CONTENT_EDITOR"],
+      ["prayer@bmcc.local", "Prayer Manager (test)", "PRAYER_MANAGER"],
+      ["membership@bmcc.local", "Membership Coordinator (test)", "MEMBERSHIP_COORDINATOR"],
+      ["treasurer@bmcc.local", "Treasurer (test)", "TREASURER"],
+    ] as const;
+    for (const [email, name, role] of staff) {
+      await db.user.create({ data: { email, name, adminRoles: [role], passwordHash: hash } });
+    }
+  }
 
   // Existing member with an active membership, for testing the portal (phase 7).
   const enrolledAt = at(addDays(today, -60), "10:00");
@@ -221,7 +236,7 @@ async function main() {
   });
 
   console.log("Seeded: prayer settings, 2 Jumu'ah services, 5 announcements (1 expired), 4 events,");
-  console.log(`        ${listings.length} approved + 2 pending directory listings, admin + member test accounts.`);
+  console.log(`        ${listings.length} approved + 2 pending directory listings, admin + member test accounts${staffPassword ? ", 4 role test accounts" : ""}.`);
 }
 
 main()

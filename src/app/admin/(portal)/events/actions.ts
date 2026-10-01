@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth";
+import { requireSection } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { storage } from "@/lib/storage";
 import { detectImage, imageKey, MAX_IMAGE_BYTES } from "@/lib/storage/images";
@@ -42,7 +42,7 @@ function refresh() {
 }
 
 export async function saveEvent(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("events");
   const id = text(form, "id") || undefined;
   const title = readL10n(form, "title");
   const description = readL10n(form, "description");
@@ -107,7 +107,7 @@ export async function saveEvent(_prev: ActionResult, form: FormData): Promise<Ac
 }
 
 export async function deleteEvent(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("events");
   const id = text(form, "id");
   const row = await db.event.findUnique({ where: { id } });
   if (row) {

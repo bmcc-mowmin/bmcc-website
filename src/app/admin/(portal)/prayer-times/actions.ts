@@ -5,11 +5,12 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { Prisma } from "@/generated/prisma/client";
-import { requireAdmin } from "@/lib/auth";
+import { requireSection } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { storage } from "@/lib/storage";
 import { done, fail, optionalText, readL10n, text } from "@/lib/admin/forms";
 import { CALC_METHODS, DAILY_PRAYERS, HIGH_LAT_RULES, isClock } from "@/lib/prayer/calculate";
+import { SOURCE_OPTIONS } from "@/lib/prayer/sources";
 import type { ActionResult } from "@/components/admin/ActionForm";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -29,7 +30,7 @@ function refresh() {
 // ── Single-day override ──────────────────────────────────────────────────────
 
 export async function saveDayOverride(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("prayer");
   const date = text(form, "date");
   if (!DATE.test(date)) return fail("Pick a valid date.");
 
@@ -76,7 +77,7 @@ export async function saveDayOverride(_prev: ActionResult, form: FormData): Prom
 }
 
 export async function clearDayOverride(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("prayer");
   const date = text(form, "date");
   if (!DATE.test(date)) return fail("Invalid date.");
   await db.prayerDayOverride.deleteMany({ where: { date: asDate(date) } });
@@ -90,7 +91,7 @@ export async function clearDayOverride(_prev: ActionResult, form: FormData): Pro
 const MAX_PDF_BYTES = 10 * 1024 * 1024;
 
 export async function uploadTimetable(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("prayer");
   const month = text(form, "month");
   const file = form.get("file");
   if (!MONTH.test(month)) return fail("Invalid month.");
@@ -111,7 +112,7 @@ export async function uploadTimetable(_prev: ActionResult, form: FormData): Prom
 }
 
 export async function removeTimetable(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("prayer");
   const month = text(form, "month");
   if (!MONTH.test(month)) return fail("Invalid month.");
   const row = await db.timetablePdf.findUnique({ where: { month } });
@@ -140,7 +141,7 @@ const ruleSchema = z
   .refine((r) => !r.effectiveTo || r.effectiveTo >= r.effectiveFrom, { message: "The end date is before the start date." });
 
 export async function addIqamahRule(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("prayer");
   const raw = Object.fromEntries(form);
   if (raw.mode === "OFFSET") delete raw.fixedTime;
   if (raw.mode === "FIXED") delete raw.offsetMinutes;
@@ -163,7 +164,7 @@ export async function addIqamahRule(_prev: ActionResult, form: FormData): Promis
 }
 
 export async function deleteIqamahRule(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("prayer");
   const id = text(form, "id");
   await db.iqamahRule.deleteMany({ where: { id } });
   await audit(admin.id, "delete", "IqamahRule", id);
@@ -174,7 +175,7 @@ export async function deleteIqamahRule(_prev: ActionResult, form: FormData): Pro
 // ── Jumu'ah services ─────────────────────────────────────────────────────────
 
 export async function saveJumuahService(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("prayer");
   const id = text(form, "id");
   const khutbahTime = text(form, "khutbahTime");
   const iqamahTime = text(form, "iqamahTime");
@@ -201,7 +202,7 @@ export async function saveJumuahService(_prev: ActionResult, form: FormData): Pr
 }
 
 export async function deleteJumuahService(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("prayer");
   const id = text(form, "id");
   await db.jumuahService.deleteMany({ where: { id } });
   await audit(admin.id, "delete", "JumuahService", id);
@@ -219,7 +220,7 @@ const settingsSchema = z.object({
 });
 
 export async function saveCalcSettings(_prev: ActionResult, form: FormData): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requireSection("prayer");
   const parsed = settingsSchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return fail(parsed.error.issues[0].message);
   const current = await db.prayerSettings.findUnique({ where: { id: 1 } });
@@ -231,4 +232,18 @@ export async function saveCalcSettings(_prev: ActionResult, form: FormData): Pro
   await audit(admin.id, "update", "PrayerSettings", "1", parsed.data);
   refresh();
   return done("Settings saved. All calculated times now use them.");
+}
+
+// ── Times source ─────────────────────────────────────────────────────────────
+
+export async function saveSource(_prev: ActionResult, form: FormData): Promise<ActionResult> {
+  const admin = await requireSection("prayer");
+  const id = text(form, "source");
+  const option = SOURCE_OPTIONS.find((o) => o.id === id);
+  if (!option) return fail("Unknown source.");
+  if (!option.available) return fail(`${option.label} isn't available yet.`);
+  await db.prayerSettings.update({ where: { id: 1 }, data: { source: id } });
+  await audit(admin.id, "update", "PrayerSettings", "1", { source: id });
+  refresh();
+  return done(`Prayer times now come from: ${option.label}.`);
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireSection } from "@/lib/auth";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { localize } from "@/lib/i18n/dictionary";
@@ -11,6 +12,7 @@ export const metadata: Metadata = { title: "Events" };
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default async function EventsAdmin({ searchParams }: PageProps<"/admin/events">) {
+  await requireSection("events");
   const { status } = await searchParams;
   const [rows, { timeZone }] = await Promise.all([db.event.findMany({ orderBy: { startAt: "desc" } }), masjidClock()]);
   const now = new Date();

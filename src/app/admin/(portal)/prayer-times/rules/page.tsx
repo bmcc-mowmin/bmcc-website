@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireSection } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getCalcSettings, masjidClock } from "@/lib/prayer/schedule";
 import { CALC_METHODS, HIGH_LAT_RULES } from "@/lib/prayer/calculate";
@@ -7,7 +8,8 @@ import { ActionForm } from "@/components/admin/ActionForm";
 import { L10nField } from "@/components/admin/L10nField";
 import styles from "@/components/admin/admin.module.css";
 import { PrayerTabs } from "../Tabs";
-import { addIqamahRule, deleteIqamahRule, deleteJumuahService, saveCalcSettings, saveJumuahService } from "../actions";
+import { addIqamahRule, deleteIqamahRule, deleteJumuahService, saveCalcSettings, saveJumuahService, saveSource } from "../actions";
+import { getPrayerSourceStatus, SOURCE_OPTIONS } from "@/lib/prayer/sources";
 
 export const metadata: Metadata = { title: "Prayer rules" };
 
@@ -16,11 +18,13 @@ const title = (p: string) => p.charAt(0) + p.slice(1).toLowerCase();
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
 export default async function PrayerRulesAdmin() {
-  const [rules, services, settings, { date: today }] = await Promise.all([
+  await requireSection("prayer");
+  const [rules, services, settings, { date: today }, sourceStatus] = await Promise.all([
     db.iqamahRule.findMany({ orderBy: [{ prayer: "asc" }, { effectiveFrom: "desc" }] }),
     db.jumuahService.findMany({ orderBy: { sortOrder: "asc" } }),
     getCalcSettings(),
     masjidClock(),
+    getPrayerSourceStatus(),
   ]);
 
   return (
@@ -28,6 +32,31 @@ export default async function PrayerRulesAdmin() {
       <h1 className={styles.pageTitle}>Prayer times</h1>
       <p className={styles.pageLead}>Rules that apply to every day. For a single day, use the month view.</p>
       <PrayerTabs active="rules" />
+
+      {/* ── Source ── */}
+      <section className={styles.card} aria-labelledby="source-title">
+        <h2 id="source-title" className={styles.cardTitle}>
+          Where prayer times come from
+        </h2>
+        <p className={styles.cardLead}>
+          Currently: <strong>{sourceStatus.label}</strong>. {sourceStatus.message} Whatever the source, the header, Home
+          page, Prayer Times page, API and PDF all show the same times.
+        </p>
+        <ActionForm action={saveSource} submitLabel="Save source">
+          <fieldset className={styles.checkboxList} style={{ border: "none", padding: 0 }}>
+            <legend className="visually-hidden">Prayer times source</legend>
+            {SOURCE_OPTIONS.map((o) => (
+              <label key={o.id} htmlFor={`source-${o.id}`} style={o.available ? undefined : { opacity: 0.6 }}>
+                <input id={`source-${o.id}`} type="radio" name="source" value={o.id} defaultChecked={settings.source === o.id} disabled={!o.available} />
+                <span>
+                  {o.label}
+                  {!o.available && <small>{o.unavailableReason}</small>}
+                </span>
+              </label>
+            ))}
+          </fieldset>
+        </ActionForm>
+      </section>
 
       {/* ── Iqamah rules ── */}
       <section className={styles.card} aria-labelledby="rules-title">
