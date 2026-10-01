@@ -41,6 +41,12 @@ export default async function AnnouncementsAdmin() {
         time ({timeZone}). <strong>{live}</strong> showing now.
       </p>
 
+      <section className={styles.card} style={{ borderColor: "var(--primary)" }}>
+        <h2 className={styles.cardTitle}>Add an announcement</h2>
+        <AnnouncementForm local={local} defaultStart={`${date}T00:00`} />
+      </section>
+
+      {rows.length > 0 && <h2 className={styles.cardTitle} style={{ margin: "8px 0 12px" }}>Current announcements</h2>}
       {rows.map((a) => {
         const s = statusOf(a, now);
         return (
@@ -58,10 +64,6 @@ export default async function AnnouncementsAdmin() {
         );
       })}
 
-      <section className={styles.card} style={{ borderColor: "var(--primary)" }}>
-        <h2 className={styles.cardTitle}>Add an announcement</h2>
-        <AnnouncementForm local={local} defaultStart={`${date}T00:00`} />
-      </section>
     </>
   );
 }
