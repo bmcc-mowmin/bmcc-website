@@ -128,7 +128,7 @@ async function main() {
         title: l10n(`ev${e.n}_title`),
         description: l10n(`ev${e.n}_desc`),
         tag: l10n(`ev${e.n}_tag`),
-        location: messages.en[`ev${e.n}_location`],
+        location: l10n(`ev${e.n}_location`),
         startAt: e.start,
         endAt: e.end,
         rrule: e.rrule,

@@ -153,7 +153,7 @@ model Event {
   // iCalendar RRULE, e.g. "FREQ=WEEKLY;BYDAY=FR". Null = one-off.
   rrule       String?
   rruleUntil  DateTime?
-  location    String
+  location    Json // L10n
   imageKey    String?
   published   Boolean     @default(true)
   createdAt   DateTime    @default(now())

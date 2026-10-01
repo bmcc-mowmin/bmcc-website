@@ -99,6 +99,42 @@
   color: var(--ink);
 }
 
+/* ── Events carousel band ── */
+.eventsBand {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+}
+.eventsHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.eventsIntro {
+  max-width: 640px;
+}
+.eventsEyebrow {
+  margin-bottom: 10px;
+}
+.eventsH2 {
+  font-size: clamp(26px, 3.2vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ink);
+}
+.viewAll {
+  font-weight: 700;
+  font-size: 14.5px;
+  color: var(--primary);
+}
+:global([dir="rtl"]) .viewAll span {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
 /* ── Category tiles ── */
 .tilesBand {
   background: var(--page);

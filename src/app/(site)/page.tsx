@@ -6,17 +6,26 @@ import { contactHref, routes } from "@/lib/routes";
 import { PrayerTable } from "@/components/prayer/PrayerTable";
 import { formatDayLabel } from "@/lib/prayer/next-prayer";
 import { intlLocale } from "@/lib/i18n/config";
+import { getUpcomingEvents, formatEventWhen } from "@/lib/events";
+import { masjidClock } from "@/lib/prayer/schedule";
+import { EventsCarousel, type CarouselCard } from "@/components/events/EventsCarousel";
 import { MemberLoginCard } from "./MemberLoginCard";
 import styles from "./home.module.css";
 
-// Sections still to come: re-subscribe bar + newsletter (phase 6), events carousel (phase 3).
+// Sections still to come: re-subscribe bar + newsletter (phase 6).
 export default async function HomePage() {
   const { t, lang } = await getI18n();
-  const [{ today }, jumuah, announcements] = await Promise.all([
+  const [{ today }, jumuah, announcements, events, { timeZone }] = await Promise.all([
     getTodayAndTomorrow(lang),
     getUpcomingJumuah(lang),
     getActiveAnnouncements(lang),
+    getUpcomingEvents(lang, { limit: 8 }),
+    masjidClock(),
   ]);
+  const cards: CarouselCard[] = events.map((e) => {
+    const when = formatEventWhen(e, e.next, lang, t, timeZone);
+    return { slug: e.slug, title: e.title, description: e.description, tag: e.tag, location: e.location, imageUrl: e.imageUrl, date: when.date, time: when.startTime };
+  });
 
   const tiles = [
     { title: t.tile_prayer_title, href: routes.prayerTimes, icon: "🕌", description: t.tile_prayer_desc },
@@ -55,6 +64,28 @@ export default async function HomePage() {
         </div>
         <div className={styles.heroPara}>
           <p>{t.home_paragraph}</p>
+        </div>
+      </section>
+
+      {/* EVENTS CAROUSEL — the next upcoming events (up to 8) */}
+      <section className={styles.eventsBand} aria-labelledby="home-events-title">
+        <div className="container section-y">
+          <div className={styles.eventsHead}>
+            <div className={styles.eventsIntro}>
+              <div className={`eyebrow ${styles.eventsEyebrow}`}>{t.evc_eyebrow}</div>
+              <h2 id="home-events-title" className={styles.eventsH2}>
+                {t.evc_heading}
+              </h2>
+            </div>
+            <Link href={routes.events} className={styles.viewAll}>
+              {t.evc_view_all} <span aria-hidden>→</span>
+            </Link>
+          </div>
+          {cards.length > 0 ? (
+            <EventsCarousel cards={cards} readMore={t.evc_read_more} prevLabel={t.carousel_prev} nextLabel={t.carousel_next} />
+          ) : (
+            <p className="lead">{t.events_empty}</p>
+          )}
         </div>
       </section>
 

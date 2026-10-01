@@ -47,7 +47,8 @@ The member account has an active membership and a 3-person household.
 | `npm run dev` | Dev server with hot reload |
 | `npm run build` / `npm start` | Production build / run it |
 | `npm run lint` / `npm run typecheck` | Checks |
-| `npm run test:unit` | Unit tests (prayer-time logic) |
+| `npm run test:unit` | Unit tests (prayer times, event dates, calendar files) |
+| `npm run test:e2e` | End-to-end tests in a real browser (needs the dev server + seeded DB; first time: `npx playwright install chromium`) |
 | `npm run db:migrate` | Create + apply a migration after editing `prisma/schema.prisma` |
 | `npm run db:deploy` | Apply pending migrations (what production runs) |
 | `npm run db:seed` | Reload sample data (wipes the seeded tables) |
@@ -81,6 +82,18 @@ Prayer Times page, the API and the PDF:
 Next Prayer is computed in the masjid's time zone and refreshes every 30 seconds; on Fridays the
 first Jumu'ah replaces Dhuhr; after Isha it shows tomorrow's Fajr. The monthly PDF is generated on
 request unless an admin uploaded one for that month.
+
+## Events and announcements
+
+Events are stored with per-language title, description, tag and location, a first date/time, and
+optionally "every week on the same day" (until an optional end date). Weekly repeats are evaluated on
+masjid wall-clock time, so a 1:00 PM Friday event stays at 1:00 PM across daylight-saving changes.
+The Home carousel shows the next 8 upcoming published events; the Events page shows all of them.
+Each event has a page at `/events/<slug>`, an `.ics` file (`/api/events/<slug>/ics`) and a Google
+Calendar link. Photos are uploaded in admin and served from `/media/…`.
+
+Announcements show in the header ticker only between their start and end times and while active;
+the ticker disappears when none are showing.
 
 ## Admin sign-in
 

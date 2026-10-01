@@ -219,9 +219,9 @@ function JumuahForm({ service }: { service?: Service }) {
       <ActionForm action={saveJumuahService} submitLabel={service ? "Save" : "Add service"} resetOnSuccess={!service}>
         <input type="hidden" name="id" value={service?.id ?? ""} />
         <div className={styles.grid2}>
-          <L10nField name="label" label="Name (e.g. First Jumu'ah)" value={service?.label as L10n | undefined} />
-          <L10nField name="location" label="Location" value={service?.location as L10n | undefined} />
-          <L10nField name="note" label="Note (optional)" value={service?.note as L10n | undefined} required={false} />
+          <L10nField idPrefix={key} name="label" label="Name (e.g. First Jumu'ah)" value={service?.label as L10n | undefined} />
+          <L10nField idPrefix={key} name="location" label="Location" value={service?.location as L10n | undefined} />
+          <L10nField idPrefix={key} name="note" label="Note (optional)" value={service?.note as L10n | undefined} required={false} />
         </div>
         <div className={styles.row}>
           <div className={styles.field}>

@@ -29,6 +29,7 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/playwright/.auth/
 
 # logs & OS
 npm-debug.log*

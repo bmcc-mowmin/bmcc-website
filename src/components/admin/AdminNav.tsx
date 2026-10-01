@@ -5,8 +5,12 @@ import { usePathname } from "next/navigation";
 import styles from "./admin.module.css";
 
 // Sections appear here as each build phase lands.
-const SECTIONS = [{ href: "/admin/prayer-times", label: "Prayer times" }];
-const COMING = ["Events", "Announcements", "Directory queue", "Memberships", "Donations", "Subscribers", "Messages"];
+const SECTIONS = [
+  { href: "/admin/prayer-times", label: "Prayer times" },
+  { href: "/admin/events", label: "Events" },
+  { href: "/admin/announcements", label: "Announcements" },
+];
+const COMING = ["Directory queue", "Memberships", "Donations", "Subscribers", "Messages"];
 
 export function AdminNav() {
   const pathname = usePathname();
