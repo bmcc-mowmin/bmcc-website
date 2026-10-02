@@ -158,6 +158,8 @@
   border-color: #b42318;
 }
 select.input {
+  width: 100%;
+  max-width: 100%;
   background: var(--white);
   font: inherit;
   font-size: 14.5px;
@@ -196,13 +198,14 @@ select.input {
 }
 .again {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 @media (max-width: 900px) {
   .panel,
   .contactGrid {
-    grid-template-columns: 1fr;
+    /* minmax(0, …) so a long option in the topic dropdown can't widen the page on phones. */
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 .panelImg {

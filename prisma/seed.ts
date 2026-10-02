@@ -176,7 +176,7 @@ async function main() {
     }
   }
 
-  // Existing member with an active membership, for testing the portal (phase 7).
+  // Existing member with an active membership, for testing the member portal.
   const enrolledAt = at(addDays(today, -60), "10:00");
   const eligible = benefitEligibleFrom(enrolledAt, TZ);
   const household = await db.household.create({

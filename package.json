@@ -43,6 +43,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
@@ -64,5 +65,9 @@
   },
   "engines": {
     "node": ">=24"
+  },
+  "overrides": {
+    "mysql2": "^3.24.5",
+    "deepmerge-ts": "^8.0.2"
   }
 }

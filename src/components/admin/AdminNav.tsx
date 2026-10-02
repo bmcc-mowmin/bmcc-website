@@ -21,7 +21,7 @@ export function AdminNav({ items }: { items: { href: string; label: string; buil
       })}
       {coming.length > 0 && (
         <>
-          <div className={styles.navGroup}>Coming in later phases</div>
+          <div className={styles.navGroup}>Not available yet</div>
           {coming.map((c) => (
             <span key={c.href} className={styles.navSoon}>
               {c.label}

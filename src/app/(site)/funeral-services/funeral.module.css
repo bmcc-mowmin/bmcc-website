@@ -7,7 +7,7 @@
   letter-spacing: 0.12em;
   font-size: 13px;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--sky-on-dark);
   margin-bottom: 14px;
 }
 .heroH1 {
@@ -91,7 +91,7 @@
 .policyNumber {
   font-size: 22px;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 .policyTitle {
   margin: 0 0 12px 0;

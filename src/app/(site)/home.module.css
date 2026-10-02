@@ -128,7 +128,7 @@
 .viewAll {
   font-weight: 700;
   font-size: 14.5px;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 :global([dir="rtl"]) .viewAll span {
   display: inline-block;
@@ -187,7 +187,7 @@
   color: var(--eyebrow);
 }
 .stripInner a:hover {
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 /* ── Member portal ── */
@@ -213,7 +213,7 @@
   letter-spacing: 0.12em;
   font-size: 13px;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--sky-on-dark);
   margin-bottom: 12px;
 }
 .portalH2 {
@@ -243,7 +243,7 @@
   color: #dce8e0;
 }
 .portalPoints li span:first-child {
-  color: var(--primary);
+  color: var(--sky-on-dark);
   font-weight: 800;
 }
 .loginCard {

@@ -50,7 +50,7 @@
   color: var(--ink);
 }
 .title a:hover {
-  color: var(--primary);
+  color: var(--primary-text);
 }
 .description {
   font-size: 14.5px;

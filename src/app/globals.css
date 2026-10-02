@@ -4,13 +4,16 @@
   --ink: #0b1524;
   --primary: #2f6fed;
   --primary-hover: #1d54c4;
+  /* Blue for TEXT on light backgrounds (the brighter --primary is for buttons/borders; 4.5:1 contrast). */
+  --primary-text: #1d54c4;
   --eyebrow: #2354a6;
   --sky-100: #eaf1fe;
   --sky-200: #d7e4fb;
   --sky-on-dark: #8fb0e8;
   --body: #384152;
-  --muted: #6b7280;
-  --subtle: #98a2b3;
+  --muted: #5d6574;
+  /* Was #98a2b3 in the design; darkened to meet WCAG AA contrast (4.5:1) for small text. */
+  --subtle: #636e7f;
   --mist-on-dark: #c5d2e4;
   --border: #e2e5ea;
   --page: #f6f7f9;
@@ -54,7 +57,7 @@ a {
   text-decoration: none;
 }
 a:hover {
-  color: var(--primary);
+  color: var(--primary-text);
 }
 button,
 input,
@@ -225,4 +228,12 @@ img {
     border: none !important;
     box-shadow: none !important;
   }
+}
+
+/* Links inside sentences are underlined, so they don't rely on colour alone (WCAG 1.4.1). */
+p a:not([class]),
+li a:not([class]),
+dd a:not([class]) {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

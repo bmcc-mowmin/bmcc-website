@@ -5,8 +5,9 @@ import { getDictionary } from "./dictionary";
 import { ensureMessageOverrides } from "./overrides";
 
 export async function getLang(): Promise<Lang> {
-  await ensureMessageOverrides();
+  // Cookies first: that makes the page per-request, so nothing below runs during the build.
   const value = (await cookies()).get(LANG_STORAGE_KEY)?.value;
+  await ensureMessageOverrides();
   return isLang(value) ? value : DEFAULT_LANG;
 }
 

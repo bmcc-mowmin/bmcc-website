@@ -13,7 +13,7 @@
   letter-spacing: 0.12em;
   font-size: 13px;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--sky-on-dark);
   margin-bottom: 14px;
 }
 .heroH1 {
@@ -273,7 +273,7 @@
 }
 .warn {
   background: #fff1dc;
-  color: #b25e00;
+  color: #8a4800;
 }
 .resultH {
   font-size: 26px;

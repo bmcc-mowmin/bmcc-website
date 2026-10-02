@@ -3,7 +3,7 @@ import { intlLocale, type Lang } from "@/lib/i18n/config";
 import type { Dictionary, MessageKey } from "@/lib/i18n/dictionary";
 import styles from "./PrayerTable.module.css";
 
-// Adhan / Iqamah table used on Home (and, in phase 2, on the Prayer Times page).
+// Adhan / Iqamah table used on Home and the Prayer Times page.
 // Fed only by lib/prayer/schedule.ts — never hard-code times here.
 export function PrayerTable({
   day,

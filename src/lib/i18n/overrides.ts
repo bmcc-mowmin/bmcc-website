@@ -11,7 +11,13 @@ const NAME = "message-overrides";
 let applied: unknown = null;
 
 export async function ensureMessageOverrides() {
-  const rows = await cached(NAME, 15_000, () => db.messageOverride.findMany());
+  // If the database can't be reached, the built-in text still shows.
+  const rows = await cached(NAME, 15_000, () =>
+    db.messageOverride.findMany().catch((e) => {
+      if (process.env.NEXT_PHASE !== "phase-production-build") console.error("site text edits unavailable", e); // no database while building
+      return [];
+    }),
+  );
   if (rows === applied) return;
   applied = rows;
   const next: Partial<Record<Lang, Partial<Dictionary>>> = {};

@@ -1,5 +1,5 @@
 // Language codes match the design handoff (i18n.js), plus Spanish (added after the handoff).
-// Arabic is deferred to a later phase:
+// Arabic is not included yet. To add it:
 // add it here, add messages/arabic.json, and it appears in the language menu.
 
 // `intl` is the locale for dates, times and numbers. Dari and Pashto default to the Afghan solar

@@ -34,6 +34,10 @@ npm run dev          # http://localhost:3000
 To run the **production build** locally instead of the dev server:
 `docker compose --profile app up -d --build` (applies migrations on start).
 
+**Sign-in locally:** `AUTH_PROVIDER=dev` uses the seeded test accounts below (and is what the
+browser tests need). `AUTH_PROVIDER=clerk` uses BMCC's Clerk development instance — set the two
+Clerk keys in `.env` and restart `npm run dev`. Switch back to `dev` to run `npm run test:e2e`.
+
 ### Test accounts (local only)
 
 Created by the seed; passwords are in your `.env`.
@@ -56,13 +60,13 @@ The member account has an active membership and a 3-person household.
 | `npm run dev` | Dev server with hot reload |
 | `npm run build` / `npm start` | Production build / run it |
 | `npm run lint` / `npm run typecheck` | Checks |
-| `npm run test:unit` | Unit tests (prayer times, event dates, calendar files) |
-| `npm run test:e2e` | End-to-end tests in a real browser (needs the dev server + seeded DB; first time: `npx playwright install chromium`) |
+| `npm run test:unit` | Unit tests (prayer times, dates, coverage, permissions, search, translations) |
+| `npm run test:e2e` | Browser tests for every flow, accessibility (axe) and phone layout. Needs the seeded database, Mailpit and `AUTH_PROVIDER=dev`; first time: `npx playwright install chromium` |
 | `npm run db:migrate` | Create + apply a migration after editing `prisma/schema.prisma` |
 | `npm run db:deploy` | Apply pending migrations (what production runs) |
 | `npm run db:seed` | Reload sample data (wipes the seeded tables) |
-| `npm run db:seed:directory` | Add initial-feed listings from the private CSV that are missing (never deletes) |
 | `npm run db:reset` | Drop everything, re-migrate, re-seed |
+| `npm run admin:create -- email "Name"` | Make someone a Super admin (the way to create the first admin in production) |
 
 ## How it is organized
 
@@ -265,6 +269,81 @@ menu labels are too long for the desktop header, the header automatically falls 
 
 ## Deployment
 
-A deployment guide is added in phase 8. In short: build the Docker image, provide the environment
-variables for production, point `DATABASE_URL` at a managed Postgres, and route traffic to port 3000
-with `/api/health` as the health check. See [GO_LIVE.md](GO_LIVE.md) for everything BMCC must supply.
+The site is **one Docker image** (Next.js standalone server, port 3000) plus services you rent:
+Postgres, file storage, an email provider, Clerk (sign-in) and Stripe (payments). Every setting is
+an environment variable, so the same image runs anywhere containers run (Render, Railway, Fly.io,
+DigitalOcean App Platform, AWS App Runner/ECS, a VPS with Docker…). [GO_LIVE.md](GO_LIVE.md) lists
+what BMCC must decide or supply first.
+
+### 1. Put the code on GitHub
+
+Create a **private** repository and push this folder (`.env`, uploads, test sessions and local data
+are ignored). The workflow in `.github/workflows/ci.yml` then runs on every push: type check, lint,
+unit tests, production build, all browser tests (against throwaway Postgres + Mailpit), and the
+Docker build. Keep `main` protected so only changes with a green run are deployed.
+
+### 2. Create the services
+
+| Service | What to set up | Settings |
+|---|---|---|
+| Postgres 17 | Managed database with daily backups and point-in-time restore | `DATABASE_URL` |
+| File storage | An S3-compatible bucket (AWS S3, Cloudflare R2, DigitalOcean Spaces) for event photos, the media library and uploaded timetables | `STORAGE_DRIVER=s3`, `S3_*` |
+| Email | Resend, Postmark or any SMTP relay; verify brmcc.org (SPF, DKIM, DMARC) | `MAIL_TRANSPORT`, `MAIL_PROVIDER_API_KEY` or `SMTP_*`, `MAIL_FROM`, `MAIL_REPLY_TO` |
+| Clerk | Production instance for brmcc.org (Clerk → *Go to prod*), Google OAuth client | `AUTH_PROVIDER=clerk`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET` |
+| Stripe | Live account, two membership prices, webhook (the Stripe adapter is a go-live task) | `PAYMENT_PROVIDER=stripe`, `STRIPE_*` |
+
+### 3. Production settings
+
+Start from `.env.example`; anything not listed keeps its default. Never commit these.
+
+```
+APP_ENV=production
+APP_URL=https://brmcc.org
+ADMIN_HOST=admin.brmcc.org
+NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=<openssl rand -base64 32>
+DATABASE_URL=postgresql://…?sslmode=require
+AUTH_PROVIDER=clerk            # plus the Clerk keys (pk_live_/sk_live_)
+PAYMENT_PROVIDER=stripe        # plus the Stripe keys and price ids
+MAIL_TRANSPORT=resend          # or postmark / smtp, plus its key or SMTP_*
+STORAGE_DRIVER=s3              # plus S3_*
+```
+
+The app refuses to start in production with the local test sign-in, mock payments or Clerk
+development keys, and the seed script refuses to run — so test data can't reach the live site.
+Contact details, EIN, the office inbox and the site switches are then set in **Admin → Settings**.
+
+### 4. Run it
+
+- Image: build from the `Dockerfile` (or let the host build from the GitHub repo). The container
+  **applies pending database migrations on start**, then serves on port **3000**.
+- Health check: `GET /api/health` (also used by the image's own `HEALTHCHECK`).
+- Put it behind HTTPS. The proxy must set `X-Forwarded-For` (visitor IP for rate limits) and
+  `Host` unchanged (the admin host check uses it).
+- DNS: `brmcc.org` (and `www`) and `admin.brmcc.org` point to the app; add the records Clerk lists.
+- More than one instance is fine: set `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` (same value everywhere).
+  Site-text, settings and photo changes reach other instances within 15 seconds.
+
+### 5. First day
+
+1. **First Super admin** — from a checkout of this repository on a trusted computer, with
+   `DATABASE_URL` pointing at production: `npm run admin:create -- you@brmcc.org "Your Name"`, then
+   sign in at `https://admin.brmcc.org/admin/login?mode=sign-up` with that email. Invite everyone
+   else from Admin → Admin users.
+2. **Directory listings** — copy the vetted listings from the local database once:
+   ```bash
+   pg_dump --data-only --table='"DirectoryListing"' "$LOCAL_DATABASE_URL" > listings.sql
+   psql "$PRODUCTION_DATABASE_URL" -f listings.sql
+   ```
+   (Delete `listings.sql` afterwards — it contains contact details.)
+3. **Content** — Admin → Settings, Media library (logo, About Us photos), Prayer times (method,
+   coordinates, Iqamah rules, Jumu'ah), Events, Announcements.
+4. **Smoke test** — a real low-value donation and a membership sign-up end to end, then refund them;
+   the contact form, a mailing-list sign-up and its confirmation email; sign-in with email and Google.
+5. **Monitoring** — an uptime check on `/api/health`, and alerts from the database and email provider.
+
+### Updating the live site
+
+Merge to `main` → CI passes → the host deploys the new image → migrations run on start. To roll
+back, redeploy the previous image — that's safe when the newer migrations only added things; if a
+migration removed or renamed something, restore the database backup taken before the deploy too.
+Take a database snapshot before deploying any change that includes a migration.

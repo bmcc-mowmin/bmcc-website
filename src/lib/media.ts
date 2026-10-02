@@ -22,7 +22,11 @@ const NAME = "image-slots";
 
 export async function getSlotImages() {
   return cached(NAME, 15_000, async () => {
-    const rows = await db.imageSlot.findMany({ where: { mediaId: { not: null } }, include: { media: true } });
+    // If the database can't be reached, the placeholders and the built-in logo show.
+    const rows = await db.imageSlot.findMany({ where: { mediaId: { not: null } }, include: { media: true } }).catch((e) => {
+      if (process.env.NEXT_PHASE !== "phase-production-build") console.error("photo slots unavailable", e); // no database while building
+      return [];
+    });
     return new Map(rows.filter((r) => r.media).map((r) => [r.slot, { url: mediaUrl(r.media!.storageKey)!, alt: r.media!.alt as L10n }]));
   });
 }

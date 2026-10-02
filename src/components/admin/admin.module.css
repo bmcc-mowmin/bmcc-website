@@ -264,7 +264,7 @@
 }
 .overridden {
   font-weight: 800;
-  color: #b25e00;
+  color: #8a4800;
 }
 .badge {
   display: inline-block;
@@ -277,7 +277,7 @@
 }
 .badgeWarn {
   background: #fff1dc;
-  color: #b25e00;
+  color: #8a4800;
 }
 .muted {
   color: var(--subtle);
@@ -357,7 +357,7 @@ a.stat:hover {
   margin-top: 4px;
 }
 .statAlert .statValue {
-  color: #b25e00;
+  color: #8a4800;
 }
 .notice {
   padding: 12px 14px;

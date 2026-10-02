@@ -69,7 +69,7 @@
 .hitTitle {
   font-size: 17px;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 .meta {
   margin-top: 2px;

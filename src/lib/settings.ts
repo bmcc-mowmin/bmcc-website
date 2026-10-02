@@ -33,7 +33,13 @@ export const ENV_DEFAULTS: Settings = {
 };
 
 export async function getSettings(): Promise<Settings> {
-  const row = await cached(NAME, 15_000, () => db.siteSettings.findUnique({ where: { id: 1 } }));
+  // If the database can't be reached, the server defaults (.env) are used.
+  const row = await cached(NAME, 15_000, () =>
+    db.siteSettings.findUnique({ where: { id: 1 } }).catch((e) => {
+      if (process.env.NEXT_PHASE !== "phase-production-build") console.error("settings unavailable", e); // no database while building
+      return null;
+    }),
+  );
   if (!row) return ENV_DEFAULTS;
   const pick = <K extends keyof Settings>(k: K): Settings[K] => (row[k] ?? ENV_DEFAULTS[k]) as Settings[K];
   return {

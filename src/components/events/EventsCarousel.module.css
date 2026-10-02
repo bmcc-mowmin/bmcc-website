@@ -12,6 +12,8 @@
   display: none;
 }
 .card {
+  /* Keeps positioned children (e.g. screen-reader text) inside the scrolling strip. */
+  position: relative;
   flex: 0 0 calc((100% - 40px) / 3);
   background: var(--navy);
   border-radius: 14px;

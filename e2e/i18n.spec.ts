@@ -15,7 +15,7 @@ const ALLOWED = /^(TEST01|BMCC|Brentwood|Muslim|Community|Center|Lone|Tree|Way|C
 async function englishOnPage(page: Page) {
   const texts = await page.evaluate(() => {
     const out = new Set<string>();
-    const skip = (el: Element) => el.closest("bdi, [dir=auto], script, style, noscript, [aria-hidden=true], [style*='-10000px']");
+    const skip = (el: Element) => el.closest("bdi, [dir=auto], script, style, noscript, [aria-hidden=true], [data-honeypot]");
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     while (walker.nextNode()) {
       const el = walker.currentNode.parentElement;

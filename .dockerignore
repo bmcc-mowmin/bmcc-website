@@ -13,3 +13,4 @@ docs
 src/generated
 .claude
 *.log
+playwright
