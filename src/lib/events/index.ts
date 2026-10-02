@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { localize, type Dictionary } from "@/lib/i18n/dictionary";
 import { intlLocale, ltrIsolate, type Lang } from "@/lib/i18n/config";
-import { org } from "@/lib/org";
+import { getOrg, type Org } from "@/lib/org";
 import { getCalcSettings } from "@/lib/prayer/schedule";
 import { upcomingOccurrences, weeklyDay, type Occurrence } from "./recurrence";
 import { googleCalendarUrl, type CalendarEvent } from "./calendar";
@@ -28,7 +28,7 @@ type EventRow = Awaited<ReturnType<typeof db.event.findMany>>[number];
 
 export const mediaUrl = (key: string | null) => (key ? `/media/${key}` : null);
 
-function calendarData(row: EventRow, lang: Lang): CalendarEvent {
+function calendarData(row: EventRow, lang: Lang, org: Org): CalendarEvent {
   return {
     uid: `${row.id}@${new URL(env.APP_URL).hostname}`,
     title: localize(row.title, lang),
@@ -43,7 +43,7 @@ function calendarData(row: EventRow, lang: Lang): CalendarEvent {
   };
 }
 
-function toPublic(row: EventRow, lang: Lang, upcoming: Occurrence[], timeZone: string): PublicEvent {
+function toPublic(row: EventRow, lang: Lang, upcoming: Occurrence[], timeZone: string, org: Org): PublicEvent {
   return {
     id: row.id,
     slug: row.slug,
@@ -57,16 +57,16 @@ function toPublic(row: EventRow, lang: Lang, upcoming: Occurrence[], timeZone: s
     next: upcoming[0],
     upcoming,
     icsUrl: `/api/events/${row.slug}/ics?lang=${lang}`,
-    googleUrl: googleCalendarUrl(calendarData(row, lang), timeZone),
+    googleUrl: googleCalendarUrl(calendarData(row, lang, org), timeZone),
   };
 }
 
 // Published events that haven't finished, soonest first (each event once, at its next date).
 export async function getUpcomingEvents(lang: Lang, { limit, now = new Date() }: { limit?: number; now?: Date } = {}) {
   const { timezone } = await getCalcSettings();
-  const rows = await db.event.findMany({ where: { published: true } });
+  const [rows, org] = await Promise.all([db.event.findMany({ where: { published: true } }), getOrg()]);
   const events = rows
-    .map((row) => toPublic(row, lang, upcomingOccurrences(row, timezone, now, 1), timezone))
+    .map((row) => toPublic(row, lang, upcomingOccurrences(row, timezone, now, 1), timezone, org))
     .filter((e) => e.next)
     .sort((a, b) => a.next.start.getTime() - b.next.start.getTime());
   return limit ? events.slice(0, limit) : events;
@@ -78,7 +78,7 @@ export async function getEventBySlug(slug: string, lang: Lang, now = new Date())
   const { timezone } = await getCalcSettings();
   const upcoming = upcomingOccurrences(row, timezone, now, 6);
   // A past one-off event still has a page; show its original date.
-  return toPublic(row, lang, upcoming.length ? upcoming : [{ start: row.startAt, end: row.endAt }], timezone);
+  return toPublic(row, lang, upcoming.length ? upcoming : [{ start: row.startAt, end: row.endAt }], timezone, await getOrg());
 }
 
 // Data for the .ics file (in the visitor's language).
@@ -86,7 +86,7 @@ export async function getCalendarEvent(slug: string, lang: Lang): Promise<(Calen
   const row = await db.event.findUnique({ where: { slug } });
   if (!row || !row.published) return null;
   const { timezone } = await getCalcSettings();
-  return { ...calendarData(row, lang), timeZone: timezone };
+  return { ...calendarData(row, lang, await getOrg()), timeZone: timezone };
 }
 
 // "Every Friday" / "Sat, Oct 10" and "1:00 PM – 2:00 PM" in the visitor's language.

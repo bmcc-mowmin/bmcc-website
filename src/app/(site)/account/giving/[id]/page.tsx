@@ -5,6 +5,7 @@ import { getI18n } from "@/lib/i18n/server";
 import { requireMember } from "@/lib/auth";
 import { getMyPayment } from "@/lib/account";
 import { receiptText } from "@/lib/payments/receipts";
+import { getOrg } from "@/lib/org";
 import { PrintButton } from "../../PrintButton";
 import styles from "../../account.module.css";
 
@@ -21,6 +22,7 @@ export default async function ReceiptPage({ params }: PageProps<"/account/giving
   const { t } = await getI18n();
   const payment = await getMyPayment(user, id);
   if (!payment?.receiptNumber) notFound();
+  const org = await getOrg();
   return (
     <>
       <div className={`${styles.printBar} no-print`}>
@@ -30,7 +32,7 @@ export default async function ReceiptPage({ params }: PageProps<"/account/giving
       <p className={`${styles.small} no-print`}>{t.acct_receipt_english_note}</p>
       <article className={`${styles.doc} print-doc`} lang="en" dir="ltr">
         <h2 className={styles.docTitle}>{payment.kind === "DONATION" ? "Donation receipt" : "Payment receipt"}</h2>
-        <pre className={styles.docText}>{receiptText(payment)}</pre>
+        <pre className={styles.docText}>{receiptText(payment, org)}</pre>
         {payment.status === "REFUNDED" && <p className={styles.docNote}>This payment was refunded.</p>}
       </article>
     </>

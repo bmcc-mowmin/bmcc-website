@@ -2,8 +2,9 @@
 
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { adminUrl, env } from "@/lib/env";
+import { adminUrl } from "@/lib/env";
 import { getLang } from "@/lib/i18n/server";
+import { getSettings } from "@/lib/settings";
 import { getDictionary } from "@/lib/i18n/dictionary";
 import { checkHoneypot } from "@/lib/security/honeypot";
 import { rateLimit } from "@/lib/security/rate-limit";
@@ -48,7 +49,7 @@ export async function sendContactMessage(_prev: ContactState, form: FormData): P
   const inbox = adminUrl(`/admin/messages/${saved.id}`);
   await Promise.allSettled([
     sendMail({
-      to: env.CONTACT_INBOX,
+      to: (await getSettings()).contactInbox,
       replyTo: email,
       subject: `[Website] ${about} — ${oneLine(name)}`,
       text: `New message from the website contact form.\n\nFrom: ${name} <${email}>\nAbout: ${about}\n\n${message}\n\nReply to this email to answer them, then mark it handled: ${inbox}`,

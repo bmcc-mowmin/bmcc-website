@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { getSettings } from "@/lib/settings";
 import Link from "next/link";
 import { getI18n } from "@/lib/i18n/server";
-import { env } from "@/lib/env";
 import { routes } from "@/lib/routes";
 import { DEFAULT_FUND, isFund } from "@/lib/payments/catalog";
 import { DonateForm } from "./DonateForm";
@@ -29,7 +29,7 @@ export default async function DonatePage({ searchParams }: PageProps<"/donate">)
         </p>
       )}
       <div className={styles.grid}>
-        <DonateForm defaultFrequency={env.DEFAULT_DONATION_FREQUENCY} initialFund={fund} />
+        <DonateForm defaultFrequency={(await getSettings()).defaultDonationFrequency} initialFund={fund} />
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>{t.donate_join_title}</h2>
           <p className={styles.cardSub}>

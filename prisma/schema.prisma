@@ -507,3 +507,54 @@ model AuditLog {
 
   @@index([entity, entityId])
 }
+
+// ─── Site content (admin-editable) ──────────────────────────────────────────
+
+// Admin edits to the site's built-in text (messages/<lang>.json). One row per key and language;
+// deleting the row restores the built-in text.
+model MessageOverride {
+  key         String
+  lang        String
+  value       String
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+
+  @@id([key, lang])
+}
+
+// Contact details and switches editable in Admin → Settings. A null field uses the server
+// setting (ORG_*, CONTACT_INBOX, … in .env).
+model SiteSettings {
+  id                       Int      @id @default(1)
+  orgLegalName             String?
+  orgAddress               String?
+  orgPhone                 String?
+  orgPhoneTel              String?
+  orgEmail                 String?
+  orgEin                   String?
+  contactInbox             String?
+  showResubBarSitewide     Boolean?
+  defaultDonationFrequency String?
+  updatedAt                DateTime @updatedAt
+}
+
+// Media library: uploaded photos, reused across the site.
+model MediaAsset {
+  id           String      @id @default(cuid())
+  storageKey   String      @unique
+  filename     String
+  contentType  String
+  sizeBytes    Int
+  alt          Json // L10n: describes the photo for screen readers
+  uploadedById String?
+  createdAt    DateTime    @default(now())
+  slots        ImageSlot[]
+}
+
+// Named places on the site that show a photo from the library (e.g. "about_story", "logo").
+model ImageSlot {
+  slot      String      @id
+  mediaId   String?
+  media     MediaAsset? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  updatedAt DateTime    @updatedAt
+}

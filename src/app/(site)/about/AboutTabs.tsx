@@ -12,6 +12,8 @@ export type AboutTab = {
   list: string[];
   cta?: { label: string; href: string };
   imageLabel: string;
+  // A photo from the media library, or null for the placeholder.
+  image: { url: string; alt: string } | null;
 };
 
 // WAI-ARIA tabs: arrow keys move between tabs, Home/End jump to the ends.
@@ -82,9 +84,14 @@ export function AboutTabs({ tabs }: { tabs: AboutTab[] }) {
             </Link>
           )}
         </div>
-        <div className={`photo-placeholder ${styles.panelPhoto}`} role="img" aria-label={current.imageLabel}>
-          {current.imageLabel}
-        </div>
+        {current.image ? (
+          // eslint-disable-next-line @next/next/no-img-element -- admin-uploaded photo
+          <img src={current.image.url} alt={current.image.alt} className={`${styles.panelPhoto} ${styles.panelImg}`} />
+        ) : (
+          <div className={`photo-placeholder ${styles.panelPhoto}`} role="img" aria-label={current.imageLabel}>
+            {current.imageLabel}
+          </div>
+        )}
       </div>
     </>
   );

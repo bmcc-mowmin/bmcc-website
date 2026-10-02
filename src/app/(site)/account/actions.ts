@@ -4,11 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { adminUrl, env } from "@/lib/env";
+import { adminUrl } from "@/lib/env";
 import { requireMember } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { getMyHousehold, getMyMemberships, getMyRecurringGifts } from "@/lib/account";
 import { getLang } from "@/lib/i18n/server";
+import { getSettings } from "@/lib/settings";
 import { getDictionary } from "@/lib/i18n/dictionary";
 import { fieldErrors } from "@/lib/directory/listing";
 import { startDuesCheckout } from "@/lib/membership/checkout";
@@ -89,7 +90,7 @@ export async function requestCoverageChange(_prev: FormState, form: FormData): P
   const saved = await db.contactMessage.create({ data: { name, email: user.email, message, topic: "household" } });
   const link = adminUrl(`/admin/memberships/${mine.membership.id}`);
   await sendMail({
-    to: env.CONTACT_INBOX,
+    to: (await getSettings()).contactInbox,
     replyTo: user.email,
     subject: `[Member] Change to covered people — ${mine.membership.referenceId}`,
     text: `${name} <${user.email}> asked to change the people covered by membership ${mine.membership.referenceId}:\n\n${message}\n\nMake the change in Admin → Memberships: ${link}\nThe request is also in Admin → Messages.`,

@@ -1,7 +1,6 @@
 import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
-import { env } from "@/lib/env";
-import { org } from "@/lib/org";
+import { getOrg, type Org } from "@/lib/org";
 import { escapeHtml, layoutHtml, sendMail } from "@/lib/mail";
 import { FUND_LABELS, isFund, usd } from "./catalog";
 
@@ -23,7 +22,7 @@ type ReceiptPayment = {
 };
 
 // The text of a receipt. GO_LIVE.md: BMCC's accountant approves this wording and the EIN is set.
-export function receiptText(p: ReceiptPayment) {
+export function receiptText(p: ReceiptPayment, org: Org) {
   const date = new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "America/Los_Angeles" }).format(p.paidAt ?? new Date());
   const what =
     p.kind === "DUES"
@@ -32,7 +31,7 @@ export function receiptText(p: ReceiptPayment) {
   const lines = [
     `${org.legalName}`,
     `${org.address}`,
-    env.ORG_EIN ? `EIN: ${env.ORG_EIN}` : "",
+    org.ein ? `EIN: ${org.ein}` : "",
     "",
     `Receipt number: ${p.receiptNumber}`,
     `Date: ${date}`,
@@ -47,7 +46,7 @@ export function receiptText(p: ReceiptPayment) {
 }
 
 export async function emailReceipt(p: ReceiptPayment) {
-  const text = receiptText(p);
+  const text = receiptText(p, await getOrg());
   const thanks =
     p.kind === "DUES" ? "Thank you — your membership dues were received." : "JazakAllah Khair — thank you for your generous gift to BMCC.";
   await sendMail({

@@ -66,9 +66,9 @@ export const NAV: { section: Section; href: string; label: string; built: boolea
   { section: "donations", href: "/admin/donations", label: "Donations", built: true },
   { section: "subscribers", href: "/admin/subscribers", label: "Subscribers", built: true },
   { section: "messages", href: "/admin/messages", label: "Messages", built: true },
-  { section: "content", href: "/admin/content", label: "Site text", built: false },
-  { section: "media", href: "/admin/media", label: "Media library", built: false },
-  { section: "settings", href: "/admin/settings", label: "Settings", built: false },
+  { section: "content", href: "/admin/content", label: "Site text", built: true },
+  { section: "media", href: "/admin/media", label: "Media library", built: true },
+  { section: "settings", href: "/admin/settings", label: "Settings", built: true },
   { section: "users", href: "/admin/users", label: "Admin users", built: true },
   { section: "activity", href: "/admin/activity", label: "Activity log", built: true },
 ];

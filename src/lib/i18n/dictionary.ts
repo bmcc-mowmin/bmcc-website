@@ -10,16 +10,30 @@ export type Dictionary = Record<MessageKey, string>;
 
 const partials: Record<Lang, Partial<Dictionary>> = { en, dari, urdu, pashto, spanish };
 
+// Admin edits (Admin → Site text) layered over the files. Set on the server by
+// src/lib/i18n/overrides.ts; the browser gets the finished dictionary from the server.
+type Overrides = Partial<Record<Lang, Partial<Dictionary>>>;
+let overrides: Overrides = {};
+export function setMessageOverrides(next: Overrides) {
+  overrides = next;
+  cache.clear();
+}
+
 // Same behavior as the prototype's t(lang): the chosen language merged over English,
 // so any key without a translation falls back to English.
 const cache = new Map<Lang, Dictionary>();
 export function getDictionary(lang: Lang): Dictionary {
   let dict = cache.get(lang);
   if (!dict) {
-    dict = { ...en, ...partials[lang] } as Dictionary;
+    dict = { ...en, ...overrides.en, ...partials[lang], ...overrides[lang] } as Dictionary;
     cache.set(lang, dict);
   }
   return dict;
+}
+
+// The built-in text from the files (no admin edits), for the Site text editor.
+export function builtInText(lang: Lang): Partial<Dictionary> {
+  return partials[lang];
 }
 
 // Per-language text stored in the database: { en: "...", dari: "...", ... }.

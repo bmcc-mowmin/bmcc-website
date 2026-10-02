@@ -82,7 +82,7 @@ function linkProps(item: { href: string; external?: boolean }) {
   return item.external ? { target: "_blank", rel: "noopener" } : {};
 }
 
-export function HeaderClient({ announcements, prayer, signedIn }: { announcements: TickerItem[]; prayer: PrayerFeed; signedIn: boolean }) {
+export function HeaderClient({ announcements, prayer, signedIn, logo }: { announcements: TickerItem[]; prayer: PrayerFeed; signedIn: boolean; logo: string }) {
   const { t, lang, dir } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
@@ -215,7 +215,7 @@ export function HeaderClient({ announcements, prayer, signedIn }: { announcement
         <div className={styles.headerInner}>
           <Link href={routes.home} className={styles.logoLink}>
             {/* eslint-disable-next-line @next/next/no-img-element -- tiny fixed-size logo */}
-            <img src="/brand/bmcc-logo.jpeg" alt="Brentwood Muslim Community Center" className={styles.logo} />
+            <img src={logo} alt="Brentwood Muslim Community Center" className={styles.logo} />
           </Link>
 
           <nav ref={navRef} className={styles.desktopNav} aria-label={t.aria_main_nav} aria-hidden={navCollapsed || undefined}>

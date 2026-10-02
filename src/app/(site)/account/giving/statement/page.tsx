@@ -4,8 +4,7 @@ import { notFound } from "next/navigation";
 import { getI18n } from "@/lib/i18n/server";
 import { requireMember } from "@/lib/auth";
 import { getMyPayments } from "@/lib/account";
-import { env } from "@/lib/env";
-import { org } from "@/lib/org";
+import { getOrg } from "@/lib/org";
 import { masjidClock } from "@/lib/prayer/schedule";
 import { FUND_LABELS, isFund, usd } from "@/lib/payments/catalog";
 import { zonedDate } from "@/lib/time";
@@ -23,7 +22,7 @@ export default async function StatementPage({ searchParams }: PageProps<"/accoun
   if (typeof year !== "string" || !/^\d{4}$/.test(year)) notFound();
   const user = await requireMember(`/account/giving/statement?year=${year}`);
   const { t } = await getI18n();
-  const [payments, { timeZone }] = await Promise.all([getMyPayments(user), masjidClock()]);
+  const [payments, { timeZone }, org] = await Promise.all([getMyPayments(user), masjidClock(), getOrg()]);
   const gifts = payments
     .filter((p) => p.kind === "DONATION" && p.status === "SUCCEEDED" && p.paidAt && zonedDate(p.paidAt, timeZone).startsWith(year))
     .sort((a, b) => a.paidAt!.getTime() - b.paidAt!.getTime());
@@ -44,10 +43,10 @@ export default async function StatementPage({ searchParams }: PageProps<"/accoun
           {org.legalName}
           <br />
           {org.address}
-          {env.ORG_EIN && (
+          {org.ein && (
             <>
               <br />
-              EIN: {env.ORG_EIN}
+              EIN: {org.ein}
             </>
           )}
         </p>

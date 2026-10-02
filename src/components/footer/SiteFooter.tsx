@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { getI18n } from "@/lib/i18n/server";
-import { org } from "@/lib/org";
+import { getOrg } from "@/lib/org";
+import { logoUrl } from "@/lib/media";
 import { routes } from "@/lib/routes";
 import styles from "./Footer.module.css";
 
 export async function SiteFooter() {
+  const [org, logo] = await Promise.all([getOrg(), logoUrl()]);
   const { t } = await getI18n();
   return (
     <footer className={styles.footer}>
@@ -12,7 +14,7 @@ export async function SiteFooter() {
         <div>
           <div className={styles.logoWrap}>
             {/* eslint-disable-next-line @next/next/no-img-element -- tiny fixed-size logo */}
-            <img src="/brand/bmcc-logo.jpeg" alt="Brentwood Muslim Community Center" className={styles.logo} />
+            <img src={logo} alt="Brentwood Muslim Community Center" className={styles.logo} />
           </div>
           <p className={styles.tagline}>{t.footer_tagline}</p>
         </div>

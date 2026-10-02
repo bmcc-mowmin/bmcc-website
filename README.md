@@ -204,6 +204,20 @@ people at once. Admin → Events → an event lists who's coming per date.
 approved directory listings. It matches in the visitor's language *and* English, ignores case, accents
 and Arabic-script spelling variants (ي/ی, ك/ک, short vowels, Persian digits), and highlights matches.
 
+## Site text, settings and media (admin)
+
+- **Site text** (Content editor): every built-in text — headings, buttons, paragraphs, form messages,
+  emails — in all five languages, searchable by the words on the page. Edits are stored in the
+  database (`MessageOverride`) on top of `messages/<lang>.json`; clearing a box or *Reset* brings the
+  built-in text back. Placeholders such as `{name}` must stay. Edits show at once on this server and
+  within 15 seconds on others.
+- **Settings** (Super admin): organization name, address, phones, public email, EIN (printed on
+  receipts once set), the office inbox for notifications, the site-wide re-subscribe bar and the
+  Donate page's default. Blank = the value from `.env`.
+- **Media library** (Content editor): upload JPEG/PNG/WebP photos (≤ 5 MB, type checked from the
+  file itself) with a description in each language for screen readers, then choose which photo shows
+  in each place: the logo and the four About Us photos. A photo in use can't be deleted.
+
 ## Admin portal
 
 `/admin` (production: `ADMIN_HOST`, e.g. admin.brmcc.org — `/admin` on the main site redirects there,

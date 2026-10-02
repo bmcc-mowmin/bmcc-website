@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { logoUrl } from "@/lib/media";
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
 import { navFor, ROLE_INFO } from "@/lib/auth/permissions";
@@ -12,6 +13,7 @@ export const metadata: Metadata = { title: { default: "Admin", template: "%s · 
 // Every portal page is behind this: signed in, not disabled, at least one admin role.
 // Each page and server action additionally checks its own section (requireSection).
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
+  const logo = await logoUrl();
   const user = await requireStaff();
   const nav = navFor(user.adminRoles).map(({ href, label, built }) => ({ href, label, built }));
   return (
@@ -19,7 +21,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
       <aside className={styles.sidebar}>
         <Link href="/admin" className={styles.brand}>
           {/* eslint-disable-next-line @next/next/no-img-element -- tiny fixed-size logo */}
-          <img src="/brand/bmcc-logo.jpeg" alt="" />
+          <img src={logo} alt="" />
           BMCC Admin
         </Link>
         <AdminNav items={nav} />

@@ -1,13 +1,20 @@
 import "server-only";
-import { env } from "@/lib/env";
+import { getSettings } from "@/lib/settings";
 
-// Organization contact details, shown in the footer and on About/Contact.
-export const org = {
-  legalName: env.ORG_LEGAL_NAME,
-  address: env.ORG_ADDRESS,
-  // The footer shows the street address without the ZIP, as in the design.
-  addressShort: env.ORG_ADDRESS.replace(/\s+\d{5}(-\d{4})?$/, ""),
-  phone: env.ORG_PHONE,
-  phoneHref: `tel:${env.ORG_PHONE_TEL}`,
-  email: env.ORG_EMAIL,
-};
+// Organization contact details (Admin → Settings), shown in the footer, About/Contact, receipts
+// and calendar files.
+export type Org = Awaited<ReturnType<typeof getOrg>>;
+
+export async function getOrg() {
+  const s = await getSettings();
+  return {
+    legalName: s.orgLegalName,
+    address: s.orgAddress,
+    // The footer shows the street address without the ZIP, as in the design.
+    addressShort: s.orgAddress.replace(/\s+\d{5}(-\d{4})?$/, ""),
+    phone: s.orgPhone,
+    phoneHref: `tel:${s.orgPhoneTel}`,
+    email: s.orgEmail,
+    ein: s.orgEin,
+  };
+}

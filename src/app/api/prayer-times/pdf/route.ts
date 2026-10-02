@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
-import { org } from "@/lib/org";
+import { getOrg } from "@/lib/org";
 import { storage } from "@/lib/storage";
 import { getMonthSchedule, masjidClock } from "@/lib/prayer/schedule";
 import { renderTimetablePdf } from "@/lib/prayer/timetable-pdf";
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     if (file) return new Response(new Uint8Array(file), { headers });
   }
 
-  const days = await getMonthSchedule(month, "en");
+  const [days, org] = await Promise.all([getMonthSchedule(month, "en"), getOrg()]);
   const generatedAt = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: clock.timeZone }).format(new Date());
   const pdf = await renderTimetablePdf({
     month,

@@ -11,20 +11,21 @@ import { masjidClock } from "@/lib/prayer/schedule";
 import { EventsCarousel, type CarouselCard } from "@/components/events/EventsCarousel";
 import { ResubBar } from "@/components/mailing-list/ResubBar";
 import { NewsletterBand } from "@/components/mailing-list/NewsletterBand";
-import { env } from "@/lib/env";
+import { getSettings } from "@/lib/settings";
 import { getCurrentUser } from "@/lib/auth";
 import { MemberLoginCard } from "./MemberLoginCard";
 import styles from "./home.module.css";
 
 export default async function HomePage() {
   const { t, lang } = await getI18n();
-  const [{ today }, jumuah, announcements, events, { timeZone }, user] = await Promise.all([
+  const [{ today }, jumuah, announcements, events, { timeZone }, user, settings] = await Promise.all([
     getTodayAndTomorrow(lang),
     getUpcomingJumuah(lang),
     getActiveAnnouncements(lang),
     getUpcomingEvents(lang, { limit: 8 }),
     masjidClock(),
     getCurrentUser(),
+    getSettings(),
   ]);
   const cards: CarouselCard[] = events.map((e) => {
     const when = formatEventWhen(e, e.next, lang, t, timeZone);
@@ -50,7 +51,7 @@ export default async function HomePage() {
   return (
     <>
       {/* RE-SUBSCRIBE BAR (in the layout instead when it shows on every page) */}
-      {!env.SHOW_RESUB_BAR_SITEWIDE && <ResubBar />}
+      {!settings.showResubBarSitewide && <ResubBar />}
 
       {/* HERO */}
       <section className={styles.hero}>

@@ -2,8 +2,9 @@
 
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { adminUrl, env } from "@/lib/env";
+import { adminUrl } from "@/lib/env";
 import { getLang } from "@/lib/i18n/server";
+import { getSettings } from "@/lib/settings";
 import { getDictionary } from "@/lib/i18n/dictionary";
 import { checkHoneypot } from "@/lib/security/honeypot";
 import { rateLimit } from "@/lib/security/rate-limit";
@@ -48,7 +49,7 @@ export async function submitListing(_prev: SubmitState, form: FormData): Promise
   const queue = adminUrl("/admin/directory");
   await Promise.allSettled([
     sendMail({
-      to: env.CONTACT_INBOX,
+      to: (await getSettings()).contactInbox,
       subject: `New directory listing to review: ${listing.name}`,
       text: `A new Community Directory listing is waiting for approval.\n\n${listing.name} — ${listing.parentCategory} / ${listing.category}\nSubmitted by ${listing.submitterEmail}\n\nReview it: ${queue}`,
       html: layoutHtml(

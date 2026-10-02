@@ -205,3 +205,8 @@ select.input {
     grid-template-columns: 1fr;
   }
 }
+.panelImg {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+}

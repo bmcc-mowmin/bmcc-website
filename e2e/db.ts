@@ -30,6 +30,10 @@ export async function cleanTestData() {
   await sql(`DELETE FROM "ContactMessage" WHERE email LIKE 'e2e-%'`);
   await sql(`DELETE FROM "EventRsvp" WHERE "userId" IN (SELECT id FROM "User" WHERE email LIKE 'e2e-%' OR email = $1)`, [process.env.SEED_MEMBER_EMAIL ?? "member@bmcc.local"]);
   await sql(`UPDATE "Event" SET "rsvpCapacity" = 60 WHERE slug = 'community-dinner'`);
+  // Site text edits, settings and media-library photos made by the content tests.
+  await sql(`DELETE FROM "MessageOverride" WHERE value LIKE 'E2E%'`);
+  await sql(`UPDATE "SiteSettings" SET "orgPhone" = NULL WHERE "orgPhone" LIKE '%E2E%'`);
+  await sql(`DELETE FROM "MediaAsset" WHERE alt->>'en' LIKE 'E2E%'`);
 }
 
 export async function subscriberStatus(email: string) {

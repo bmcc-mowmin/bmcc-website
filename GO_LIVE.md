@@ -82,8 +82,9 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 - [ ] Set the masjid's exact coordinates in admin (the default is Brentwood's center, 37.93, -121.70).
 - [ ] Real event dates and photos.
 - [ ] Food pantry hours ("Saturday 10 AM – 12 PM" is a placeholder in announcements).
-- [ ] Photos for About Us and the event cards (striped placeholders today).
-- [ ] Logo as SVG or high-resolution PNG (current one is 216×102 px).
+- [ ] Photos for About Us (Admin → Media library) and the event cards (each event).
+- [ ] Logo as a high-resolution PNG (current one is 216×102 px) — upload it in Admin → Media library.
+- [ ] Contact details, EIN and office inbox in Admin → Settings.
 - [ ] Vetted human translations for Dari, Urdu, Pashto and Spanish (all current non-English text
       is machine-generated). Arabic is out of scope for launch.
 - [ ] Decide whether the "Stay Connected" form stays after the re-subscribe campaign.
