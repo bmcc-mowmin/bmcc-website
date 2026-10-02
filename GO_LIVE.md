@@ -26,12 +26,19 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 
 ## Accounts and sign-in (Clerk)
 
-- [ ] Create the Clerk production instance and set `AUTH_PROVIDER=clerk`,
-      `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET`.
-- [ ] Implement the Clerk adapter: `getCurrentUser()` in `src/lib/auth/index.ts` reads the Clerk
-      session and links it to the `User` row by email (`clerkUserId`); `/login` renders Clerk's
-      sign-in (email code + password); the Clerk webhook keeps email/name in sync. Members, donors
-      and RSVPs need no other changes. Staff accounts should use a second factor in Clerk.
+- [x] Clerk connected (`AUTH_PROVIDER=clerk`): sign-in/sign-up on `/login` and `/sign-up`, admin on
+      `/admin/login`; accounts link to BMCC records by verified email. Tested locally with the
+      development instance.
+- [ ] Sign-in methods (BMCC's choice): **email (code or password) + Google** only. No phone/SMS,
+      passkeys or paid add-ons — the app stays on Clerk's free plan.
+- [ ] Clerk → *Go to prod*: create the production instance for brmcc.org, add the DNS records Clerk
+      lists, set the production keys (`pk_live_`/`sk_live_`; development keys are refused).
+- [ ] Google sign-in in production needs BMCC's own Google OAuth client (Google Cloud console),
+      entered in Clerk → SSO connections → Google. (Development uses Clerk's shared credentials.)
+- [ ] Rename the Clerk application from "My Application" to "BMCC" (shown on the sign-in box).
+- [ ] Register the webhook `https://brmcc.org/api/webhooks/clerk` (user.updated, user.deleted) and
+      set `CLERK_WEBHOOK_SECRET`.
+- [ ] Consider requiring a second factor for staff (authenticator app is a paid Clerk feature).
 - [ ] Sign-in link page tells visitors when an email isn't in BMCC's member/donor records (BMCC's
       choice, with a "Become a Member" link). This confirms who is a member or donor; it is limited
       to `RATE_LIMIT_MAX` lookups per visitor per `RATE_LIMIT_WINDOW_SEC`. Keep the same behaviour
