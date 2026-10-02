@@ -16,11 +16,12 @@ const generated = {
 };
 
 let env = readFileSync(".env", "utf8");
-// Add settings introduced since this .env was created (blank, or generated below).
+// Add settings introduced since this .env was created, with .env.example's default value
+// (secrets there are blank; some are generated below).
 for (const line of readFileSync(".env.example", "utf8").split("\n")) {
   const key = line.match(/^([A-Z0-9_]+)=/)?.[1];
   if (key && !new RegExp(`^${key}=`, "m").test(env)) {
-    env += `${env.endsWith("\n") ? "" : "\n"}${key}=\n`;
+    env += `${env.endsWith("\n") ? "" : "\n"}${line.trim()}\n`;
     console.log(`Added missing setting ${key}`);
   }
 }
