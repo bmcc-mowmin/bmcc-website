@@ -12,17 +12,19 @@ import { EventsCarousel, type CarouselCard } from "@/components/events/EventsCar
 import { ResubBar } from "@/components/mailing-list/ResubBar";
 import { NewsletterBand } from "@/components/mailing-list/NewsletterBand";
 import { env } from "@/lib/env";
+import { getCurrentUser } from "@/lib/auth";
 import { MemberLoginCard } from "./MemberLoginCard";
 import styles from "./home.module.css";
 
 export default async function HomePage() {
   const { t, lang } = await getI18n();
-  const [{ today }, jumuah, announcements, events, { timeZone }] = await Promise.all([
+  const [{ today }, jumuah, announcements, events, { timeZone }, user] = await Promise.all([
     getTodayAndTomorrow(lang),
     getUpcomingJumuah(lang),
     getActiveAnnouncements(lang),
     getUpcomingEvents(lang, { limit: 8 }),
     masjidClock(),
+    getCurrentUser(),
   ]);
   const cards: CarouselCard[] = events.map((e) => {
     const when = formatEventWhen(e, e.next, lang, t, timeZone);
@@ -149,7 +151,7 @@ export default async function HomePage() {
               ))}
             </ul>
           </div>
-          <MemberLoginCard />
+          <MemberLoginCard signedIn={!!user} name={user?.name?.split(" ")[0]} />
         </div>
       </section>
 

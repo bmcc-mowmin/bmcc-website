@@ -215,3 +215,14 @@ img {
     scroll-behavior: auto !important;
   }
 }
+
+/* Printing a receipt or statement: only the document itself. */
+@media print {
+  body:has(.print-doc) :is(header, footer, nav, .skip-link, .no-print) {
+    display: none !important;
+  }
+  body:has(.print-doc) .print-doc {
+    border: none !important;
+    box-shadow: none !important;
+  }
+}

@@ -124,8 +124,8 @@ async function main() {
   const events = [
     { slug: "friday-jumuah", n: 1, start: at(friday, "13:00"), end: at(friday, "14:00"), rrule: "FREQ=WEEKLY;BYDAY=FR" },
     { slug: "weekend-islamic-studies", n: 2, start: at(saturday, "10:00"), end: at(saturday, "12:30"), rrule: "FREQ=WEEKLY;BYDAY=SA" },
-    { slug: "community-dinner", n: 3, start: at(dinnerDay, "18:30"), end: at(dinnerDay, "21:00"), rrule: null },
-    { slug: "general-body-meeting", n: 4, start: at(meetingDay, "11:00"), end: at(meetingDay, "13:00"), rrule: null },
+    { slug: "community-dinner", n: 3, start: at(dinnerDay, "18:30"), end: at(dinnerDay, "21:00"), rrule: null, rsvpEnabled: true, rsvpCapacity: 60 },
+    { slug: "general-body-meeting", n: 4, start: at(meetingDay, "11:00"), end: at(meetingDay, "13:00"), rrule: null, rsvpEnabled: true },
   ];
   for (const e of events) {
     await db.event.create({
@@ -138,6 +138,8 @@ async function main() {
         startAt: e.start,
         endAt: e.end,
         rrule: e.rrule,
+        rsvpEnabled: "rsvpEnabled" in e ? e.rsvpEnabled : false,
+        rsvpCapacity: "rsvpCapacity" in e ? e.rsvpCapacity : null,
       },
     });
   }

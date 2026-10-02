@@ -66,6 +66,10 @@ export async function saveEvent(_prev: ActionResult, form: FormData): Promise<Ac
   if (slugInput && !SLUG.test(slugInput)) return fail("The web address may only use lowercase letters, numbers and dashes.");
   const slug = await uniqueSlug(slugInput || slugify(title.en), id);
 
+  const capacityRaw = text(form, "rsvpCapacity");
+  const rsvpCapacity = capacityRaw ? Number(capacityRaw) : null;
+  if (rsvpCapacity !== null && (!Number.isInteger(rsvpCapacity) || rsvpCapacity < 1 || rsvpCapacity > 10000)) return fail("The RSVP limit must be a whole number of people (or blank for no limit).");
+
   const { timezone } = await getCalcSettings();
   const data = {
     slug,
@@ -79,6 +83,8 @@ export async function saveEvent(_prev: ActionResult, form: FormData): Promise<Ac
     rrule: repeat === "weekly" ? `FREQ=WEEKLY;BYDAY=${WEEKDAY_CODES[weekdayOf(date)]}` : null,
     rruleUntil: repeat === "weekly" && until ? zonedToUtc(until, "23:59", timezone) : null,
     published: form.get("published") === "on",
+    rsvpEnabled: form.get("rsvpEnabled") === "on",
+    rsvpCapacity,
   };
 
   // Photo: optional upload, or remove the current one.

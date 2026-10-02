@@ -165,3 +165,66 @@
   border-top: 1px solid #f0eee5;
   padding-top: 16px;
 }
+
+/* RSVP (members) */
+.rsvp {
+  margin-bottom: 4px;
+}
+.rsvpForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.rsvpLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--body);
+}
+.rsvpSelect {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--white);
+  font: inherit;
+  font-size: 14.5px;
+}
+.rsvpNote {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.rsvpOk,
+.rsvpMine span {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--success);
+}
+.rsvpErr {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #b42318;
+}
+.rsvpMine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: var(--success-bg);
+}
+.linkButton {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #b42318;
+  text-decoration: underline;
+  cursor: pointer;
+}

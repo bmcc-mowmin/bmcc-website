@@ -60,3 +60,30 @@
   opacity: 0.6;
   cursor: progress;
 }
+.stack {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.subtitle {
+  margin: 0 0 6px 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.secondary {
+  background: var(--white);
+  color: var(--navy);
+  border: 1px solid var(--navy);
+}
+.new {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+.new a {
+  font-weight: 700;
+}

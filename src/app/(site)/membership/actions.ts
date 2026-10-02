@@ -9,8 +9,7 @@ import { getDictionary } from "@/lib/i18n/dictionary";
 import { checkHoneypot } from "@/lib/security/honeypot";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { clientIp } from "@/lib/request";
-import { paymentProvider } from "@/lib/payments/provider";
-import { DUES } from "@/lib/payments/catalog";
+import { startDuesCheckout } from "@/lib/membership/checkout";
 
 export type MembershipState = { errors: Record<string, string>; values: Record<string, string>; message?: string } | undefined;
 
@@ -68,23 +67,6 @@ async function referenceId() {
     const ref = `BMCC-${new Date().getFullYear()}-${randomBytes(4).toString("hex").toUpperCase().slice(0, 6)}`;
     if (!(await db.membership.findUnique({ where: { referenceId: ref } }))) return ref;
   }
-}
-
-async function startDuesCheckout(membershipId: string, plan: "MONTHLY" | "YEARLY", email: string, name: string, lang: string) {
-  const dues = DUES[plan];
-  const { url } = await paymentProvider().createCheckout({
-    kind: "DUES",
-    amountCents: dues.cents,
-    interval: dues.interval,
-    membershipId,
-    email,
-    name,
-    description: `BMCC membership dues — ${dues.label}`,
-    lang,
-    successUrl: "/membership/complete?checkout={CHECKOUT_ID}",
-    cancelUrl: "/membership/complete?checkout={CHECKOUT_ID}",
-  });
-  return url;
 }
 
 export async function applyForMembership(_prev: MembershipState, form: FormData): Promise<MembershipState> {

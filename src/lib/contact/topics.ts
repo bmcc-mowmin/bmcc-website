@@ -16,6 +16,7 @@ export const CONTACT_TOPICS = {
   furniture: "a_furniture_title",
   vehicle: "a_vehicle_title",
   idea: "involved_idea_title",
+  household: "topic_household",
 } as const satisfies Record<string, MessageKey>;
 
 export type ContactTopic = keyof typeof CONTACT_TOPICS;

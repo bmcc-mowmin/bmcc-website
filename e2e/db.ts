@@ -28,6 +28,8 @@ export async function cleanTestData() {
   await sql(`DELETE FROM "Household" WHERE email LIKE 'e2e-%'`);
   await sql(`DELETE FROM "Subscriber" WHERE email LIKE 'e2e-%'`);
   await sql(`DELETE FROM "ContactMessage" WHERE email LIKE 'e2e-%'`);
+  await sql(`DELETE FROM "EventRsvp" WHERE "userId" IN (SELECT id FROM "User" WHERE email LIKE 'e2e-%' OR email = $1)`, [process.env.SEED_MEMBER_EMAIL ?? "member@bmcc.local"]);
+  await sql(`UPDATE "Event" SET "rsvpCapacity" = 60 WHERE slug = 'community-dinner'`);
 }
 
 export async function subscriberStatus(email: string) {

@@ -11,7 +11,8 @@ export const routes = {
   funeral: "/funeral-services",
   about: "/about",
   contact: "/about#contact",
-  memberLogin: "/#member-access", // becomes the Clerk sign-in in phase 7
+  memberLogin: "/login", // Clerk's sign-in in production (same address)
+  account: "/account",
   search: "/search",
   hikmahSchool: "https://hikmahschool.com/",
 } as const;

@@ -28,6 +28,12 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 
 - [ ] Create the Clerk production instance and set `AUTH_PROVIDER=clerk`,
       `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET`.
+- [ ] Implement the Clerk adapter: `getCurrentUser()` in `src/lib/auth/index.ts` reads the Clerk
+      session and links it to the `User` row by email (`clerkUserId`); `/login` renders Clerk's
+      sign-in (email code + password); the Clerk webhook keeps email/name in sync. Members, donors
+      and RSVPs need no other changes. Staff accounts should use a second factor in Clerk.
+- [ ] Decide whether members may add/remove covered people themselves (today: a request the office
+      approves, because it changes who the Funeral Services Benefit covers).
 - [ ] Create the first Super admin with `npm run admin:create -- email "Name"`; they invite the rest
       from Admin users and assign roles. The seeded test accounts never exist in production
       (the seed refuses to run and dev login is disabled when `APP_ENV=production`).

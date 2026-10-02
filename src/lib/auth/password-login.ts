@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { clientIp } from "@/lib/request";
-import { createSession } from "./session";
+import { createSession, MEMBER_SESSION_SEC, STAFF_SESSION_SEC } from "./session";
+import { isStaff } from "./permissions";
 
 // Email + password sign-in for AUTH_PROVIDER=dev (local test accounts and invited admins).
 
@@ -29,7 +30,7 @@ export async function passwordLogin(emailRaw: string, password: string): Promise
   const ok = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
   if (!user || !ok || user.disabled) return { ok: false, error: "login_error" };
 
-  await createSession(user.id);
+  await createSession(user.id, isStaff(user.adminRoles) ? STAFF_SESSION_SEC : MEMBER_SESSION_SEC);
   await db.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
   return { ok: true, userId: user.id, adminRoles: user.adminRoles };
 }

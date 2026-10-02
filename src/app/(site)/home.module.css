@@ -331,3 +331,11 @@
   display: inline-block;
   transform: scaleX(-1);
 }
+.loginError {
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: #fdecec;
+  color: #a4262c;
+  font-size: 14px;
+}

@@ -82,7 +82,7 @@ function linkProps(item: { href: string; external?: boolean }) {
   return item.external ? { target: "_blank", rel: "noopener" } : {};
 }
 
-export function HeaderClient({ announcements, prayer }: { announcements: TickerItem[]; prayer: PrayerFeed }) {
+export function HeaderClient({ announcements, prayer, signedIn }: { announcements: TickerItem[]; prayer: PrayerFeed; signedIn: boolean }) {
   const { t, lang, dir } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
@@ -200,8 +200,8 @@ export function HeaderClient({ announcements, prayer }: { announcements: TickerI
                 </div>
               )}
             </div>
-            <Link href={routes.memberLogin} className={styles.memberLogin}>
-              {t.member_login}
+            <Link href={signedIn ? routes.account : routes.memberLogin} className={styles.memberLogin}>
+              {signedIn ? t.nav_my_account : t.member_login}
             </Link>
             <Link href={routes.donate} className={styles.donateButton}>
               {t.header_donate}

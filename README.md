@@ -174,6 +174,35 @@ from `?topic=` (the Services, Assistance and Home links). Each message is saved,
 what they wrote). **Admin → Messages** (Content editor, Membership coordinator): New / Handled,
 reply by email, mark handled, delete.
 
+## Member portal, RSVPs and search
+
+**Sign-in** (`/login`, also the Home "Member Portal" card and the header's *Member Login*):
+`AUTH_PROVIDER=dev` offers email + password (seeded accounts) and **"Email me a sign-in link"** — a
+one-time, 30-minute link (Mailpit locally) for anyone BMCC knows by email: a donor, a member, or an
+applicant who hasn't paid yet. Opening the link shows a *Sign in* button (mail scanners open links).
+The form answers the same way for unknown addresses; staff accounts never get links (password only).
+Member sessions last 30 days, staff sessions 8 hours. In production Clerk replaces this page
+(GO_LIVE.md) and everything else stays the same — pages ask `getCurrentUser()` / `requireMember()`.
+
+**My account** (`/account`), matched to the person by account and by email:
+- *Membership* — coverage status, plan, reference and Membership ID, benefit start date, next dues
+  date; an unpaid application gets *Complete payment*.
+- *Household* — the people covered, and contact details the member can edit. Adding or removing
+  covered people is a **request** emailed to the office (and saved in Admin → Messages), because it
+  changes who the Funeral Services Benefit covers; the office makes it in Admin → Memberships.
+- *Giving & receipts* — payment history, printable receipts, a yearly giving statement (donations
+  only), and *Stop this monthly gift*. Receipts and statements are always in English (official
+  records); everything around them is translated.
+- *My RSVPs* — upcoming RSVPs, with cancel.
+
+**RSVPs:** switched on per event in Admin → Events (*Members can RSVP*, optional limit in people per
+date). Signed-in members pick a date and party size (1–10); the limit can't be exceeded even by two
+people at once. Admin → Events → an event lists who's coming per date.
+
+**Search** (`/search`, the header's magnifier): pages, Services/Assistance cards, upcoming events and
+approved directory listings. It matches in the visitor's language *and* English, ignores case, accents
+and Arabic-script spelling variants (ي/ی, ك/ک, short vowels, Persian digits), and highlights matches.
+
 ## Admin portal
 
 `/admin` (production: `ADMIN_HOST`, e.g. admin.brmcc.org — `/admin` on the main site redirects there,
@@ -189,7 +218,7 @@ and the admin host serves nothing else). Pages get `X-Frame-Options: DENY`, `noi
 - **First admin in production** (the seed never runs there): `npm run admin:create -- email "Name"`
   from a checkout whose `DATABASE_URL` points at production; it prints a set-password link.
 - **Sign-in:** `AUTH_PROVIDER=dev` is email + password with a signed session cookie and rate-limited
-  attempts; it is refused when `APP_ENV=production`, where Clerk takes over (member-login phase).
+  attempts; it is refused when `APP_ENV=production`, where Clerk takes over (see GO_LIVE.md).
 
 ### Prayer-times source
 

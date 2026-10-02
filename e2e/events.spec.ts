@@ -10,7 +10,7 @@ test("admin creates an event with a photo; it appears on Events, its page, Home 
   await page.getByLabel("Tag (e.g. Weekly, Youth, Community)").fill("Study");
   await page.getByLabel("Location (e.g. Main Prayer Hall)").fill("Library");
   await page.getByLabel("Description").fill("A weekly study circle for adults.");
-  await page.getByLabel("Date").fill(masjidDate(2));
+  await page.getByLabel("Date", { exact: true }).fill(masjidDate(2));
   await page.getByLabel("Starts").fill("19:30");
   await page.getByLabel("Ends").fill("20:30");
   await page.getByLabel("Repeats").selectOption("weekly");

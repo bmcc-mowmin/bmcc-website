@@ -19,6 +19,8 @@ type EventRow = {
   rruleUntil: Date | null;
   imageKey: string | null;
   published: boolean;
+  rsvpEnabled: boolean;
+  rsvpCapacity: number | null;
 };
 
 export function EventForm({ event, timeZone, defaultDate }: { event?: EventRow; timeZone: string; defaultDate: string }) {
@@ -117,6 +119,15 @@ export function EventForm({ event, timeZone, defaultDate }: { event?: EventRow; 
             <label className={styles.field} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
               <input type="checkbox" name="published" defaultChecked={event?.published ?? true} /> Published (visible on the site)
             </label>
+            <label className={styles.field} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <input type="checkbox" name="rsvpEnabled" defaultChecked={event?.rsvpEnabled ?? false} /> Members can RSVP
+            </label>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="ev-capacity">
+                RSVP limit (people per date)
+              </label>
+              <input id="ev-capacity" name="rsvpCapacity" type="number" min={1} max={10000} defaultValue={event?.rsvpCapacity ?? ""} placeholder="No limit" className={styles.input} style={{ width: 140 }} />
+            </div>
           </div>
         </section>
       </ActionForm>

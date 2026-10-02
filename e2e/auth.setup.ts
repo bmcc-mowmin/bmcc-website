@@ -26,16 +26,39 @@ async function signIn(browser: Browser, email: string, password: string, statePa
   await context.close();
 }
 
+// The seeded member signs in on the public sign-in page and lands in their account.
+async function signInMember(browser: Browser, email: string, password: string, statePath: string) {
+  if (existsSync(statePath)) {
+    const context = await browser.newContext({ storageState: statePath });
+    const page = await context.newPage();
+    await page.goto("/account");
+    const stillSignedIn = new URL(page.url()).pathname === "/account";
+    await context.close();
+    if (stillSignedIn) return;
+  }
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto("/login");
+  const form = page.getByRole("form", { name: "Member Login" });
+  await form.getByLabel("Email address").fill(email);
+  await form.getByLabel("Password").fill(password);
+  await form.getByRole("button", { name: "Log In" }).click();
+  await expect(page).toHaveURL(/\/account$/);
+  await context.storageState({ path: statePath });
+  await context.close();
+}
+
 setup("sign in as the seeded accounts", async ({ browser }) => {
   // Tests submit public forms repeatedly from one address; start each run with fresh rate limits.
   await resetRateLimits();
   await cleanTestData();
-  const { SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD, SEED_STAFF_PASSWORD } = process.env;
-  if (!SEED_ADMIN_EMAIL || !SEED_ADMIN_PASSWORD || !SEED_STAFF_PASSWORD) {
-    throw new Error("SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD and SEED_STAFF_PASSWORD must be set in .env (npm run setup)");
+  const { SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD, SEED_STAFF_PASSWORD, SEED_MEMBER_EMAIL, SEED_MEMBER_PASSWORD } = process.env;
+  if (!SEED_ADMIN_EMAIL || !SEED_ADMIN_PASSWORD || !SEED_STAFF_PASSWORD || !SEED_MEMBER_EMAIL || !SEED_MEMBER_PASSWORD) {
+    throw new Error("SEED_ADMIN_EMAIL/PASSWORD, SEED_STAFF_PASSWORD and SEED_MEMBER_EMAIL/PASSWORD must be set in .env (npm run setup)");
   }
   await signIn(browser, SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD, ADMIN_STATE);
   for (const role of ["editor", "prayer", "treasurer", "membership"]) {
     await signIn(browser, `${role}@bmcc.local`, SEED_STAFF_PASSWORD, roleState(role));
   }
+  await signInMember(browser, SEED_MEMBER_EMAIL, SEED_MEMBER_PASSWORD, roleState("member"));
 });

@@ -7,13 +7,13 @@ import { readSession } from "./session";
 import { can, isStaff, type AdminRole, type Section } from "./permissions";
 
 // One place to ask "who is signed in?". AUTH_PROVIDER=dev uses the local session cookie and
-// the seeded test accounts; AUTH_PROVIDER=clerk is connected in the member-login phase.
+// the seeded test accounts; AUTH_PROVIDER=clerk is connected at go-live (GO_LIVE.md).
 
 export type CurrentUser = { id: string; email: string; name: string | null; adminRoles: AdminRole[] };
 
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   if (env.AUTH_PROVIDER !== "dev") {
-    throw new Error("AUTH_PROVIDER=clerk is not connected yet (member-login phase).");
+    throw new Error("AUTH_PROVIDER=clerk is connected at go-live (GO_LIVE.md). Use AUTH_PROVIDER=dev locally.");
   }
   const userId = await readSession();
   if (!userId) return null;
@@ -40,5 +40,12 @@ export async function requireStaff(nextPath = "/admin"): Promise<CurrentUser> {
 export async function requireSection(section: Section): Promise<CurrentUser> {
   const user = await requireStaff();
   if (!can(user.adminRoles, section)) redirect("/admin?denied=1");
+  return user;
+}
+
+// Any signed-in person (member, donor or staff). Member pages redirect to the public sign-in.
+export async function requireMember(nextPath: string): Promise<CurrentUser> {
+  const user = await getCurrentUser();
+  if (!user) redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   return user;
 }

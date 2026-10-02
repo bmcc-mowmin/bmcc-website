@@ -1,13 +1,16 @@
 import { test, expect, type Page } from "@playwright/test";
+import { roleState } from "./helpers";
 
 // No English slips onto translated pages. Opens every public page (plus the mobile menu and a
 // service popup) in each right-to-left language and fails on any visible text, screen-reader label
 // or page title containing English words. Content people enter (directory listings, announcements)
 // is wrapped in <bdi>/dir="auto" and skipped.
 
-const PAGES = ["/", "/about", "/services", "/assistance", "/funeral-services", "/prayer-times", "/events", "/events/friday-jumuah", "/community", "/community/submit", "/donate", "/membership", "/subscribe/confirm", "/unsubscribe", "/no-such-page"];
+const PAGES = ["/", "/about", "/services", "/assistance", "/funeral-services", "/prayer-times", "/events", "/events/friday-jumuah", "/community", "/community/submit", "/donate", "/membership", "/subscribe/confirm", "/unsubscribe", "/no-such-page", "/login", "/login/link", "/search", "/search?q=nikah", "/events/community-dinner"];
+// Signed in as the seeded member.
+const MEMBER_PAGES = ["/account", "/account/household", "/account/giving", "/account/events", "/events/community-dinner"];
 // Words that are the same in every language: names, brands, prayer names, units.
-const ALLOWED = /^(BMCC|Brentwood|Muslim|Community|Center|Lone|Tree|Way|CA|AM|PM|Google|Maps|iCal|Stripe|Zelle|PayPal|Jumu['’]?ah|Fajr|Dhuhr|Asr|Maghrib|Isha|Adhan|Iqamah|Hikmah|ISNA|Hanafi|English|US|Dari|Urdu|Pashtu|Spanish|USD|PDF|env)$/i;
+const ALLOWED = /^(TEST01|BMCC|Brentwood|Muslim|Community|Center|Lone|Tree|Way|CA|AM|PM|Google|Maps|iCal|Stripe|Zelle|PayPal|Jumu['’]?ah|Fajr|Dhuhr|Asr|Maghrib|Isha|Adhan|Iqamah|Hikmah|ISNA|Hanafi|English|US|Dari|Urdu|Pashtu|Spanish|USD|PDF|env)$/i;
 
 async function englishOnPage(page: Page) {
   const texts = await page.evaluate(() => {
@@ -26,7 +29,7 @@ async function englishOnPage(page: Page) {
         if (v) out.add(v);
       }
     }
-    out.add(document.title);
+    out.add(document.title.replace(/\u2068[^\u2069]*\u2069/g, "")); // text in isolate marks is what someone typed
     return [...out];
   });
   return texts.filter((t) => {
@@ -57,7 +60,17 @@ for (const lang of ["urdu", "dari", "pashto"]) {
     const menu = await englishOnPage(page);
     if (menu.length) found["mobile menu"] = menu;
 
-    expect(found).toEqual({});
     await context.close();
+
+    const member = await browser.newContext({ storageState: roleState("member") });
+    await member.addCookies([{ name: "bmcc_lang", value: lang, domain: new URL(baseURL!).hostname, path: "/" }]);
+    const mp = await member.newPage();
+    for (const path of MEMBER_PAGES) {
+      await mp.goto(path);
+      const english = await englishOnPage(mp);
+      if (english.length) found[`${path} (signed in)`] = english;
+    }
+    await member.close();
+    expect(found).toEqual({});
   });
 }

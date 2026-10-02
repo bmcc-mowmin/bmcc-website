@@ -6,23 +6,25 @@ import { env } from "@/lib/env";
 // Session cookie for the local dev-login provider (AUTH_PROVIDER=dev).
 // A signed JWT holding only the user id; the user's role is always re-read from the database.
 export const SESSION_COOKIE = "bmcc_session";
-const MAX_AGE_SEC = 8 * 60 * 60;
+// Staff sessions are short; members stay signed in for a month on their own device.
+export const STAFF_SESSION_SEC = 8 * 60 * 60;
+export const MEMBER_SESSION_SEC = 30 * 24 * 60 * 60;
 
 const key = () => new TextEncoder().encode(env.SESSION_SECRET);
 
-export async function createSession(userId: string) {
+export async function createSession(userId: string, maxAgeSec = STAFF_SESSION_SEC) {
   const token = await new SignJWT({})
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setIssuedAt()
-    .setExpirationTime(`${MAX_AGE_SEC}s`)
+    .setExpirationTime(`${maxAgeSec}s`)
     .sign(key());
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: env.APP_URL.startsWith("https://"),
     sameSite: "lax",
     path: "/",
-    maxAge: MAX_AGE_SEC,
+    maxAge: maxAgeSec,
   });
 }
 

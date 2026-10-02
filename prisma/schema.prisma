@@ -180,6 +180,9 @@ model Event {
   location    Json // L10n
   imageKey    String?
   published   Boolean     @default(true)
+  // Members can RSVP (signed in) when switched on; capacity = max people per occurrence (null = no limit).
+  rsvpEnabled  Boolean    @default(false)
+  rsvpCapacity Int?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   rsvps       EventRsvp[]
