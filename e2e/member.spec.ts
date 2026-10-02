@@ -32,7 +32,7 @@ async function signInWithLink(browser: Browser, email: string) {
   const form = page.getByRole("form", { name: "No password? Get a sign-in link" });
   await form.getByLabel("Email address").fill(email);
   await form.getByRole("button", { name: "Email me a sign-in link" }).click();
-  await expect(page.getByRole("status")).toContainText(`If ${email} is linked to a BMCC membership or donation`);
+  await expect(page.getByRole("status")).toContainText(`We've sent a sign-in link to ${email}.`);
   const mail = await waitForEmail(email, since);
   expect(mail.subject).toBe("Your BMCC sign-in link");
   const link = firstLink(mail.text, "/login/link?token=");
@@ -80,7 +80,7 @@ test("seeded member: password sign-in → membership, household, receipts; sign 
   await context.close();
 });
 
-test("donor: emailed sign-in link → giving history, stop a monthly gift; link works once; unknown email gets nothing", async ({ browser }) => {
+test("donor: emailed sign-in link → giving history, stop a monthly gift; link works once; unknown email is told to join", async ({ browser }) => {
   const email = `e2e-portal-${uid()}@example.com`;
   const visitor = await browser.newContext(anon);
   await donateMonthly(await visitor.newPage(), email, "15");
@@ -105,17 +105,26 @@ test("donor: emailed sign-in link → giving history, stop a monthly gift; link 
   await ap.goto(link);
   await expect(ap.getByRole("heading", { name: "This sign-in link has expired or was already used" })).toBeVisible();
 
-  // An address BMCC doesn't know (or a staff account) gets the same answer and no email.
-  for (const unknown of [`e2e-nobody-${uid()}@example.com`, "editor@bmcc.local"]) {
-    await ap.goto("/login");
-    await ap.waitForTimeout(2600);
-    const form = ap.getByRole("form", { name: "No password? Get a sign-in link" });
-    await form.getByLabel("Email address").fill(unknown);
-    await form.getByRole("button", { name: "Email me a sign-in link" }).click();
-    await expect(ap.getByRole("status")).toContainText(`If ${unknown} is linked`);
-    await ap.waitForTimeout(1000);
-    expect((await subjectsFor(unknown)).filter((s) => s === "Your BMCC sign-in link")).toHaveLength(0);
-  }
+  // An address BMCC doesn't know is told so, with a link to become a member; nothing is sent.
+  const unknown = `e2e-nobody-${uid()}@example.com`;
+  await ap.goto("/login");
+  await ap.waitForTimeout(2600);
+  const form = ap.getByRole("form", { name: "No password? Get a sign-in link" });
+  await form.getByLabel("Email address").fill(unknown);
+  await form.getByRole("button", { name: "Email me a sign-in link" }).click();
+  const notFound = form.getByRole("alert");
+  await expect(notFound).toContainText(`We couldn't find ${unknown} in BMCC's member or donor records.`);
+  await expect(form.getByLabel("Email address")).toHaveValue(unknown); // kept, to fix a typo
+  await expect(notFound.getByRole("link", { name: "Become a Member →" })).toHaveAttribute("href", "/membership");
+  expect(await sql(`SELECT 1 FROM "User" WHERE email = $1`, [unknown])).toHaveLength(0);
+
+  // A staff account is pointed to the password form, and gets no link.
+  await form.getByLabel("Email address").fill("editor@bmcc.local");
+  await ap.waitForTimeout(2600);
+  await form.getByRole("button", { name: "Email me a sign-in link" }).click();
+  await expect(form.getByRole("alert")).toHaveText("This is a staff account. Please sign in with your password above.");
+  await ap.waitForTimeout(1000);
+  expect((await subjectsFor("editor@bmcc.local")).filter((s) => s === "Your BMCC sign-in link")).toHaveLength(0);
   await again.close();
 });
 

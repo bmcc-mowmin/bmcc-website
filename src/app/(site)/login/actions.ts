@@ -22,17 +22,23 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
   redirect(safeNext(form.get("next"), isStaff(result.adminRoles) ? "/admin" : "/account"));
 }
 
-export type LinkState = { status: "idle" } | { status: "sent"; email: string } | { status: "error"; error: "form_error_email" | "form_rate_limited" | "form_try_again"; email: string };
+export type LinkState =
+  | { status: "idle" }
+  | { status: "sent"; email: string }
+  | { status: "not_found"; email: string }
+  | { status: "error"; error: "form_error_email" | "form_rate_limited" | "form_try_again" | "signin_use_password" | "signin_too_many"; email: string };
 
 export async function emailSignInLink(_prev: LinkState, form: FormData): Promise<LinkState> {
   const email = String(form.get("email") ?? "").trim();
   const spam = checkHoneypot(form);
-  if (spam.reason === "honeypot") return { status: "sent", email };
+  if (spam.reason === "honeypot") return { status: "error", error: "form_try_again", email };
   if (spam.reason === "too_fast") return { status: "error", error: "form_try_again", email };
   if (!(await rateLimit(`signin-link:ip:${await clientIp()}`))) return { status: "error", error: "form_rate_limited", email };
   if (!z.email().safeParse(email).success) return { status: "error", error: "form_error_email", email };
-  await requestSignInLink(email, await getLang(), String(form.get("next") ?? ""));
-  return { status: "sent", email };
+  const result = await requestSignInLink(email, await getLang(), String(form.get("next") ?? ""));
+  if (result === "sent") return { status: "sent", email };
+  if (result === "not_found") return { status: "not_found", email };
+  return { status: "error", error: result === "staff" ? "signin_use_password" : "signin_too_many", email };
 }
 
 export async function signInFromLink(form: FormData) {

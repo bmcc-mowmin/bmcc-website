@@ -87,3 +87,19 @@
 .new a {
   font-weight: 700;
 }
+.notFound {
+  margin: 0 0 14px 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #fff6e0;
+  color: #5c3d00;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.notFound p {
+  margin: 0 0 8px;
+}
+.notFoundCta {
+  font-weight: 800;
+  color: var(--navy);
+}

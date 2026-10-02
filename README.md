@@ -180,7 +180,8 @@ reply by email, mark handled, delete.
 `AUTH_PROVIDER=dev` offers email + password (seeded accounts) and **"Email me a sign-in link"** — a
 one-time, 30-minute link (Mailpit locally) for anyone BMCC knows by email: a donor, a member, or an
 applicant who hasn't paid yet. Opening the link shows a *Sign in* button (mail scanners open links).
-The form answers the same way for unknown addresses; staff accounts never get links (password only).
+An address not in BMCC's member/donor records is told so, with a *Become a Member* link (lookups are
+rate limited); staff accounts never get links and are pointed to the password form.
 Member sessions last 30 days, staff sessions 8 hours. In production Clerk replaces this page
 (GO_LIVE.md) and everything else stays the same — pages ask `getCurrentUser()` / `requireMember()`.
 
