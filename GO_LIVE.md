@@ -39,10 +39,9 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 - [ ] Register the webhook `https://brmcc.org/api/webhooks/clerk` (user.updated, user.deleted) and
       set `CLERK_WEBHOOK_SECRET`.
 - [ ] Consider requiring a second factor for staff (authenticator app is a paid Clerk feature).
-- [ ] Sign-in link page tells visitors when an email isn't in BMCC's member/donor records (BMCC's
-      choice, with a "Become a Member" link). This confirms who is a member or donor; it is limited
-      to `RATE_LIMIT_MAX` lookups per visitor per `RATE_LIMIT_WINDOW_SEC`. Keep the same behaviour
-      when Clerk is connected, or switch to a neutral "check your inbox" message.
+- [x] With Clerk, anyone can create an account; someone not yet in BMCC's records lands on
+      *My account* with "You're not a member yet" and a *Become a Member* link. (The local test
+      sign-in's "email not found" message only applies with `AUTH_PROVIDER=dev`.)
 - [ ] Decide whether members may add/remove covered people themselves (today: a request the office
       approves, because it changes who the Funeral Services Benefit covers).
 - [ ] Create the first Super admin with `npm run admin:create -- email "Name"`; they invite the rest
