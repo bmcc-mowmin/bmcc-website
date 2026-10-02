@@ -85,6 +85,9 @@ const schema = z
     if (e.AUTH_PROVIDER === "clerk") {
       need("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "when AUTH_PROVIDER=clerk");
       need("CLERK_SECRET_KEY", "when AUTH_PROVIDER=clerk");
+      // Development keys on the live site would send members to Clerk's test instance.
+      if (e.APP_ENV === "production" && (e.CLERK_SECRET_KEY?.startsWith("sk_test_") || e.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_test_")))
+        ctx.addIssue({ code: "custom", path: ["CLERK_SECRET_KEY"], message: "use Clerk production keys (pk_live_/sk_live_) in production" });
     }
     if (e.PAYMENT_PROVIDER === "mock" && e.APP_ENV === "production")
       ctx.addIssue({ code: "custom", path: ["PAYMENT_PROVIDER"], message: "mock payments are not allowed in production" });

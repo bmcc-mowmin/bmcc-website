@@ -26,6 +26,15 @@ async function main() {
     ? await db.user.update({ where: { id: existing.id }, data: { adminRoles: roles, disabled: false } })
     : await db.user.create({ data: { email, name, adminRoles: ["SUPER_ADMIN"] } });
 
+  const base = process.env.ADMIN_HOST
+    ? `${new URL(process.env.APP_URL ?? "https://localhost").protocol}//${process.env.ADMIN_HOST}`
+    : (process.env.APP_URL ?? "http://localhost:3000");
+  if (process.env.AUTH_PROVIDER === "clerk") {
+    // Clerk: their roles wait for the first sign-in with this (verified) email.
+    console.log(`${email} is a Super admin.`);
+    console.log(`Sign in (or create a login) with that email at:\n${base}/admin/login?mode=sign-up`);
+    return;
+  }
   const raw = randomBytes(32).toString("base64url");
   await db.authToken.deleteMany({ where: { userId: user.id, purpose: "set_password", usedAt: null } });
   await db.authToken.create({
@@ -36,9 +45,6 @@ async function main() {
       expiresAt: new Date(Date.now() + 72 * 3600_000),
     },
   });
-  const base = process.env.ADMIN_HOST
-    ? `${new URL(process.env.APP_URL ?? "https://localhost").protocol}//${process.env.ADMIN_HOST}`
-    : (process.env.APP_URL ?? "http://localhost:3000");
   console.log(`${email} is a Super admin.`);
   console.log(`Set-password link (works once, expires in 72 hours):\n${base}/admin/set-password?token=${raw}`);
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { logoUrl } from "@/lib/media";
+import { SignOut } from "@/components/auth/SignOut";
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
 import { navFor, ROLE_INFO } from "@/lib/auth/permissions";
@@ -30,11 +31,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
           <div className={styles.roleList}>{user.adminRoles.map((r) => ROLE_INFO[r].label).join(" · ")}</div>
           <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
             <a href={env.APP_URL}>View site</a>
-            <form action={adminLogout}>
-              <button type="submit" className={styles.linkButton}>
-                Sign out
-              </button>
-            </form>
+            <SignOut action={adminLogout} label="Sign out" className={styles.linkButton} redirectUrl="/admin/login" />
           </div>
         </div>
       </aside>

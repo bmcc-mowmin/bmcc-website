@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 
 // 1. Admin subdomain (production): with ADMIN_HOST=admin.brmcc.org the portal is served only there.
 //    /admin on the main site redirects to the admin host; the admin host serves only the portal.
@@ -25,7 +26,8 @@ function adminHeaders(res: NextResponse) {
   return res;
 }
 
-export function proxy(request: NextRequest) {
+// `signedIn`: an optimistic check only (the portal layout checks properly on every request).
+function handle(request: NextRequest, signedIn: boolean) {
   const { pathname, search } = request.nextUrl;
   const host = request.headers.get("host") ?? "";
   const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
@@ -40,13 +42,19 @@ export function proxy(request: NextRequest) {
   if (!isAdminPath) return NextResponse.next();
 
   const isPublicAdminPage = PUBLIC_ADMIN_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-  if (!isPublicAdminPage && !request.cookies.has("bmcc_session")) {
+  if (!isPublicAdminPage && !signedIn) {
     const url = new URL("/admin/login", ADMIN_ORIGIN);
     url.searchParams.set("next", `${pathname}${search}`);
     return adminHeaders(NextResponse.redirect(url));
   }
   return adminHeaders(NextResponse.next());
 }
+
+// AUTH_PROVIDER=clerk: Clerk reads its session first; dev: the local session cookie.
+export const proxy =
+  process.env.AUTH_PROVIDER === "clerk"
+    ? clerkMiddleware(async (auth, request) => handle(request, !!(await auth()).userId))
+    : (request: NextRequest) => handle(request, request.cookies.has("bmcc_session"));
 
 export const config = {
   // Everything except Next's static files (the admin-host rules need to see public paths too).

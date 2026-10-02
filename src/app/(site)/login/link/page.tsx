@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { env } from "@/lib/env";
 import { getI18n } from "@/lib/i18n/server";
 import { signInLinkValid } from "@/lib/auth/sign-in-link";
 import { signInFromLink } from "../actions";
@@ -13,6 +15,8 @@ export async function generateMetadata(): Promise<Metadata> {
 // The emailed sign-in link lands here. Signing in takes a button press, because mail scanners
 // open links on their own.
 export default async function SignInLinkPage({ searchParams }: PageProps<"/login/link">) {
+  // Clerk sends its own sign-in codes and links.
+  if (env.AUTH_PROVIDER === "clerk") redirect("/login");
   const { t } = await getI18n();
   const { token, next } = await searchParams;
   const valid = typeof token === "string" && (await signInLinkValid(token));

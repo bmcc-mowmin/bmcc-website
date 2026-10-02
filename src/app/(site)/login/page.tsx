@@ -5,6 +5,8 @@ import { getI18n } from "@/lib/i18n/server";
 import { getCurrentUser } from "@/lib/auth";
 import { safeNext } from "@/lib/auth/password-login";
 import { routes } from "@/lib/routes";
+import { env } from "@/lib/env";
+import { ClerkSignIn } from "@/components/auth/ClerkScreens";
 import { LoginForm } from "./LoginForm";
 import { SignInLinkForm } from "./SignInLinkForm";
 import styles from "./login.module.css";
@@ -20,6 +22,13 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const nextPath = typeof next === "string" ? next : undefined;
   // Already signed in (and not sent here for lacking admin access): go straight on.
   if (error !== "forbidden" && (await getCurrentUser())) redirect(safeNext(nextPath, "/account"));
+  if (env.AUTH_PROVIDER === "clerk") {
+    return (
+      <section className={`container section-y ${styles.wrap}`}>
+        <ClerkSignIn redirectTo={safeNext(nextPath, "/account")} signUpUrl="/sign-up" />
+      </section>
+    );
+  }
   return (
     <section className={`container section-y ${styles.wrap}`}>
       <div className={styles.stack}>

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { getI18n } from "@/lib/i18n/server";
 import { htmlLang } from "@/lib/i18n/config";
 import { I18nProvider } from "@/components/i18n/I18nProvider";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,7 +25,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang={htmlLang(lang)} dir={dir} className={inter.variable}>
       <body>
-        <I18nProvider value={{ lang, t, dir }}>{children}</I18nProvider>
+        <AuthProvider lang={lang}>
+          <I18nProvider value={{ lang, t, dir }}>{children}</I18nProvider>
+        </AuthProvider>
       </body>
     </html>
   );

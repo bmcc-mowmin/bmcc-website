@@ -9,7 +9,7 @@ import styles from "./home.module.css";
 
 // Home "Member Portal" card: signs in with a password, or links to the emailed-link option.
 // Signed-in visitors get a link to their account instead.
-export function MemberLoginCard({ signedIn, name }: { signedIn: boolean; name?: string | null }) {
+export function MemberLoginCard({ signedIn, name, clerk }: { signedIn: boolean; name?: string | null; clerk: boolean }) {
   const { t } = useI18n();
   const [state, action, pending] = useActionState<LoginState, FormData>(login, undefined);
 
@@ -30,6 +30,20 @@ export function MemberLoginCard({ signedIn, name }: { signedIn: boolean; name?: 
         <Link href={routes.account} className={styles.loginButton} style={{ textAlign: "center", display: "block" }}>
           {t.home_go_account}
         </Link>
+      </div>
+    );
+  }
+  if (clerk) {
+    // Clerk: its sign-in and sign-up screens are on /login and /sign-up.
+    return (
+      <div className={styles.loginCard}>
+        <h3 className={styles.loginTitle}>{t.login_title}</h3>
+        <Link href={`${routes.memberLogin}?next=${routes.account}`} className={styles.loginButton} style={{ textAlign: "center", display: "block" }}>
+          {t.login_button}
+        </Link>
+        <div className={styles.loginNew}>
+          {t.login_new} <Link href="/sign-up">{t.create_account}</Link>
+        </div>
       </div>
     );
   }

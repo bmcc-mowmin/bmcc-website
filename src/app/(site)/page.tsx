@@ -12,6 +12,7 @@ import { EventsCarousel, type CarouselCard } from "@/components/events/EventsCar
 import { ResubBar } from "@/components/mailing-list/ResubBar";
 import { NewsletterBand } from "@/components/mailing-list/NewsletterBand";
 import { getSettings } from "@/lib/settings";
+import { env } from "@/lib/env";
 import { getCurrentUser } from "@/lib/auth";
 import { MemberLoginCard } from "./MemberLoginCard";
 import styles from "./home.module.css";
@@ -152,7 +153,7 @@ export default async function HomePage() {
               ))}
             </ul>
           </div>
-          <MemberLoginCard signedIn={!!user} name={user?.name?.split(" ")[0]} />
+          <MemberLoginCard signedIn={!!user} name={user?.name?.split(" ")[0]} clerk={env.AUTH_PROVIDER === "clerk"} />
         </div>
       </section>
 

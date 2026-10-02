@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { adminUrl, isProduction } from "@/lib/env";
+import { adminUrl, env, isProduction } from "@/lib/env";
 import { requireSection, type CurrentUser } from "@/lib/auth";
 import { ADMIN_ROLES, ROLE_INFO, type AdminRole } from "@/lib/auth/permissions";
 import { createToken } from "@/lib/auth/tokens";
@@ -25,9 +25,23 @@ async function otherActiveSuperAdmins(exceptId: string) {
 }
 
 async function sendInvite(user: { id: string; email: string; name: string | null }, invitedBy: CurrentUser) {
+  const by = invitedBy.name ?? invitedBy.email;
+  if (env.AUTH_PROVIDER === "clerk") {
+    // Clerk: they create a login with this email; their roles are already waiting for it.
+    const link = adminUrl("/admin/login?mode=sign-up");
+    await sendMail({
+      to: user.email,
+      subject: "You're invited to the BMCC admin portal",
+      text: `Assalamu alaikum${user.name ? ` ${user.name}` : ""},\n\n${by} invited you to the Brentwood Muslim Community Center admin portal.\n\nCreate your login with this email address (${user.email}):\n${link}\n\nAlready have a BMCC login with this email? Just sign in. If you weren't expecting this, you can ignore this email.`,
+      html: layoutHtml(
+        "You're invited to the BMCC admin portal",
+        `<p>Assalamu alaikum${user.name ? ` ${escapeHtml(user.name)}` : ""},</p><p>${escapeHtml(by)} invited you to the Brentwood Muslim Community Center admin portal.</p><p>Create your login with this email address: <strong>${escapeHtml(user.email)}</strong></p>${buttonHtml(link, "Create your login")}<p style="color:#6b7280;font-size:13px">Already have a BMCC login with this email? Just sign in. If you weren't expecting this, you can ignore this email.</p>`,
+      ),
+    });
+    return link;
+  }
   const token = await createToken(user.id, "set_password", INVITE_HOURS);
   const link = adminUrl(`/admin/set-password?token=${token}`);
-  const by = invitedBy.name ?? invitedBy.email;
   await sendMail({
     to: user.email,
     subject: "You're invited to the BMCC admin portal",

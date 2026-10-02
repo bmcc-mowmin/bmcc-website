@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { env } from "@/lib/env";
 import { logoUrl } from "@/lib/media";
 import Link from "next/link";
 import { peekToken } from "@/lib/auth/tokens";
@@ -8,6 +10,8 @@ import styles from "../auth.module.css";
 export const metadata: Metadata = { title: "Set your password", robots: { index: false } };
 
 export default async function SetPasswordPage({ searchParams }: PageProps<"/admin/set-password">) {
+  // With Clerk, invited admins create their login on the sign-in page instead.
+  if (env.AUTH_PROVIDER === "clerk") redirect("/admin/login?mode=sign-up");
   const logo = await logoUrl();
   const { token } = await searchParams;
   const row = typeof token === "string" ? await peekToken(token, "set_password") : null;
