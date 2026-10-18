@@ -12,6 +12,7 @@ import { EventsCarousel, type CarouselCard } from "@/components/events/EventsCar
 import { ResubBar } from "@/components/mailing-list/ResubBar";
 import { NewsletterBand } from "@/components/mailing-list/NewsletterBand";
 import { getSettings } from "@/lib/settings";
+import { slotImage } from "@/lib/media";
 import { env } from "@/lib/env";
 import { getCurrentUser } from "@/lib/auth";
 import { MemberLoginCard } from "./MemberLoginCard";
@@ -28,6 +29,7 @@ export default async function HomePage() {
     getCurrentUser(),
     getSettings(),
   ]);
+  const homePhoto = await slotImage("home_photo", lang);
   const cards: CarouselCard[] = events.map((e) => {
     const when = formatEventWhen(e, e.next, lang, t, timeZone);
     return { slug: e.slug, title: e.title, description: e.description, tag: e.tag, location: e.location, imageUrl: e.imageUrl, date: when.date, time: when.startTime };
@@ -75,6 +77,14 @@ export default async function HomePage() {
           <p>{t.home_paragraph}</p>
         </div>
       </section>
+
+      {/* PHOTO — optional, chosen in Admin → Media library */}
+      {homePhoto && (
+        <div className={`container ${styles.homePhotoWrap}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- admin-uploaded photo */}
+          <img src={homePhoto.url} alt={homePhoto.alt} className={styles.homePhoto} />
+        </div>
+      )}
 
       {/* EVENTS CAROUSEL — the next upcoming events (up to 8) */}
       <section className={styles.eventsBand} aria-labelledby="home-events-title">

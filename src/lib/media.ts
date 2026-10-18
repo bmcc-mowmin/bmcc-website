@@ -9,6 +9,7 @@ import { mediaUrl } from "@/lib/events";
 // Until a photo is chosen, the page shows the striped placeholder from the design.
 export const SLOTS = [
   { slot: "logo", label: "Logo (header, footer and admin)", hint: "A wide PNG or JPEG, at least 400 px wide. Shown about 50 px tall." },
+  { slot: "home_photo", label: "Home — wide photo under the opening", hint: "Landscape, at least 1600 px wide. Leave empty to show no photo." },
   { slot: "about_about", label: "About Us — “About” tab", hint: "Landscape, at least 1200 px wide." },
   { slot: "about_resources", label: "About Us — “Resources” tab", hint: "Landscape, at least 1200 px wide." },
   { slot: "about_schedule", label: "About Us — “Schedule” tab", hint: "Landscape, at least 1200 px wide." },

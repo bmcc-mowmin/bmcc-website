@@ -339,3 +339,15 @@
   color: #a4262c;
   font-size: 14px;
 }
+
+/* Optional wide photo under the opening (Admin → Media library → Home) */
+.homePhotoWrap {
+  padding-block: 8px 0;
+}
+.homePhoto {
+  display: block;
+  width: 100%;
+  height: clamp(220px, 38vw, 520px);
+  object-fit: cover;
+  border-radius: 14px;
+}
