@@ -279,3 +279,10 @@
   justify-content: center;
   flex-wrap: wrap;
 }
+
+.projectLink {
+  display: inline-block;
+  margin-top: 10px;
+  font-weight: 700;
+  color: var(--primary-text);
+}

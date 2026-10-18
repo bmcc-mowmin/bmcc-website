@@ -6,7 +6,7 @@ import { roleState } from "./helpers";
 // or page title containing English words. Content people enter (directory listings, announcements)
 // is wrapped in <bdi>/dir="auto" and skipped.
 
-const PAGES = ["/", "/about", "/services", "/assistance", "/funeral-services", "/prayer-times", "/events", "/events/friday-jumuah", "/community", "/community/submit", "/donate", "/membership", "/subscribe/confirm", "/unsubscribe", "/no-such-page", "/login", "/login/link", "/search", "/search?q=nikah", "/events/community-dinner"];
+const PAGES = ["/", "/about", "/services", "/assistance", "/funeral-services", "/prayer-times", "/events", "/events/friday-jumuah", "/community", "/community/submit", "/donate", "/membership", "/subscribe/confirm", "/unsubscribe", "/no-such-page", "/login", "/login/link", "/search", "/search?q=nikah", "/events/community-dinner", "/new-bmcc"];
 // Signed in as the seeded member.
 const MEMBER_PAGES = ["/account", "/account/household", "/account/giving", "/account/events", "/events/community-dinner"];
 // Words that are the same in every language: names, brands, prayer names, units.

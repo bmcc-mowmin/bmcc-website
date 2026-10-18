@@ -41,10 +41,11 @@ function buildMenus(t: Dictionary): Menu[] {
     {
       id: "give",
       label: t.nav_give,
-      childIds: ["donate", "membership"],
+      childIds: ["donate", "membership", "new-bmcc"],
       items: [
         { id: "donate", label: t.nav_donate, href: routes.donate, description: t.nav_donate_desc },
         { id: "membership", label: t.nav_membership, href: routes.membership, description: t.nav_membership_desc },
+        { id: "new-bmcc", label: t.nb_nav, href: routes.newBmcc, description: t.nb_nav_desc },
       ],
     },
     { id: "funeral", label: t.nav_funeral_short, href: routes.funeral, childIds: [] },
@@ -71,6 +72,7 @@ function currentId(pathname: string) {
     [routes.assistance]: "assistance",
     [routes.donate]: "donate",
     [routes.membership]: "membership",
+    [routes.newBmcc]: "new-bmcc",
     [routes.funeral]: "funeral",
     [routes.about]: "about",
   };

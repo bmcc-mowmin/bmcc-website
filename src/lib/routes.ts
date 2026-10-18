@@ -8,6 +8,7 @@ export const routes = {
   assistance: "/assistance",
   donate: "/donate",
   membership: "/membership",
+  newBmcc: "/new-bmcc",
   funeral: "/funeral-services",
   about: "/about",
   contact: "/about#contact",

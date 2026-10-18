@@ -34,6 +34,7 @@ export async function cleanTestData() {
   await sql(`DELETE FROM "MessageOverride" WHERE value LIKE 'E2E%'`);
   await sql(`UPDATE "SiteSettings" SET "orgPhone" = NULL WHERE "orgPhone" LIKE '%E2E%'`);
   await sql(`DELETE FROM "MediaAsset" WHERE alt->>'en' LIKE 'E2E%'`);
+  await sql(`DELETE FROM "CampaignUpdate" WHERE title->>'en' LIKE 'E2E%'`);
 }
 
 export async function subscriberStatus(email: string) {

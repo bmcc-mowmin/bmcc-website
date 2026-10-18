@@ -15,6 +15,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DonatePage({ searchParams }: PageProps<"/donate">) {
   const [{ t }, params] = await Promise.all([getI18n(), searchParams]);
   const fund = isFund(params.fund) ? params.fund : DEFAULT_FUND;
+  // ?frequency= from a link (e.g. "Give monthly" on the New BMCC page), else the site default.
+  const frequency = params.frequency === "monthly" || params.frequency === "one-time" ? params.frequency : (await getSettings()).defaultDonationFrequency;
   const benefits = [t.benefit1, t.benefit2, t.benefit3, t.benefit4, t.benefit5, t.benefit6];
   return (
     <section className="container section-y">
@@ -29,7 +31,7 @@ export default async function DonatePage({ searchParams }: PageProps<"/donate">)
         </p>
       )}
       <div className={styles.grid}>
-        <DonateForm defaultFrequency={(await getSettings()).defaultDonationFrequency} initialFund={fund} />
+        <DonateForm defaultFrequency={frequency} initialFund={fund} />
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>{t.donate_join_title}</h2>
           <p className={styles.cardSub}>

@@ -7,7 +7,7 @@ import { audit } from "@/lib/audit";
 import { done, fail, readL10n, text } from "@/lib/admin/forms";
 import { storage } from "@/lib/storage";
 import { detectImage, imageKey, MAX_IMAGE_BYTES } from "@/lib/storage/images";
-import { invalidateSlots, isSlot, SLOTS } from "@/lib/media";
+import { invalidateSlots, isCollection, isSlot, SLOTS } from "@/lib/media";
 import type { ActionResult } from "@/components/admin/ActionForm";
 
 function refresh() {
@@ -22,13 +22,15 @@ export async function uploadMedia(_prev: ActionResult, form: FormData): Promise<
   if (file.size > MAX_IMAGE_BYTES) return fail("The photo must be 5 MB or smaller.");
   const alt = readL10n(form, "alt");
   if (!alt.en) return fail("Describe the photo in English (for people using screen readers).");
+  const collection = text(form, "collection");
+  if (!isCollection(collection)) return fail("Choose where the photo may be used.");
   const bytes = Buffer.from(await file.arrayBuffer());
   const kind = detectImage(bytes);
   if (!kind) return fail("The photo must be a JPEG, PNG or WebP image.");
   const storageKey = imageKey("library", kind.ext);
   await storage.put(storageKey, bytes, kind.type);
   const asset = await db.mediaAsset.create({
-    data: { storageKey, filename: file.name.slice(0, 200) || `photo.${kind.ext}`, contentType: kind.type, sizeBytes: file.size, alt, uploadedById: user.id },
+    data: { storageKey, filename: file.name.slice(0, 200) || `photo.${kind.ext}`, contentType: kind.type, sizeBytes: file.size, alt, collection, uploadedById: user.id },
   });
   await audit(user.id, "upload", "MediaAsset", asset.id, { filename: asset.filename });
   revalidatePath("/admin/media");
@@ -67,9 +69,35 @@ export async function setSlot(_prev: ActionResult, form: FormData): Promise<Acti
   const slot = text(form, "slot");
   if (!isSlot(slot)) return fail("Unknown place on the site.");
   const mediaId = text(form, "mediaId") || null;
-  if (mediaId && !(await db.mediaAsset.findUnique({ where: { id: mediaId } }))) return fail("Photo not found.");
+  if (mediaId) {
+    const asset = await db.mediaAsset.findUnique({ where: { id: mediaId } });
+    if (!asset) return fail("Photo not found.");
+    const wanted = SLOTS.find((s) => s.slot === slot)!.collection;
+    if (asset.collection !== wanted) return fail("That photo's collection doesn't belong in this place. Change its collection first.");
+  }
   await db.imageSlot.upsert({ where: { slot }, create: { slot, mediaId }, update: { mediaId } });
   await audit(user.id, "set_photo", "ImageSlot", slot, { mediaId });
   refresh();
   return done(mediaId ? "Photo set. The site shows it now." : "Photo removed; the placeholder shows again.");
+}
+
+// Move a photo to another collection. Leaving a collection takes it out of any place on the site
+// that belongs to the old one (so an archived photo disappears from the site at once).
+export async function setCollection(_prev: ActionResult, form: FormData): Promise<ActionResult> {
+  const user = await requireSection("media");
+  const id = text(form, "id");
+  const collection = text(form, "collection");
+  if (!isCollection(collection)) return fail("Unknown collection.");
+  const asset = await db.mediaAsset.findUnique({ where: { id }, include: { slots: true } });
+  if (!asset) return fail("Photo not found.");
+  if (asset.collection === collection) return done("No change.");
+  const leaving = asset.slots.filter((s) => SLOTS.find((x) => x.slot === s.slot)?.collection !== collection).map((s) => s.slot);
+  await db.$transaction([
+    db.mediaAsset.update({ where: { id }, data: { collection } }),
+    db.imageSlot.updateMany({ where: { slot: { in: leaving }, mediaId: id }, data: { mediaId: null } }),
+  ]);
+  await audit(user.id, "set_collection", "MediaAsset", id, { from: asset.collection, to: collection, removedFrom: leaving });
+  refresh();
+  revalidatePath("/new-bmcc");
+  return done(leaving.length ? `Moved. It was taken off: ${leaving.map((s) => SLOTS.find((x) => x.slot === s)?.label ?? s).join(", ")}.` : "Moved.");
 }

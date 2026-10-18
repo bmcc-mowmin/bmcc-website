@@ -32,13 +32,13 @@ test.describe("roles", () => {
     await context.close();
   });
 
-  test("treasurer gets the dashboard and Donations only", async ({ browser }) => {
+  test("treasurer gets the dashboard, Donations and the New BMCC project figures", async ({ browser }) => {
     const context = await browser.newContext({ storageState: roleState("treasurer") });
     const page = await context.newPage();
     await page.goto("/admin");
     await expect(page.getByText("Donations this month")).toBeVisible();
     await expect(page.getByText("Upcoming events")).toHaveCount(0);
-    await expect(sidebar(page).getByRole("link")).toHaveText(["Dashboard", "Donations"]);
+    await expect(sidebar(page).getByRole("link")).toHaveText(["Dashboard", "Donations", "New BMCC project"]);
     await context.close();
   });
 });

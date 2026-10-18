@@ -6,10 +6,10 @@ export type AdminRole = (typeof ADMIN_ROLES)[number];
 
 export const ROLE_INFO: Record<AdminRole, { label: string; description: string }> = {
   SUPER_ADMIN: { label: "Super admin", description: "Everything, including admin users, settings and the activity log." },
-  CONTENT_EDITOR: { label: "Content editor", description: "Events, announcements, site text, media, subscribers and messages." },
+  CONTENT_EDITOR: { label: "Content editor", description: "Events, announcements, the New BMCC project page, site text, media, subscribers and messages." },
   PRAYER_MANAGER: { label: "Prayer times manager", description: "Prayer times, Iqamah rules, Jumu'ah and the monthly timetable." },
   MEMBERSHIP_COORDINATOR: { label: "Membership coordinator", description: "Members and households, the directory approval queue, messages." },
-  TREASURER: { label: "Treasurer", description: "Donations and dues (read-only)." },
+  TREASURER: { label: "Treasurer", description: "Donations and dues (read-only); the New BMCC project's figures." },
 };
 
 export type Section =
@@ -20,6 +20,7 @@ export type Section =
   | "directory"
   | "memberships"
   | "donations"
+  | "campaign"
   | "subscribers"
   | "messages"
   | "content"
@@ -37,6 +38,7 @@ const ACCESS: Record<Section, AdminRole[]> = {
   directory: ["MEMBERSHIP_COORDINATOR", "CONTENT_EDITOR"],
   memberships: ["MEMBERSHIP_COORDINATOR"],
   donations: ["TREASURER"],
+  campaign: ["CONTENT_EDITOR", "TREASURER"],
   subscribers: ["CONTENT_EDITOR"],
   messages: ["CONTENT_EDITOR", "MEMBERSHIP_COORDINATOR"],
   content: ["CONTENT_EDITOR"],
@@ -64,6 +66,7 @@ export const NAV: { section: Section; href: string; label: string; built: boolea
   { section: "directory", href: "/admin/directory", label: "Directory", built: true },
   { section: "memberships", href: "/admin/memberships", label: "Memberships", built: true },
   { section: "donations", href: "/admin/donations", label: "Donations", built: true },
+  { section: "campaign", href: "/admin/new-bmcc", label: "New BMCC project", built: true },
   { section: "subscribers", href: "/admin/subscribers", label: "Subscribers", built: true },
   { section: "messages", href: "/admin/messages", label: "Messages", built: true },
   { section: "content", href: "/admin/content", label: "Site text", built: true },

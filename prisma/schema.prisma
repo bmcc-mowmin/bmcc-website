@@ -546,6 +546,11 @@ model MediaAsset {
   contentType  String
   sizeBytes    Int
   alt          Json // L10n: describes the photo for screen readers
+  // Where the photo may appear: "general" (anywhere), "new-bmcc" (the New BMCC project page only)
+  // or "archive" (kept, but shown nowhere — e.g. old photos from earlier fundraisers).
+  collection   String      @default("general")
+  // Order within its collection (the project page's gallery).
+  sortOrder    Int         @default(0)
   uploadedById String?
   createdAt    DateTime    @default(now())
   slots        ImageSlot[]
@@ -557,4 +562,30 @@ model ImageSlot {
   mediaId   String?
   media     MediaAsset? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
   updatedAt DateTime    @updatedAt
+}
+
+// ─── New BMCC (School and Masjid Expansion Project) ─────────────────────────
+
+// The project page's numbers, edited in Admin → New BMCC project. Online gifts to the "new-bmcc"
+// fund are added automatically; offlineRaisedCents covers cheques, pledges paid, and the like.
+model CampaignSettings {
+  id                 Int       @id @default(1)
+  goalCents          Int?
+  offlineRaisedCents Int       @default(0)
+  raisedAsOf         DateTime?
+  showProgress       Boolean   @default(false)
+  updatedAt          DateTime  @updatedAt
+}
+
+// Dated updates on the project page ("Site plan submitted to the city", …).
+model CampaignUpdate {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  title       Json // L10n
+  body        Json // L10n
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, date])
 }

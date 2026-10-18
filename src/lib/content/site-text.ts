@@ -12,6 +12,7 @@ export const GROUPS: { id: string; label: string; keys: RegExp }[] = [
   { id: "prayer", label: "Prayer times", keys: /^(prayer_|jumuah_|timetable_|asr_|next_prayer|tomorrow)/ },
   { id: "events", label: "Events & RSVP", keys: /^(events?_|ev\d_|every_|rsvp_|add_to_calendar)/ },
   { id: "directory", label: "Community Directory", keys: /^(community_|dir_|submit_|f_|listing|call|visit_|get_directions|open_in_maps|no_location|city_label|state_label|zip_label|posted_by)/ },
+  { id: "new-bmcc", label: "New BMCC project", keys: /^nb_/ },
   { id: "donate", label: "Donate", keys: /^(donate_|fund_|benefit\d|received)/ },
   { id: "membership", label: "Membership", keys: /^(membership_|m\d?_|reference_id|receipt_)/ },
   { id: "funeral", label: "Funeral Services Benefit", keys: /^(funeral_|ps_|disclaimer_|checklist_|stat_|not_member_)/ },

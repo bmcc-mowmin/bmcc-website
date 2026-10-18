@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { HoneypotFields } from "@/components/forms/HoneypotFields";
 import type { MessageKey } from "@/lib/i18n/dictionary";
@@ -43,6 +44,11 @@ export function DonateForm({ defaultFrequency, initialFund }: { defaultFrequency
             </label>
           ))}
         </div>
+        {fund === "new-bmcc" && (
+          <Link href="/new-bmcc" className={styles.projectLink}>
+            {t.nb_about_project} →
+          </Link>
+        )}
       </fieldset>
 
       <div className={styles.segmented} role="radiogroup" aria-label={t.donate_choose_fund}>

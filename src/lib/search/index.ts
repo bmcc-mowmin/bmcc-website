@@ -20,6 +20,7 @@ const PAGES: { href: string; title: MessageKey; keys: RegExp }[] = [
   { href: "/community/submit", title: "submit_heading", keys: /^(submit_|involved_listing)/ },
   { href: "/services", title: "nav_services", keys: /^(services_|nav_services_desc)/ },
   { href: "/assistance", title: "nav_assistance", keys: /^(assist_|nav_assistance_desc)/ },
+  { href: "/new-bmcc", title: "nb_title", keys: /^nb_/ },
   { href: "/funeral-services", title: "nav_funeral", keys: /^(funeral_|ps_|disclaimer_|checklist_|stat_|not_member_|nav_funeral)/ },
   { href: "/donate", title: "nav_donate", keys: /^(donate_|fund_|benefit\d|nav_donate_desc|tile_give)/ },
   { href: "/membership", title: "nav_membership", keys: /^(membership_|m[1-5]_(title|sub)|m4_|nav_membership_desc|involved_member)/ },

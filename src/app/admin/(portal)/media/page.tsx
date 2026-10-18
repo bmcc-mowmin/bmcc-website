@@ -3,19 +3,22 @@ import { requireSection } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { localize, type L10n } from "@/lib/i18n/dictionary";
 import { mediaUrl } from "@/lib/events";
-import { DEFAULT_LOGO, SLOTS } from "@/lib/media";
+import { COLLECTIONS, DEFAULT_LOGO, SLOTS } from "@/lib/media";
+import Link from "next/link";
 import { masjidClock } from "@/lib/prayer/schedule";
 import { ActionForm } from "@/components/admin/ActionForm";
 import { L10nField } from "@/components/admin/L10nField";
 import styles from "@/components/admin/admin.module.css";
-import { deleteMedia, setSlot, updateMediaAlt, uploadMedia } from "./actions";
+import { deleteMedia, setCollection, setSlot, updateMediaAlt, uploadMedia } from "./actions";
 
 export const metadata: Metadata = { title: "Media library" };
 
 const size = (bytes: number) => (bytes > 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`);
 
-export default async function MediaAdmin() {
+export default async function MediaAdmin({ searchParams }: PageProps<"/admin/media">) {
   await requireSection("media");
+  const { show } = await searchParams;
+  const filter = COLLECTIONS.find((c) => c.id === show)?.id;
   const [assets, slots, { timeZone }] = await Promise.all([
     db.mediaAsset.findMany({ orderBy: { createdAt: "desc" }, include: { slots: true } }),
     db.imageSlot.findMany(),
@@ -60,7 +63,7 @@ export default async function MediaAdmin() {
                   </label>
                   <select id={`slot-${s.slot}`} name="mediaId" defaultValue={chosen(s.slot)} className={styles.select} style={{ width: "100%" }}>
                     <option value="">{s.slot === "logo" ? "Built-in logo" : "No photo (placeholder)"}</option>
-                    {assets.map((a) => (
+                    {assets.filter((a) => a.collection === s.collection).map((a) => (
                       <option key={a.id} value={a.id}>
                         {a.filename} — {localize(a.alt as L10n, "en").slice(0, 40)}
                       </option>
@@ -85,6 +88,17 @@ export default async function MediaAdmin() {
             <input id="media-file" name="file" type="file" accept="image/jpeg,image/png,image/webp" required />
           </div>
           <L10nField name="alt" label="Describe the photo (read aloud to people who can't see it)" idPrefix="upload" />
+          <fieldset style={{ border: "none", padding: 0, margin: "4px 0 0" }}>
+            <legend className={styles.label}>Where may it be used?</legend>
+            {COLLECTIONS.map((c) => (
+              <label key={c.id} style={{ display: "flex", gap: 8, alignItems: "baseline", fontSize: 14, margin: "4px 0" }}>
+                <input type="radio" name="collection" value={c.id} defaultChecked={c.id === "general"} />
+                <span>
+                  <strong>{c.label}</strong> <span className={styles.muted}>— {c.hint}</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
         </ActionForm>
       </section>
 
@@ -92,9 +106,19 @@ export default async function MediaAdmin() {
         <h2 id="library-title" className={styles.cardTitle}>
           Library ({assets.length})
         </h2>
+        <nav className={styles.tabs} aria-label="Collection">
+          <Link href="/admin/media#library-title" className={`${styles.tab} ${!filter ? styles.tabActive : ""}`} aria-current={!filter ? "page" : undefined}>
+            All
+          </Link>
+          {COLLECTIONS.map((c) => (
+            <Link key={c.id} href={`/admin/media?show=${c.id}#library-title`} className={`${styles.tab} ${filter === c.id ? styles.tabActive : ""}`} aria-current={filter === c.id ? "page" : undefined}>
+              {c.label} ({assets.filter((a) => a.collection === c.id).length})
+            </Link>
+          ))}
+        </nav>
         {assets.length === 0 && <p className={styles.muted}>No photos yet.</p>}
         <div className={styles.mediaGrid}>
-          {assets.map((a) => (
+          {assets.filter((a) => !filter || a.collection === filter).map((a) => (
             <article key={a.id} className={styles.mediaCard} aria-label={a.filename}>
               {/* eslint-disable-next-line @next/next/no-img-element -- admin preview */}
               <img src={mediaUrl(a.storageKey)!} alt={localize(a.alt as L10n, "en")} className={styles.mediaThumb} />
@@ -105,6 +129,19 @@ export default async function MediaAdmin() {
               <span className={styles.hint}>
                 {a.slots.length ? `Used: ${a.slots.map((s) => SLOTS.find((x) => x.slot === s.slot)?.label ?? s.slot).join(", ")}` : "Not used on the site"}
               </span>
+              <ActionForm action={setCollection} submitLabel="Move" variant="secondary">
+                <input type="hidden" name="id" value={a.id} />
+                <label className="visually-hidden" htmlFor={`col-${a.id}`}>
+                  Collection for {a.filename}
+                </label>
+                <select id={`col-${a.id}`} name="collection" defaultValue={a.collection} className={styles.select} style={{ width: "100%" }}>
+                  {COLLECTIONS.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </ActionForm>
               <details>
                 <summary className={styles.label} style={{ cursor: "pointer" }}>
                   Description
