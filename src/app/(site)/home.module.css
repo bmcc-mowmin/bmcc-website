@@ -45,7 +45,7 @@
   font-weight: 700;
   font-size: 15.5px;
   padding: 14px 20px;
-  border-radius: 9px;
+  border-radius: var(--r-btn, 9px);
   white-space: nowrap;
 }
 .heroBtnPrimary {
@@ -146,7 +146,7 @@
   flex-direction: column;
   gap: 8px;
   padding: 22px;
-  border-radius: 12px;
+  border-radius: var(--r-md, 12px);
   border: 1px solid var(--border);
 }
 .tile:hover {
@@ -248,7 +248,7 @@
 }
 .loginCard {
   background: var(--white);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: 30px;
   color: var(--text);
 }
@@ -265,7 +265,7 @@
 }
 .loginInput {
   padding: 12px 14px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: 1px solid var(--input-border);
   font-size: 14.5px;
 }
@@ -276,7 +276,7 @@
   font-weight: 700;
   font-size: 15px;
   padding: 12.5px 0;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: none;
   cursor: pointer;
   margin-bottom: 14px;
@@ -309,7 +309,7 @@
 }
 .involvedCard {
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--r-md, 12px);
   padding: 22px;
   display: flex;
   flex-direction: column;
@@ -334,7 +334,7 @@
 .loginError {
   margin: 0 0 12px;
   padding: 9px 12px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   background: #fdecec;
   color: #a4262c;
   font-size: 14px;
@@ -349,5 +349,5 @@
   width: 100%;
   height: clamp(220px, 38vw, 520px);
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
 }

@@ -2,7 +2,7 @@
 .filters {
   background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: 20px 24px;
   margin-bottom: 24px;
   display: flex;
@@ -25,13 +25,13 @@
   width: 100%;
   padding: 11px 14px;
   padding-inline-start: 36px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: 1px solid var(--input-border);
   font-size: 14.5px;
 }
 .select {
   padding: 11px 14px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: 1px solid var(--input-border);
   font-size: 14.5px;
   color: var(--text);
@@ -56,7 +56,7 @@
 /* ── Table (wider than 700px) ── */
 .table {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   overflow: hidden;
   background: var(--white);
 }
@@ -121,7 +121,7 @@
   font-weight: 700;
   font-size: 13px;
   padding: 9px 16px;
-  border-radius: 7px;
+  border-radius: var(--r-sm, 7px);
   border: none;
   cursor: pointer;
 }
@@ -144,7 +144,7 @@
 .card {
   background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -206,7 +206,7 @@
 .cards .empty {
   background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: 40px 20px;
 }
 @media (max-width: 700px) {
@@ -230,7 +230,7 @@
 .pageButton {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: 1px solid #dbe1e8;
   background: var(--white);
   color: var(--ink);
@@ -265,7 +265,7 @@
 .dialogPanel {
   position: relative;
   background: var(--white);
-  border-radius: 16px;
+  border-radius: var(--r-card, 16px);
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
@@ -372,7 +372,7 @@
   font-weight: 700;
   font-size: 14.5px;
   padding: 12px 22px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
 }
 .btnPrimary:hover {
   background: var(--primary-hover);
@@ -384,7 +384,7 @@
   font-weight: 700;
   font-size: 14.5px;
   padding: 10.5px 22px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
 }
 .btnOutline:hover {
   background: #f2f0e8;
@@ -396,7 +396,7 @@
   font-weight: 700;
   font-size: 14.5px;
   padding: 10.5px 22px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
 }
 
 /* ── Page header & disclaimer ── */
@@ -415,7 +415,7 @@
   white-space: nowrap;
   background: var(--primary);
   padding: 12px 22px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
 }
 .submitButton:hover {
   background: var(--primary-hover);
@@ -424,7 +424,7 @@
 .disclaimer {
   background: var(--sky-100);
   border: 1px solid var(--sky-200);
-  border-radius: 10px;
+  border-radius: var(--r-md, 10px);
   padding: 14px 18px;
   margin-bottom: 20px;
   font-size: 13px;

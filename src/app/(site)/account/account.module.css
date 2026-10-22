@@ -23,7 +23,7 @@
 .signOut {
   border: 1px solid var(--input-border);
   background: var(--white);
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   padding: 9px 16px;
   font: inherit;
   font-size: 14px;
@@ -63,7 +63,7 @@
 }
 .card {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: clamp(18px, 3vw, 26px);
   background: var(--white);
 }
@@ -133,7 +133,7 @@
 .notice {
   margin: 0 0 14px;
   padding: 12px 14px;
-  border-radius: 10px;
+  border-radius: var(--r-md, 10px);
   background: #fff6e0;
   color: #5c3d00;
   font-size: 14.5px;
@@ -209,7 +209,7 @@
 .input {
   width: 100%;
   padding: 11px 13px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: 1px solid var(--input-border);
   font: inherit;
   font-size: 14.5px;
@@ -247,7 +247,7 @@ textarea.input {
 }
 .banner {
   padding: 12px 14px;
-  border-radius: 10px;
+  border-radius: var(--r-md, 10px);
   background: var(--success-bg);
 }
 .statements {
@@ -290,7 +290,7 @@ textarea.input {
 }
 .doc {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: clamp(20px, 4vw, 36px);
   background: var(--white);
   text-align: left;

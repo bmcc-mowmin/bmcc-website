@@ -1,0 +1,141 @@
+/* ── Concept themes (theme preview, THEME_PREVIEW=1) ─────────────────────────
+   Each theme re-points the design tokens, fonts and corner rounding; the pages themselves don't
+   change. "current" sets nothing, so the site looks exactly as it does without the preview. */
+
+[data-theme] {
+  min-height: 100vh;
+  background: var(--page);
+  color: var(--text);
+  /* body reads --font from :root; re-read it here so a theme's font applies. */
+  font-family: var(--font);
+}
+[data-theme]:not([data-theme="current"]) {
+  /* Small text on the dark bars: the current site's greys are tuned for its navy. */
+  --footer-fine: var(--mist-on-dark);
+  --footer-rule: rgba(255, 255, 255, 0.14);
+  --dim-on-dark: 0.8;
+}
+[data-theme]:not([data-theme="current"]) :is(h1, h2, h3, .page-h1) {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking, normal);
+}
+
+/* A · Light and classical (after Cambridge Central Mosque): cream, warm ink, antique gold, serif. */
+[data-theme="cambridge"] {
+  --navy: #2d2a24;
+  --ink: #2a2620;
+  --primary: #7a5c22;
+  --primary-hover: #5a4316;
+  --primary-text: #6f531d;
+  --eyebrow: #6f531d;
+  --sky-100: #f5efe2;
+  --sky-200: #eadfc8;
+  --sky-on-dark: #e3cf9f;
+  --body: #4f483d;
+  --muted: #5a5347;
+  --subtle: #625a4d;
+  --mist-on-dark: #e3d4b3;
+  --border: #eadfc8;
+  --page: #fcfaf5;
+  --white: #ffffff;
+  --text: #2d2a24;
+  --input-border: #d9c9a6;
+  --menu-border: #eadfc8;
+  --font: var(--font-crimson), Georgia, serif;
+  --font-heading: var(--font-cormorant), Georgia, serif;
+  --heading-weight: 600;
+  --r-card: 0px;
+  --r-md: 2px;
+  --r-sm: 2px;
+  --r-btn: 999px;
+  --shadow-card: none;
+  /* The serif body face runs small; match Inter's apparent size. */
+  font-size-adjust: 0.5;
+}
+/* Form controls reset font-size-adjust; let them follow the page. */
+[data-theme="cambridge"] :is(button, input, select, textarea) {
+  font-size-adjust: inherit;
+}
+[data-theme="cambridge"] :is(.btn, button) {
+  letter-spacing: 0.04em;
+}
+
+/* B · Evening and immersive (after Sheikh Zayed Grand Mosque): night blue, sand, gold, arches. */
+[data-theme="zayed"] {
+  --navy: #1c2238;
+  --ink: #12182a;
+  --primary: #85662a;
+  --primary-hover: #6b521f;
+  --primary-text: #6e5320;
+  --eyebrow: #6e5320;
+  --sky-100: #ece2cf;
+  --sky-200: #ddd3c1;
+  --sky-on-dark: #e3c27e;
+  --body: #4c463b;
+  --muted: #565044;
+  --subtle: #5e574a;
+  --mist-on-dark: #ddd3c1;
+  --border: #ddd3c1;
+  --page: #f3ebdd;
+  --white: #fbf7ef;
+  --text: #23201b;
+  --input-border: #c9b78f;
+  --menu-border: #ddd3c1;
+  --font: var(--font-lato), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-marcellus), Georgia, serif;
+  --heading-weight: 400;
+  --r-card: 4px;
+  --r-md: 3px;
+  --r-sm: 2px;
+  --r-btn: 2px;
+  --shadow-card: 0 16px 40px rgba(18, 24, 42, 0.1);
+}
+/* Arched tops on the large photos, like the Zayed concept's prayer panel. */
+[data-theme="zayed"] main img:is([class*="homePhoto"], [class*="whyImg"]) {
+  border-radius: 50% 50% 4px 4px / 180px 180px 4px 4px;
+}
+
+/* C · Warm and people-first (after Islamic Center of Irvine): cream, maroon, soft rounded cards. */
+[data-theme="irvine"] {
+  --navy: #5c1825;
+  --ink: #2b1d1f;
+  --primary: #7b2333;
+  --primary-hover: #5c1825;
+  --primary-text: #7b2333;
+  --eyebrow: #7b2333;
+  --sky-100: #f4ebe0;
+  --sky-200: #efdcd6;
+  --sky-on-dark: #f1dcd8;
+  --body: #5e4a4d;
+  --muted: #65525a;
+  --subtle: #67545a;
+  --mist-on-dark: #efe2d2;
+  --border: #efe2d2;
+  --page: #fbf6ee;
+  --white: #ffffff;
+  --text: #2b1d1f;
+  --input-border: #e2cfbd;
+  --menu-border: #efe2d2;
+  --font: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --heading-weight: 800;
+  --r-card: 22px;
+  --r-md: 16px;
+  --r-sm: 10px;
+  --r-btn: 999px;
+  --shadow-card: 0 14px 34px rgba(91, 24, 37, 0.08);
+}
+[data-theme="irvine"] main img:is([class*="homePhoto"], [class*="heroImg"], [class*="whyImg"]) {
+  border-radius: 22px;
+}
+
+body:has([data-theme="cambridge"]) {
+  background: #fcfaf5;
+}
+body:has([data-theme="zayed"]) {
+  background: #f3ebdd;
+}
+body:has([data-theme="irvine"]) {
+  background: #fbf6ee;
+}

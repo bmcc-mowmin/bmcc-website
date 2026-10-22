@@ -88,7 +88,7 @@
 }
 .input {
   padding: 12px 14px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: 1px solid var(--input-border);
   font-size: 14.5px;
   background: var(--white);
@@ -96,7 +96,7 @@
 }
 .inputSmall {
   padding: 10px 12px;
-  border-radius: 7px;
+  border-radius: var(--r-sm, 7px);
   border: 1px solid var(--input-border);
   font-size: 14px;
   background: var(--white);
@@ -114,14 +114,14 @@
 .formError {
   margin: 0 0 22px;
   padding: 11px 14px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   background: #fdecec;
   color: #a4262c;
   font-size: 14.5px;
 }
 .dependent {
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--r-md, 12px);
   padding: 18px;
   margin: 0 0 12px;
   position: relative;
@@ -146,14 +146,14 @@
   font-weight: 700;
   font-size: 14px;
   padding: 12px;
-  border-radius: 10px;
+  border-radius: var(--r-md, 10px);
   width: 100%;
   cursor: pointer;
 }
 .plan {
   text-align: start;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: var(--r-md, 12px);
   padding: 18px;
   border: 1.5px solid #dbe1e8;
   background: var(--white);
@@ -191,7 +191,7 @@
 }
 .benefit {
   background: var(--sky-100);
-  border-radius: 12px;
+  border-radius: var(--r-md, 12px);
   padding: 20px 22px;
   margin-bottom: 28px;
 }
@@ -234,7 +234,7 @@
   font-weight: 700;
   font-size: 16px;
   padding: 15px 0;
-  border-radius: 10px;
+  border-radius: var(--r-md, 10px);
   border: none;
   cursor: pointer;
 }

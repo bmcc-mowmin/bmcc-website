@@ -16,7 +16,7 @@
   position: relative;
   flex: 0 0 calc((100% - 40px) / 3);
   background: var(--navy);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -125,7 +125,7 @@
   z-index: 3;
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: var(--r-md, 10px);
   border: 1px solid var(--border);
   background: var(--white);
   color: var(--navy);

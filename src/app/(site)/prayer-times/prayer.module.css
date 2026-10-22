@@ -15,7 +15,7 @@
 
 .timetable {
   background: var(--navy);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: 28px;
   color: #eef2f8;
 }
@@ -45,7 +45,7 @@
   font-weight: 700;
   font-size: 14.5px;
   padding: 12px 20px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
 }
 .pdfButton:hover {
   background: var(--primary-hover);
@@ -75,7 +75,7 @@
 }
 .jumuahCard {
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--r-md, 12px);
   padding: 20px;
 }
 .jumuahLabel {

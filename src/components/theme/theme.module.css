@@ -1,0 +1,28 @@
+.picker {
+  position: fixed;
+  inset-inline-end: 12px;
+  bottom: 12px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #101d33;
+  color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(11, 21, 36, 0.35);
+  font: 600 13px/1.2 system-ui, sans-serif;
+}
+.picker select {
+  font: 500 13px system-ui, sans-serif;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid #c5d2e4;
+  background: #ffffff;
+  color: #101828;
+}
+@media print {
+  .picker {
+    display: none;
+  }
+}

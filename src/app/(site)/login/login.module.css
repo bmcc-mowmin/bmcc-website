@@ -7,7 +7,7 @@
   max-width: 420px;
   background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: 30px;
   box-shadow: var(--shadow-card);
   display: flex;
@@ -27,7 +27,7 @@
 .error {
   margin: 0 0 14px 0;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   background: #fdecec;
   color: #a4262c;
   font-size: 14px;
@@ -40,7 +40,7 @@
 }
 .input {
   padding: 12px 14px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: 1px solid var(--input-border);
   font-size: 14.5px;
   margin-bottom: 14px;
@@ -52,7 +52,7 @@
   font-weight: 700;
   font-size: 15px;
   padding: 12.5px 0;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: none;
   cursor: pointer;
 }
@@ -90,7 +90,7 @@
 .notFound {
   margin: 0 0 14px 0;
   padding: 12px 14px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   background: #fff6e0;
   color: #5c3d00;
   font-size: 14px;

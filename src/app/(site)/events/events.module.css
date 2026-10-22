@@ -13,7 +13,7 @@
 }
 .card {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: 24px;
   background: var(--white);
   display: flex;
@@ -32,7 +32,7 @@
   font-weight: 700;
   font-size: 12.5px;
   padding: 5px 10px;
-  border-radius: 6px;
+  border-radius: var(--r-sm, 6px);
 }
 .when {
   font-size: 13px;
@@ -82,7 +82,7 @@
   color: var(--navy);
   border: 1px solid #dbe1e8;
   padding: 6px 10px;
-  border-radius: 6px;
+  border-radius: var(--r-sm, 6px);
   white-space: nowrap;
 }
 .calButton:hover {
@@ -114,7 +114,7 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   background: #1a2c4a;
   display: block;
   margin-bottom: 22px;
@@ -129,7 +129,7 @@
 .panel {
   background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: 24px;
   box-shadow: var(--shadow-card);
 }
@@ -183,7 +183,7 @@
 }
 .rsvpSelect {
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: 1px solid var(--input-border);
   background: var(--white);
   font: inherit;
@@ -214,7 +214,7 @@
   align-items: baseline;
   padding: 10px 12px;
   margin-bottom: 12px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   background: var(--success-bg);
 }
 .linkButton {

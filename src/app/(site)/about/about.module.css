@@ -121,13 +121,13 @@
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 12px;
+  border-radius: var(--r-md, 12px);
   border: 1px solid #dbe1e8;
 }
 
 .formCard {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-card, 14px);
   padding: 28px;
 }
 .formTitle {
@@ -143,7 +143,7 @@
 }
 .input {
   padding: 12px 14px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   border: 1px solid var(--input-border);
   font-size: 14.5px;
 }
@@ -184,7 +184,7 @@ select.input {
 .formError {
   margin: 0;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   background: #fef3f2;
   color: #b42318;
   font-size: 14px;

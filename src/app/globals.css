@@ -151,7 +151,7 @@ img {
   font-weight: 700;
   font-size: 15px;
   padding: 13px 26px;
-  border-radius: 8px;
+  border-radius: var(--r-btn, 8px);
   border: none;
   cursor: pointer;
   text-align: center;

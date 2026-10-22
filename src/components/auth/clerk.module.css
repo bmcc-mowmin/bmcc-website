@@ -8,7 +8,7 @@
 .notice {
   max-width: 420px;
   padding: 16px 18px;
-  border-radius: 12px;
+  border-radius: var(--r-md, 12px);
   background: #fff6e0;
   color: #5c3d00;
   font-size: 15px;
@@ -20,7 +20,7 @@
 .signOut {
   border: 1px solid #5c3d00;
   background: transparent;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   padding: 8px 14px;
   font: inherit;
   font-weight: 700;
