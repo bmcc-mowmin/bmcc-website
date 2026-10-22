@@ -57,6 +57,11 @@
 [data-theme="cambridge"] :is(button, input, select, textarea) {
   font-size-adjust: inherit;
 }
+/* The serif runs wide: keep the main menu on one line at desktop widths. */
+[data-theme="cambridge"] header nav,
+[data-theme="cambridge"] header nav button {
+  font-size-adjust: 0.43;
+}
 [data-theme="cambridge"] :is(.btn, button) {
   letter-spacing: 0.04em;
 }
