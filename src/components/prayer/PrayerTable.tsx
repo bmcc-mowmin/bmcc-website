@@ -11,7 +11,6 @@ export function PrayerTable({
   t,
   lang,
   note,
-  jumuahRows = "each",
   shadow = true,
 }: {
   day: DaySchedule;
@@ -19,15 +18,11 @@ export function PrayerTable({
   t: Dictionary;
   lang: Lang;
   note?: string;
-  // "each": one row per Jumu'ah service (Home). "first": a single "Jumu'ah" row (Prayer Times page).
-  jumuahRows?: "each" | "first";
   shadow?: boolean;
 }) {
   const locale = intlLocale(lang);
-  const jumuahList =
-    jumuahRows === "first"
-      ? jumuah.slice(0, 1).map((j) => ({ name: t.prayer_jumuah, adhan: j.khutbah, iqamah: j.iqamah }))
-      : jumuah.map((j) => ({ name: j.label, adhan: j.khutbah, iqamah: j.iqamah }));
+  // One row per Jumu'ah service, on Home and the Prayer Times page alike.
+  const jumuahList = jumuah.map((j) => ({ name: j.label, adhan: j.khutbah, iqamah: j.iqamah }));
   const rows = [
     ...day.prayers.map((p) => ({ name: t[`prayer_${p.key}` as MessageKey], adhan: p.adhan, iqamah: p.iqamah })),
     ...jumuahList,

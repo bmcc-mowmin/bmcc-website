@@ -32,7 +32,7 @@ export default async function PrayerTimesPage() {
           <p className="lead">{t.prayer_page_paragraph}</p>
         </div>
         <div className={styles.grid}>
-          <PrayerTable day={today} jumuah={jumuah} t={t} lang={lang} note={note} jumuahRows="first" shadow={false} />
+          <PrayerTable day={today} jumuah={jumuah} t={t} lang={lang} note={note} shadow={false} />
           <div className={styles.timetable}>
             <h2 className={styles.timetableH}>{t.timetable_heading}</h2>
             <p className={styles.timetableP}>{t.timetable_paragraph}</p>
