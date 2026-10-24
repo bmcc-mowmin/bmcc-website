@@ -18,23 +18,17 @@ import { getCurrentUser } from "@/lib/auth";
 import { MemberLoginCard } from "./MemberLoginCard";
 import { getTheme } from "@/lib/theme";
 import { getThemedHomeData } from "./_themes/data";
-import { HomeCambridge } from "./_themes/HomeCambridge";
-import { HomeZayed } from "./_themes/HomeZayed";
-import { HomeIrvine } from "./_themes/HomeIrvine";
+import { HomeWarm } from "./_themes/HomeWarm";
 import styles from "./home.module.css";
 
-const THEMED_HOME = { cambridge: HomeCambridge, zayed: HomeZayed, irvine: HomeIrvine };
-
 export default async function HomePage() {
-  // Theme preview: the concept themes have their own Home layouts (other pages are restyled only).
-  const theme = await getTheme();
-  if (theme !== "current") {
+  // The backup "warm" theme has its own Home layout (other pages are restyled only).
+  if ((await getTheme()) === "warm") {
     const [d, settings] = await Promise.all([getThemedHomeData(), getSettings()]);
-    const Themed = THEMED_HOME[theme];
     return (
       <>
         {!settings.showResubBarSitewide && <ResubBar />}
-        <Themed d={d} />
+        <HomeWarm d={d} />
       </>
     );
   }

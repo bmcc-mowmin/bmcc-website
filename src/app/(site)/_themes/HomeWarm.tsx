@@ -2,11 +2,11 @@ import Link from "next/link";
 import { routes } from "@/lib/routes";
 import type { ThemedHomeData } from "./data";
 import { Pattern, Photo } from "./parts";
-import s from "./irvine.module.css";
+import s from "./warm.module.css";
 
-// C · Warm and people-first (after Islamic Center of Irvine): name and "Today" card side by side,
+// Backup theme "Warm and people-first": name and "Today" card side by side,
 // a row of photo tiles, upcoming and weekly events in soft cards, and a maroon giving banner.
-export function HomeIrvine({ d }: { d: ThemedHomeData }) {
+export function HomeWarm({ d }: { d: ThemedHomeData }) {
   const { t } = d;
   const tileLabels = [
     { label: t.evc_heading, href: routes.events },

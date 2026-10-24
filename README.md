@@ -253,6 +253,29 @@ see [`.env.example`](.env.example) for the full, commented list. Nothing secret 
 Key switches: `APP_ENV`, `AUTH_PROVIDER` (dev → clerk), `PAYMENT_PROVIDER` (mock → stripe),
 `MAIL_TRANSPORT` (smtp/Mailpit → provider), `STORAGE_DRIVER` (local → s3).
 
+## Site theme
+
+The public site has two themes. Which one is live is **one line** in
+[`src/site-theme.ts`](src/site-theme.ts):
+
+```ts
+export const SITE_THEME: "current" | "warm" = "current";
+```
+
+- `"current"` — the default theme, the one we go live with.
+- `"warm"` — the backup theme "Warm and people-first": cream and maroon, rounded cards, Nunito fonts
+  and its own Home layout (today's prayers card, photo tiles, upcoming and weekly events, New BMCC
+  banner). Other pages keep their layout and take the theme's colours, fonts and corners.
+
+Change the line, commit and deploy. The admin portal is not themed.
+
+To compare the two without changing the live theme, set `THEME_PREVIEW=1` in `.env` and restart:
+a **Theme preview** picker appears at the bottom right of the site (remembered per browser). Leave
+`THEME_PREVIEW` unset in production.
+
+The theme's colours live in [`src/app/(site)/themes.css`](src/app/(site)/themes.css) (it re-points the
+design tokens from `globals.css`); its Home layout is in `src/app/(site)/_themes/`.
+
 ## Languages
 
 UI text lives in `messages/<lang>.json`. Content stored in the database (announcements, events,

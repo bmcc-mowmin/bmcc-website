@@ -6,22 +6,20 @@ import { getTodayAndTomorrow, getUpcomingJumuah, masjidClock } from "@/lib/praye
 import { formatClock, formatDayLabel, masjidNow, nextPrayer } from "@/lib/prayer/next-prayer";
 import { getUpcomingEvents, formatEventWhen } from "@/lib/events";
 import { collectionPhotos, slotImage } from "@/lib/media";
-import { getOrg } from "@/lib/org";
 
-// Everything the concept-theme Home layouts show, from the same sources as the current Home page.
+// Everything the backup theme's Home layout shows, from the same sources as the current Home page.
 // Land photos are never used here: they belong only on the New BMCC project page.
 
 export async function getThemedHomeData() {
   const { t, lang } = await getI18n();
   const locale = intlLocale(lang);
-  const [{ today, tomorrow }, jumuah, events, { timeZone }, homePhoto, general, org] = await Promise.all([
+  const [{ today, tomorrow }, jumuah, events, { timeZone }, homePhoto, general] = await Promise.all([
     getTodayAndTomorrow(lang),
     getUpcomingJumuah(lang),
     getUpcomingEvents(lang, { limit: 12 }),
     masjidClock(),
     slotImage("home_photo", lang),
     collectionPhotos("general", lang),
-    getOrg(),
   ]);
 
   const now = masjidNow(timeZone);
@@ -81,7 +79,6 @@ export async function getThemedHomeData() {
     photos,
     oneOff: shaped.filter((e) => !e.weekly),
     weekly: shaped.filter((e) => e.weekly),
-    org,
   };
 }
 

@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-// Theme preview (THEME_PREVIEW=1): the picker switches the whole public site, and every concept
-// theme still meets WCAG AA (colour contrast in particular) on the main public pages.
+// Theme preview (THEME_PREVIEW=1): the picker switches the whole public site, and the backup
+// theme meets WCAG AA (colour contrast in particular) on the main public pages.
 const PAGES = ["/", "/about", "/prayer-times", "/donate", "/membership", "/events", "/new-bmcc"];
 
 test("the picker switches the theme and remembers it", async ({ browser }) => {
@@ -12,14 +12,14 @@ test("the picker switches the theme and remembers it", async ({ browser }) => {
   const picker = page.getByLabel("Theme preview");
   test.skip((await picker.count()) === 0, "THEME_PREVIEW is off");
   await expect(page.locator("[data-theme]")).toHaveAttribute("data-theme", "current");
-  await picker.selectOption("irvine");
-  await expect(page.locator("[data-theme]")).toHaveAttribute("data-theme", "irvine");
+  await picker.selectOption("warm");
+  await expect(page.locator("[data-theme]")).toHaveAttribute("data-theme", "warm");
   await page.goto("/new-bmcc");
-  await expect(page.locator("[data-theme]")).toHaveAttribute("data-theme", "irvine");
+  await expect(page.locator("[data-theme]")).toHaveAttribute("data-theme", "warm");
   await context.close();
 });
 
-for (const theme of ["cambridge", "zayed", "irvine"]) {
+for (const theme of ["warm"]) {
   test(`accessibility in theme ${theme}`, async ({ browser, baseURL }) => {
     test.setTimeout(120_000);
     const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
@@ -39,7 +39,7 @@ for (const theme of ["cambridge", "zayed", "irvine"]) {
   });
 }
 
-for (const theme of ["cambridge", "zayed", "irvine"]) {
+for (const theme of ["warm"]) {
   test(`theme ${theme} has its own Home layout with today's prayers, fits a phone, and keeps land photos off Home`, async ({ browser, baseURL }) => {
     const context = await browser.newContext({ storageState: { cookies: [], origins: [] }, viewport: { width: 1280, height: 900 } });
     await context.addCookies([{ name: "bmcc_theme", value: theme, domain: new URL(baseURL!).hostname, path: "/" }]);

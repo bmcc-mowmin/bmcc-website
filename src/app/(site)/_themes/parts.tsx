@@ -29,13 +29,3 @@ export function Pattern({ className }: { className?: string }) {
     </div>
   );
 }
-
-export function Ornament({ className }: { className?: string }) {
-  return (
-    <svg className={className} aria-hidden width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" strokeWidth="1.2">
-      <rect x="10" y="10" width="24" height="24" />
-      <rect x="10" y="10" width="24" height="24" transform="rotate(45 22 22)" />
-      <circle cx="22" cy="22" r="4" />
-    </svg>
-  );
-}
