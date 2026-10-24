@@ -23,7 +23,10 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { lang, t, dir } = await getI18n();
   return (
-    <html lang={htmlLang(lang)} dir={dir} className={inter.variable}>
+    // suppressHydrationWarning: the re-subscribe bar's inline script marks <html> with
+    // data-resub-dismissed before React loads (so a closed bar never flashes). Applies to this
+    // element's attributes only.
+    <html lang={htmlLang(lang)} dir={dir} className={inter.variable} suppressHydrationWarning>
       <body>
         <AuthProvider lang={lang}>
           <I18nProvider value={{ lang, t, dir }}>{children}</I18nProvider>
