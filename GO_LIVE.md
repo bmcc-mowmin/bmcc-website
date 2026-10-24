@@ -90,7 +90,16 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 - [ ] Food pantry hours ("Saturday 10 AM – 12 PM" is a placeholder in announcements).
 - [ ] Photos for About Us (Admin → Media library) and the event cards (each event).
 - [ ] Logo as a high-resolution PNG (current one is 216×102 px) — upload it in Admin → Media library.
-- [ ] Contact details, EIN and office inbox in Admin → Settings.
+- [ ] Contact details, EIN and office inbox in Admin → Settings. The current brmcc.org lists the EIN
+      as 27-2886722 — confirm with the treasurer before it appears on receipts.
+- [ ] **Prayer times:** the current brmcc.org shows different times from this site (e.g. Fajr about
+      15 minutes earlier; fixed Iqamah times such as Dhuhr 1:30). Decide which schedule is correct,
+      or switch to the Masjidi feed (above).
+- [ ] **Membership policy:** the current brmcc.org's policy differs from the Membership page here
+      (24-month eligibility, a 30% education discount, burial-service coverage, a family definition
+      without grandparents). Confirm the policy and update the page text in Admin → Site text.
+- [ ] Land photos for the New BMCC project page, and the campaign goal and amount raised so far
+      (Admin → New BMCC project) if the progress bar should show.
 - [ ] Vetted human translations for Dari, Urdu, Pashto and Spanish (all current non-English text
       is machine-generated). Arabic is out of scope for launch.
 - [ ] Decide whether the "Stay Connected" form stays after the re-subscribe campaign.

@@ -7,6 +7,14 @@ Public website, member portal and admin for the **Brentwood Muslim Community Cen
 **Stack:** Next.js 16 (App Router, TypeScript, server-rendered) · Postgres 17 + Prisma 7 ·
 Docker Compose (Postgres, Mailpit) · 5 languages (English, Dari, Urdu, Pashto, Spanish; Dari, Urdu and Pashto are RTL).
 
+| Document | What it's for |
+|---|---|
+| **README.md** (this file) | Running it locally, how each part works, and [deploying to a server](#deployment) |
+| [GO_LIVE.md](GO_LIVE.md) | Checklist of what BMCC must decide or supply before launch |
+| [PHASE_2.md](PHASE_2.md) | Features planned after launch (phone verification, mobile app, QR-code giving) |
+| [docs/design-handoff/](docs/design-handoff/README.md) | The original design spec and prototypes |
+| [CLAUDE.md](CLAUDE.md) / [AGENTS.md](AGENTS.md) | Notes for AI coding assistants working on this repo |
+
 ## Run it locally
 
 Requirements: **Node 24** (`.nvmrc`) and Docker (Docker Desktop, Colima or OrbStack).
@@ -329,6 +337,7 @@ AUTH_PROVIDER=clerk            # plus the Clerk keys (pk_live_/sk_live_)
 PAYMENT_PROVIDER=stripe        # plus the Stripe keys and price ids
 MAIL_TRANSPORT=resend          # or postmark / smtp, plus its key or SMTP_*
 STORAGE_DRIVER=s3              # plus S3_*
+# THEME_PREVIEW               # leave unset: the live theme is set in src/site-theme.ts
 ```
 
 The app refuses to start in production with the local test sign-in, mock payments or Clerk
@@ -358,11 +367,16 @@ Contact details, EIN, the office inbox and the site switches are then set in **A
    psql "$PRODUCTION_DATABASE_URL" -f listings.sql
    ```
    (Delete `listings.sql` afterwards — it contains contact details.)
-3. **Content** — Admin → Settings, Media library (logo, About Us photos), Prayer times (method,
-   coordinates, Iqamah rules, Jumu'ah), Events, Announcements.
-4. **Smoke test** — a real low-value donation and a membership sign-up end to end, then refund them;
+3. **Photos** — photos are not in the repository (`uploads/` is ignored), so upload them again in
+   Admin → Media library on the live site: the logo, the current General photos (Eid, Jumu'ah) and
+   the land photos into the **New BMCC project** collection. Old photos of the previous building go
+   into **Archive** (never shown) or are left out. Then pick the Home, About Us and New BMCC photos
+   in the "Where photos appear" section, and add photos to events.
+4. **Content** — Admin → Settings, Prayer times (method, coordinates, Iqamah rules, Jumu'ah),
+   Events, Announcements, and Admin → New BMCC project (goal, amount raised offline, updates).
+5. **Smoke test** — a real low-value donation and a membership sign-up end to end, then refund them;
    the contact form, a mailing-list sign-up and its confirmation email; sign-in with email and Google.
-5. **Monitoring** — an uptime check on `/api/health`, and alerts from the database and email provider.
+6. **Monitoring** — an uptime check on `/api/health`, and alerts from the database and email provider.
 
 ### Updating the live site
 
