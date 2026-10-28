@@ -1,6 +1,6 @@
 # Runs on every push and pull request: checks, unit tests, production build, the full browser
 # test suite against throwaway Postgres + Mailpit, and the Docker image build.
-# Nothing secret is needed: `npm run setup` creates a local .env from .env.example.
+# Nothing secret is needed: `npm run setup` creates a local .env with local defaults.
 name: CI
 
 on:
