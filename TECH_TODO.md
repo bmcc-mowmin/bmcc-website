@@ -15,14 +15,13 @@ sign-in, mock payments and Clerk development keys. Type check, lint and the 35 u
 
 Fix before launch, most urgent first:
 
-- [ ] **P1 — Upgrade Next.js 16.3.6 → 16.4.3 or later.** `npm audit` reports critical advisories
-      for this version, including unauthenticated remote code execution in the image optimization
-      API ([GHSA-2464-fhr4-w9xw](https://github.com/advisories/GHSA-2464-fhr4-w9xw)), plus a Server
-      Actions denial of service, SSRF in image optimization and cache-poisoning issues. The staging
-      site on Render is public, so do this now. Also bump `eslint-config-next` to the same version.
-- [ ] **P1 — Other vulnerable dependencies:** `zod` < 4.6.6 (memory exhaustion, high),
-      `nodemailer` ≤ 10.1.3 (address parsing, moderate), and transitive `source-map-js`, `fast-uri`.
-      `npm audit fix`, then re-run tests.
+- [x] **P1 — Upgrade Next.js 16.3.6 → 16.4.3.** Done Oct 27: `next` and `eslint-config-next`
+      16.4.3, which fixes the critical advisories (unauthenticated remote code execution in the image
+      optimization API, [GHSA-2464-fhr4-w9xw](https://github.com/advisories/GHSA-2464-fhr4-w9xw), and
+      others). Type check, lint, 35 unit tests, production build and 30 of 31 browser tests (excluding
+      those that need Mailpit) pass; the remaining failure is a test bug, below.
+- [x] **P1 — Other vulnerable dependencies.** Done Oct 27: `zod` ^4.6.7, `nodemailer` ^10.2.1 and
+      the transitive `source-map-js` and `fast-uri` updated; `npm audit` reports 0 vulnerabilities.
 - [ ] **P1 — Rotate the Render database password.** The connection URL was shared in a chat; the
       external address accepts connections from anywhere. After rotating, update `DATABASE_URL` in
       Render and delete `~/.render_db_url` on the Pi. Consider restricting the database's external
@@ -49,6 +48,19 @@ Fix before launch, most urgent first:
 - [ ] **P3 — Directory CSV export isn't written to the activity log** (the subscriber export is).
 - [ ] **P3 — `RateLimitBucket` rows are never cleaned up**; add a periodic delete of expired rows
       (or delete on read) so the table doesn't grow forever.
+
+Test suite:
+
+- [ ] **Browser test bug:** `e2e/new-bmcc.spec.ts` "collections: a land photo shows only on the
+      project page" fails on a freshly seeded database. With no hero photo set, the New BMCC page
+      uses the first land photo as the hero and leaves it out of "The land", so the test's only
+      photo lands in the hero. Make the test set a hero photo (or upload two land photos) first.
+- [ ] The browser tests find some elements by CSS-module class names (`[class*=EventsCarousel]`),
+      which only exist in `npm run dev`. Use roles or `data-testid` so they also run against a
+      production build.
+- [ ] The tests that need Mailpit (sign-in links, contact, directory, mailing list, payments,
+      member, portal) weren't re-run after the upgrade; run the full suite once with Mailpit
+      (`npm run db:up`, then `npm run test:e2e`).
 
 ## Placeholders and stubs in the code
 
