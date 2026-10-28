@@ -315,7 +315,9 @@ every start) and Postgres 17 (`bmcc-db`, private network only). Render asks once
 `sync: false` (Clerk, SMTP, R2 storage, Stripe…); change them later under the service's **Environment**
 tab. Values whose names start with `NEXT_PUBLIC_` (and `SERVER_ACTIONS_ALLOWED_ORIGINS`) are read at
 **build** time, so changing them needs a redeploy, not just a restart. The Blueprint starts as
-`APP_ENV=staging` with the test checkout; switch the items marked GO-LIVE at launch.
+`APP_ENV=staging` with the test checkout, email turned off (`MAIL_TRANSPORT=off`: nothing is sent,
+each skipped email is logged) and temporary local file storage (wiped on every deploy); switch the
+items marked GO-LIVE at launch.
 
 ### 1. Put the code on GitHub
 

@@ -26,7 +26,8 @@ const schema = z
     CLERK_SECRET_KEY: optional,
     CLERK_WEBHOOK_SECRET: optional,
 
-    MAIL_TRANSPORT: z.enum(["smtp", "resend", "postmark"]).default("smtp"),
+    // "off" = send nothing (each skipped email is logged) — for a hosted test site before email is set up.
+    MAIL_TRANSPORT: z.enum(["smtp", "resend", "postmark", "off"]).default("smtp"),
     SMTP_HOST: z.string().default("localhost"),
     SMTP_PORT: z.coerce.number().int().default(1025),
     SMTP_SECURE: bool,
@@ -97,7 +98,7 @@ const schema = z
       need("STRIPE_PRICE_MEMBERSHIP_MONTHLY", "when PAYMENT_PROVIDER=stripe");
       need("STRIPE_PRICE_MEMBERSHIP_YEARLY", "when PAYMENT_PROVIDER=stripe");
     }
-    if (e.MAIL_TRANSPORT !== "smtp") need("MAIL_PROVIDER_API_KEY", `when MAIL_TRANSPORT=${e.MAIL_TRANSPORT}`);
+    if (e.MAIL_TRANSPORT === "resend" || e.MAIL_TRANSPORT === "postmark") need("MAIL_PROVIDER_API_KEY", `when MAIL_TRANSPORT=${e.MAIL_TRANSPORT}`);
     if (e.STORAGE_DRIVER === "s3") {
       for (const k of ["S3_BUCKET", "S3_REGION", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"] as const)
         need(k, "when STORAGE_DRIVER=s3");

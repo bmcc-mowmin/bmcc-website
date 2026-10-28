@@ -64,8 +64,10 @@ services:
 
       # ── Email (any SMTP relay: Resend smtp.resend.com:465, Google Workspace, SES…) ──
       # Or MAIL_TRANSPORT=resend|postmark with MAIL_PROVIDER_API_KEY instead of SMTP_*.
+      # off = no emails are sent (each one is logged) until an email service is chosen.
+      # GO-LIVE: smtp (fill SMTP_*) or resend/postmark (fill MAIL_PROVIDER_API_KEY). SMTP_* can stay blank while off.
       - key: MAIL_TRANSPORT
-        value: smtp
+        value: "off"
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT
@@ -123,10 +125,15 @@ services:
       - key: MASJID_LNG
         value: "-121.70"
 
-      # ── File storage: Cloudflare R2 (S3-compatible). Render's disk is wiped on deploy. ──
+      # ── File storage ──────────────────────────────────────────────────────
+      # local = files on the service's own disk: TEMPORARY, wiped on every deploy/restart
+      # (fine for testing; re-upload photos later). GO-LIVE: s3 with a Cloudflare R2 bucket
+      # (fill S3_*). The S3_* values can stay blank while local.
       - key: STORAGE_DRIVER
-        value: s3
-      - key: S3_ENDPOINT # https://<account-id>.r2.cloudflarestorage.com
+        value: local
+      - key: UPLOAD_DIR
+        value: /app/uploads
+      - key: S3_ENDPOINT # R2: https://<account-id>.r2.cloudflarestorage.com
         sync: false
       - key: S3_REGION
         value: auto

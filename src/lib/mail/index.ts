@@ -7,6 +7,7 @@ import { env } from "@/lib/env";
 //   smtp     → any SMTP relay (SMTP_HOST/PORT/USER/PASSWORD)
 //   resend   → Resend HTTP API (MAIL_PROVIDER_API_KEY)
 //   postmark → Postmark HTTP API (MAIL_PROVIDER_API_KEY)
+//   off      → nothing is sent; one log line per skipped email (hosted test site only)
 
 export type Mail = {
   to: string;
@@ -36,6 +37,9 @@ async function viaHttp(url: string, headers: Record<string, string>, body: unkno
 export async function sendMail(mail: Mail) {
   const replyTo = mail.replyTo ?? env.MAIL_REPLY_TO;
   switch (env.MAIL_TRANSPORT) {
+    case "off":
+      console.info(`[mail off] skipped "${mail.subject}" to ${mail.to.replace(/^(.).*@/, "$1***@")}`);
+      return;
     case "smtp":
       await smtpTransport().sendMail({ from: env.MAIL_FROM, to: mail.to, subject: mail.subject, text: mail.text, html: mail.html, replyTo, headers: mail.headers });
       return;
