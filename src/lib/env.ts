@@ -36,6 +36,7 @@ const schema = z
     MAIL_FROM: z.string().default("BMCC <no-reply@brmcc.org>"),
     MAIL_REPLY_TO: optional,
     CONTACT_INBOX: z.string().default("info@brmcc.org"),
+    BUG_INBOX: z.string().default("it_support@brmcc.org"),
 
     PAYMENT_PROVIDER: z.enum(["mock", "stripe"]).default("mock"),
     STRIPE_SECRET_KEY: optional,

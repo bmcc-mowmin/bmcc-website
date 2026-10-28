@@ -18,6 +18,7 @@ const schema = z.object({
   orgEmail: z.email("Public email isn't a valid email address").nullable(),
   orgEin: z.string().regex(/^\d{2}-\d{7}$/, "EIN must look like 12-3456789").nullable(),
   contactInbox: z.email("Office inbox isn't a valid email address").nullable(),
+  bugInbox: z.email("Bug reports inbox isn't a valid email address").nullable(),
   showResubBarSitewide: z.boolean(),
   defaultDonationFrequency: z.enum(["one-time", "monthly"]),
 });
@@ -32,6 +33,7 @@ export async function saveSettings(_prev: unknown, form: FormData) {
     orgEmail: blank(form.get("orgEmail")),
     orgEin: blank(form.get("orgEin")),
     contactInbox: blank(form.get("contactInbox")),
+    bugInbox: blank(form.get("bugInbox")),
     showResubBarSitewide: form.get("showResubBarSitewide") === "on",
     defaultDonationFrequency: form.get("defaultDonationFrequency"),
   });

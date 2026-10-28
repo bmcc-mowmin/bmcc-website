@@ -16,6 +16,7 @@ const FIELDS = [
   { name: "orgEmail", label: "Public email", hint: "Footer and About Us." },
   { name: "orgEin", label: "EIN", hint: "Printed on donation receipts and giving statements once set (e.g. 12-3456789)." },
   { name: "contactInbox", label: "Office inbox", hint: "Receives contact-form messages, new directory listings and members' requests." },
+  { name: "bugInbox", label: "Bug reports inbox", hint: "Receives every new bug report and a copy of every email sent to people who reported a bug." },
 ] as const;
 
 export default async function SettingsAdmin() {

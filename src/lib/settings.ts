@@ -16,6 +16,7 @@ export type Settings = {
   orgEmail: string;
   orgEin: string | null;
   contactInbox: string;
+  bugInbox: string;
   showResubBarSitewide: boolean;
   defaultDonationFrequency: "one-time" | "monthly";
 };
@@ -28,6 +29,7 @@ export const ENV_DEFAULTS: Settings = {
   orgEmail: env.ORG_EMAIL,
   orgEin: env.ORG_EIN ?? null,
   contactInbox: env.CONTACT_INBOX,
+  bugInbox: env.BUG_INBOX,
   showResubBarSitewide: env.SHOW_RESUB_BAR_SITEWIDE,
   defaultDonationFrequency: env.DEFAULT_DONATION_FREQUENCY,
 };
@@ -50,6 +52,7 @@ export async function getSettings(): Promise<Settings> {
     orgEmail: pick("orgEmail"),
     orgEin: pick("orgEin"),
     contactInbox: pick("contactInbox"),
+    bugInbox: pick("bugInbox"),
     showResubBarSitewide: pick("showResubBarSitewide"),
     defaultDonationFrequency: row.defaultDonationFrequency === "one-time" || row.defaultDonationFrequency === "monthly" ? row.defaultDonationFrequency : ENV_DEFAULTS.defaultDonationFrequency,
   };

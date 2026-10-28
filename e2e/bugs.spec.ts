@@ -43,6 +43,10 @@ test("report → triage → owner fixes it → reporter is told; files stay priv
   const ack = await waitForEmail(reporter, since);
   expect(ack.subject).toContain(ref);
   await waitForEmail("admin@bmcc.local", since, 10_000, `[Bug ${ref}] New report — ${title}`);
+  // The bug reports inbox (it_support@brmcc.org by default) gets the report and a copy of what the reporter was told.
+  await waitForEmail("it_support@brmcc.org", since, 10_000, `[Bug ${ref}] New report — ${title}`);
+  const copy = await waitForEmail("it_support@brmcc.org", since, 10_000, `[Copy · ${ref}] ${ack.subject}`);
+  expect(copy.text).toContain(reporter);
 
   // 2. Its files are private.
   const [file] = await sql<{ id: string }>(`SELECT a.id FROM "BugAttachment" a JOIN "BugReport" b ON b.id = a."bugId" WHERE b.number = $1`, [number]);
@@ -93,6 +97,7 @@ test("report → triage → owner fixes it → reporter is told; files stay priv
   await owner.context.close();
   const update = await waitForEmail(reporter, new Date(Date.now() - 8000), 10_000, `Update on your report ${ref}`);
   expect(update.replyTo.length).toBe(1);
+  await waitForEmail("it_support@brmcc.org", since, 10_000, `[Copy · ${ref}] Update on your report ${ref}`);
 
   // 6. The timeline keeps the whole history.
   await admin.reload();

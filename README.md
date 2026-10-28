@@ -261,12 +261,17 @@ timer and 5 reports per hour per connection.
   admins) or your open bugs (everyone else).
 - **Timeline:** every report keeps its history — comments, replies to the reporter and each change
   (with who and when); changes are also in the activity log.
-- **Emails:** super admins get each new report; the owner is emailed when a bug is assigned; the
+- **Emails:** the **bug reports inbox** (Admin → Settings; `it_support@brmcc.org` by default) and all super admins get each new report; the owner is emailed when a bug is assigned; the
   reporter gets a reference number (BUG-0001), any reply written to them, and — when ticked — a note
   when it's fixed, closed or needs their input, in the language they used. Their replies go to the
-  office inbox.
+  office inbox. The bug reports inbox also gets a labelled copy (“[Copy · BUG-0007] …”) of every email
+  sent to a reporter.
 - **Duplicates** are closed with a link to the original; **Delete** (super admins) removes spam and
   its files for good.
+- **Languages:** the form, its messages and the reporter's emails are in the visitor's language.
+  The choices (type of problem, impact) are saved as codes and shown in English in admin; the text
+  the reporter types is stored exactly as written (not translated) and shown with the site language
+  it came from.
 - **Privacy:** attachments are private — served only to signed-in admins at `/admin/bugs/files/…`,
   never cached, PDFs downloaded rather than opened. Reporters are asked not to include passwords or
   card numbers.

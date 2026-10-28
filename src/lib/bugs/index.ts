@@ -50,10 +50,27 @@ export async function fileBugReport(bug: NewBug, files: { bytes: Buffer; name: s
   return row;
 }
 
-// Super admins triage; without any, the office inbox gets the alert.
+// New reports go to the bug reports inbox (Admin → Settings; it_support@brmcc.org by default) and to
+// every super admin, who triage them.
 async function triageInboxes() {
   const admins = await db.user.findMany({ where: { adminRoles: { has: "SUPER_ADMIN" }, disabled: false }, select: { email: true } });
-  return admins.length ? admins.map((a) => a.email) : [(await getSettings()).contactInbox];
+  return Array.from(new Set([(await getSettings()).bugInbox, ...admins.map((a) => a.email)].map((e) => e.toLowerCase())));
+}
+
+// Every email to a reporter also goes, as a labelled copy, to the bug reports inbox — so IT sees
+// exactly what each reporter was told. A separate copy (not Cc) keeps the reporter's address private.
+async function sendToReporter(bug: { number: number; reporterEmail: string }, mail: { subject: string; text: string; html: string; replyTo?: string }) {
+  const ref = bugRef(bug.number);
+  await sendMail({ to: bug.reporterEmail, ...mail });
+  const inbox = (await getSettings()).bugInbox;
+  if (inbox.toLowerCase() === bug.reporterEmail.toLowerCase()) return;
+  const note = `Copy of the email sent to the reporter of ${ref} (${bug.reporterEmail}).`;
+  await sendMail({
+    to: inbox,
+    subject: `[Copy · ${ref}] ${mail.subject}`,
+    text: `${note}\nOpen ${ref}: ${bugLink(bug.number)}\n\n----\n\n${mail.text}`,
+    html: `<p style="font:13px/1.5 sans-serif;color:#6b7280;margin:0 0 12px">${escapeHtml(note)} <a href="${bugLink(bug.number)}">Open ${ref}</a></p>${mail.html}`,
+  }).catch((e) => console.error("bug inbox copy failed", e));
 }
 
 const bugLink = (number: number) => adminUrl(`/admin/bugs/${number}`);
@@ -90,7 +107,7 @@ async function notifyNewBug(id: string) {
     const t = getDictionary(isLang(bug.language) ? (bug.language as Lang) : "en");
     const subject = t.bug_email_ack_subject.replace("{ref}", ref);
     const body = t.bug_email_ack_body.replace("{ref}", ref);
-    await sendMail({ to: bug.reporterEmail, subject, text: `${body}\n\nBrentwood Muslim Community Center`, html: layoutHtml(subject, `<p>${escapeHtml(body)}</p>`) });
+    await sendToReporter({ number: bug.number, reporterEmail: bug.reporterEmail }, { subject, text: `${body}\n\nBrentwood Muslim Community Center`, html: layoutHtml(subject, `<p>${escapeHtml(body)}</p>`) });
   }
 }
 
@@ -124,8 +141,7 @@ export async function notifyReporter(bugId: string, kind: "reply" | "status", me
   if (!body) return false;
   const subject = t.bug_email_update_subject.replace("{ref}", ref);
   const inbox = (await getSettings()).contactInbox;
-  await sendMail({
-    to: bug.reporterEmail,
+  await sendToReporter({ number: bug.number, reporterEmail: bug.reporterEmail }, {
     replyTo: inbox,
     subject,
     text: `${body}\n\n${t.bug_email_reply_hint}\n\nBrentwood Muslim Community Center`,

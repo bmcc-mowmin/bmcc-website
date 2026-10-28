@@ -638,6 +638,8 @@ model SiteSettings {
   orgEmail                 String?
   orgEin                   String?
   contactInbox             String?
+  // Gets every new bug report and a copy of every email sent to bug reporters.
+  bugInbox                 String?
   showResubBarSitewide     Boolean?
   defaultDonationFrequency String?
   updatedAt                DateTime @updatedAt
