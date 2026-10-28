@@ -1,3 +1,5 @@
+import { rm } from "node:fs/promises";
+import path from "node:path";
 import { test, expect, type Browser } from "@playwright/test";
 import { roleState } from "./helpers";
 import { resetRateLimits, sql } from "./db";
@@ -7,6 +9,16 @@ import { waitForEmail } from "./mailpit";
 // the owner works on it → the reporter hears back. Attachments stay private to admins.
 const anon = { storageState: { cookies: [], origins: [] } };
 const uid = () => Date.now().toString(36);
+// Leave the tracker as it was: remove the test reports and their files, and let numbering carry on
+// from the last real report (so test runs don't use up BUG numbers).
+test.afterAll(async () => {
+  const files = await sql<{ storageKey: string }>(`SELECT a."storageKey" FROM "BugAttachment" a JOIN "BugReport" b ON b.id = a."bugId" WHERE b.title LIKE 'E2E%'`);
+  await sql(`DELETE FROM "BugReport" WHERE title LIKE 'E2E%'`);
+  await sql(`SELECT setval('"BugReport_number_seq"', COALESCE((SELECT MAX(number) FROM "BugReport"), 0) + 1, false)`);
+  const dir = path.resolve(process.env.UPLOAD_DIR ?? "./uploads");
+  await Promise.all(files.map((f) => rm(path.join(dir, f.storageKey), { force: true })));
+});
+
 async function as(browser: Browser, role: string) {
   const context = await browser.newContext({ storageState: roleState(role) });
   return { context, page: await context.newPage() };
