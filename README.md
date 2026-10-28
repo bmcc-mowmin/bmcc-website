@@ -257,7 +257,7 @@ times. Adding a provider = one adapter in `src/lib/prayer/sources/`.
 ## Settings
 
 Everything that differs between local and production is an environment variable —
-see [`render.yaml`](render.yaml) for the full, commented list (and `src/lib/env.ts` for defaults).
+see [`RENDER.md`](RENDER.md) for the full list (and `src/lib/env.ts` for defaults).
 No env files are committed; hosted settings are entered in Render's dashboard.
 Key switches: `APP_ENV`, `AUTH_PROVIDER` (dev → clerk), `PAYMENT_PROVIDER` (mock → stripe),
 `MAIL_TRANSPORT` (smtp/Mailpit → provider), `STORAGE_DRIVER` (local → s3).
@@ -309,15 +309,10 @@ what BMCC must decide or supply first.
 
 ### Render (branch `render`)
 
-`render.yaml` is a Render Blueprint: Render → **New → Blueprint** → this repo, branch `render`.
-It creates the Docker web service (`bmcc-website`, health check `/api/health`, migrations applied on
-every start) and Postgres 17 (`bmcc-db`, private network only). Render asks once for every value marked
-`sync: false` (Clerk, SMTP, R2 storage, Stripe…); change them later under the service's **Environment**
-tab. Values whose names start with `NEXT_PUBLIC_` (and `SERVER_ACTIONS_ALLOWED_ORIGINS`) are read at
-**build** time, so changing them needs a redeploy, not just a restart. The Blueprint starts as
-`APP_ENV=staging` with the test checkout, email turned off (`MAIL_TRANSPORT=off`: nothing is sent,
-each skipped email is logged) and temporary local file storage (wiped on every deploy); switch the
-items marked GO-LIVE at launch.
+The `render` branch runs on Render's Node runtime with a Render Postgres database, set up by hand in
+the dashboard (free plan, no Blueprint). Step-by-step setup, the environment variables to paste, the
+free-plan limits and the go-live changes are in [`RENDER.md`](RENDER.md). Build command:
+`npm ci && npm run render:build`; start command: `npm run render:start` (applies migrations, then starts).
 
 ### 1. Put the code on GitHub
 
@@ -338,7 +333,7 @@ Docker build. Keep `main` protected so only changes with a green run are deploye
 
 ### 3. Production settings
 
-Start from [`render.yaml`](render.yaml); anything not listed keeps its default. Never commit these.
+Start from [`RENDER.md`](RENDER.md); anything not listed keeps its default. Never commit these.
 
 ```
 APP_ENV=production

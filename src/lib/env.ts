@@ -109,7 +109,7 @@ function load() {
   const parsed = schema.safeParse(process.env);
   if (!parsed.success) {
     const lines = parsed.error.issues.map((i) => `  • ${i.path.join(".")}: ${i.message}`);
-    throw new Error(`Invalid environment settings:\n${lines.join("\n")}\nSee render.yaml for the full list.`);
+    throw new Error(`Invalid environment settings:\n${lines.join("\n")}\nSee RENDER.md for the full list.`);
   }
   return parsed.data;
 }

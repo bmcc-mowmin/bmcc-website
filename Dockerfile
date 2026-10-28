@@ -1,5 +1,5 @@
 # Production image. Build: docker build -t bmcc-website .
-# Runtime settings come from environment variables (see render.yaml for the full list); no secrets are baked in.
+# Runtime settings come from environment variables (see RENDER.md for the full list); no secrets are baked in.
 # Render passes the service's environment variables as build args; only the public ones below are read at build time.
 
 FROM node:24-alpine AS base

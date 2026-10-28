@@ -1,6 +1,6 @@
 // First-time LOCAL setup: creates .env with local defaults and fills in local secrets.
 // Safe to re-run; it never overwrites values you have already set.
-// (On this branch no env template is committed. Hosted settings live in Render — see render.yaml.)
+// (On this branch no env template is committed. Hosted settings live in Render — see RENDER.md.)
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 

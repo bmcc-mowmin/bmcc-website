@@ -13,7 +13,7 @@ next-env.d.ts
 # generated Prisma client (rebuilt by `prisma generate`)
 /src/generated/
 
-# environment — no env files are committed; settings live in Render (see render.yaml)
+# environment — no env files are committed; settings live in Render (see RENDER.md)
 .env
 .env.*
 
