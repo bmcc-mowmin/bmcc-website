@@ -1,12 +1,41 @@
-// First-time local setup: creates .env from .env.example and fills in local secrets.
+// First-time LOCAL setup: creates .env with local defaults and fills in local secrets.
 // Safe to re-run; it never overwrites values you have already set.
-import { existsSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
+// (On this branch no env template is committed. Hosted settings live in Render — see render.yaml.)
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 
-if (!existsSync(".env")) {
-  copyFileSync(".env.example", ".env");
-  console.log("Created .env from .env.example");
-}
+// Local development defaults (Postgres + Mailpit from docker-compose). Anything not listed here
+// falls back to the default in src/lib/env.ts.
+const LOCAL_DEFAULTS = `APP_ENV=local
+APP_URL=http://localhost:3000
+APP_PORT=3000
+POSTGRES_USER=bmcc
+POSTGRES_PASSWORD=bmcc
+POSTGRES_DB=bmcc
+POSTGRES_PORT=5432
+DATABASE_URL=postgresql://bmcc:bmcc@localhost:5432/bmcc
+AUTH_PROVIDER=dev
+SESSION_SECRET=
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/account
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/account
+SEED_ADMIN_EMAIL=admin@bmcc.local
+SEED_ADMIN_PASSWORD=
+SEED_MEMBER_EMAIL=member@bmcc.local
+SEED_MEMBER_PASSWORD=
+SEED_STAFF_PASSWORD=
+MAIL_TRANSPORT=smtp
+SMTP_HOST=localhost
+SMTP_PORT=1025
+MAILPIT_UI_PORT=8025
+MAILPIT_SMTP_PORT=1025
+MAILPIT_API_URL=http://localhost:8025
+PAYMENT_PROVIDER=mock
+STORAGE_DRIVER=local
+UPLOAD_DIR=./uploads
+PLAYWRIGHT_BASE_URL=http://localhost:3000
+`;
 
 const generated = {
   SESSION_SECRET: () => randomBytes(32).toString("base64url"),
@@ -15,14 +44,13 @@ const generated = {
   SEED_STAFF_PASSWORD: () => "staff-" + randomBytes(6).toString("base64url"),
 };
 
-let env = readFileSync(".env", "utf8");
-// Add settings introduced since this .env was created, with .env.example's default value
-// (secrets there are blank; some are generated below).
-for (const line of readFileSync(".env.example", "utf8").split("\n")) {
+let env = existsSync(".env") ? readFileSync(".env", "utf8") : "";
+if (!env) console.log("Creating .env with local defaults");
+// Add any local default this .env doesn't have yet.
+for (const line of LOCAL_DEFAULTS.split("\n")) {
   const key = line.match(/^([A-Z0-9_]+)=/)?.[1];
   if (key && !new RegExp(`^${key}=`, "m").test(env)) {
-    env += `${env.endsWith("\n") ? "" : "\n"}${line.trim()}\n`;
-    console.log(`Added missing setting ${key}`);
+    env += `${env === "" || env.endsWith("\n") ? "" : "\n"}${line}\n`;
   }
 }
 for (const [key, make] of Object.entries(generated)) {

@@ -1,0 +1,167 @@
+# Render Blueprint for the BMCC website (branch: render).
+# Render → New → Blueprint → pick this repo and the `render` branch. It creates:
+#   • bmcc-website — the Docker web service (applies database migrations on every start)
+#   • bmcc-db      — Postgres 17
+# This file is also the full list of settings the app reads (validated by src/lib/env.ts).
+#   value: ...          fixed, non-secret setting (edit here or in the dashboard)
+#   sync: false         secret or per-environment value — Render asks for it when the Blueprint
+#                       is first created; later, add/change it in the dashboard (Environment tab)
+#   generateValue: true Render generates a random secret once
+#
+# Starts as STAGING: Clerk development keys and the mock (test) checkout are allowed.
+# Go-live switches are marked GO-LIVE (the app refuses to start in production with mock
+# payments, the dev login or Clerk development keys).
+
+services:
+  - type: web
+    runtime: docker
+    name: bmcc-website
+    region: oregon
+    branch: render
+    plan: 0.5c-512mb # smallest paid instance; free instances sleep when idle
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      # ── App ────────────────────────────────────────────────────────────────
+      - key: APP_ENV
+        value: staging # GO-LIVE: production
+      - key: APP_URL # public address, no trailing slash, e.g. https://bmcc-website.onrender.com, later https://brmcc.org
+        sync: false
+      - key: ADMIN_HOST # blank = admin portal at /admin. GO-LIVE: admin.brmcc.org
+        sync: false
+      - key: LOG_LEVEL
+        value: info
+      - key: NEXT_SERVER_ACTIONS_ENCRYPTION_KEY # keeps forms working across deploys/instances
+        generateValue: true
+      # Optional: extra hostnames a proxy/tunnel serves the site from (read at BUILD time).
+      # - key: SERVER_ACTIONS_ALLOWED_ORIGINS
+      #   value: "*.connect.remote.it"
+
+      # ── Database ───────────────────────────────────────────────────────────
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bmcc-db
+          property: connectionString
+
+      # ── Sign-in (Clerk) ────────────────────────────────────────────────────
+      - key: AUTH_PROVIDER
+        value: clerk
+      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY # pk_test_… on staging, GO-LIVE: pk_live_… (read at build time)
+        sync: false
+      - key: CLERK_SECRET_KEY # sk_test_… on staging, GO-LIVE: sk_live_…
+        sync: false
+      - key: CLERK_WEBHOOK_SECRET # Clerk → Webhooks → https://<site>/api/webhooks/clerk
+        sync: false
+      - key: NEXT_PUBLIC_CLERK_SIGN_IN_URL
+        value: /login
+      - key: NEXT_PUBLIC_CLERK_SIGN_UP_URL
+        value: /sign-up
+      - key: NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
+        value: /account
+      - key: NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL
+        value: /account
+
+      # ── Email (any SMTP relay: Resend smtp.resend.com:465, Google Workspace, SES…) ──
+      # Or MAIL_TRANSPORT=resend|postmark with MAIL_PROVIDER_API_KEY instead of SMTP_*.
+      - key: MAIL_TRANSPORT
+        value: smtp
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_SECURE # "true" for port 465
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: MAIL_PROVIDER_API_KEY # only when MAIL_TRANSPORT is resend or postmark
+        sync: false
+      - key: MAIL_FROM
+        value: "BMCC <no-reply@brmcc.org>"
+      - key: MAIL_REPLY_TO
+        value: info@brmcc.org
+      - key: CONTACT_INBOX # where contact-form messages and new-listing alerts go
+        value: info@brmcc.org
+
+      # ── Payments ───────────────────────────────────────────────────────────
+      - key: PAYMENT_PROVIDER
+        value: mock # GO-LIVE: stripe (once the Stripe adapter is built)
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_MEMBERSHIP_MONTHLY
+        sync: false
+      - key: STRIPE_PRICE_MEMBERSHIP_YEARLY
+        sync: false
+      - key: DEFAULT_DONATION_FREQUENCY
+        value: monthly
+
+      # ── Organization (printed on receipts; also editable in Admin → Settings) ──
+      - key: ORG_LEGAL_NAME
+        value: Brentwood Muslim Community Center
+      - key: ORG_EIN
+        sync: false
+      - key: ORG_ADDRESS
+        value: "7701 Lone Tree Way, Brentwood, CA 94513"
+      - key: ORG_PHONE
+        value: "925-298-BMCC (2622)"
+      - key: ORG_PHONE_TEL
+        value: "+19252982622"
+      - key: ORG_EMAIL
+        value: info@brmcc.org
+
+      # ── Masjid location (seeds prayer-time settings) ───────────────────────
+      - key: MASJID_TIMEZONE
+        value: America/Los_Angeles
+      - key: MASJID_LAT
+        value: "37.93"
+      - key: MASJID_LNG
+        value: "-121.70"
+
+      # ── File storage: Cloudflare R2 (S3-compatible). Render's disk is wiped on deploy. ──
+      - key: STORAGE_DRIVER
+        value: s3
+      - key: S3_ENDPOINT # https://<account-id>.r2.cloudflarestorage.com
+        sync: false
+      - key: S3_REGION
+        value: auto
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_PUBLIC_URL # optional public bucket URL
+        sync: false
+
+      # ── Spam protection ────────────────────────────────────────────────────
+      - key: RATE_LIMIT_WINDOW_SEC
+        value: "600"
+      - key: RATE_LIMIT_MAX
+        value: "5"
+      - key: NEXT_PUBLIC_TURNSTILE_SITE_KEY # optional, Cloudflare Turnstile (read at build time)
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+
+      # ── Other ──────────────────────────────────────────────────────────────
+      - key: GOOGLE_MAPS_EMBED_API_KEY # optional; blank = keyless embed
+        sync: false
+      - key: SHOW_RESUB_BAR_SITEWIDE
+        value: "false"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+
+databases:
+  - name: bmcc-db
+    region: oregon
+    postgresMajorVersion: "17"
+    databaseName: bmcc
+    user: bmcc
+    plan: 0.1c-256mb # smallest paid plan; the free database expires after 30 days and has no backups
+    ipAllowList: [] # only reachable from Render services
