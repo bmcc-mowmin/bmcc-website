@@ -4,6 +4,71 @@ Engineering follow-ups for the BMCC website. Launch decisions and content sign-o
 [GO_LIVE.md](GO_LIVE.md); Render setup is in [RENDER.md](RENDER.md). Tick items off in the pull
 request that does them.
 
+## Code and security review (render branch, Oct 27, 2026)
+
+Overall the code is in good shape: every admin page, server action and CSV export checks the
+person's section; public forms have a honeypot, minimum fill time and Postgres-backed rate limits;
+uploads are checked by their actual bytes (JPEG/PNG/WebP, `%PDF-`); storage keys can't contain
+paths from users; CSV exports neutralize spreadsheet formulas; email HTML escapes user text; no raw
+SQL or `dangerouslySetInnerHTML`; the Clerk webhook verifies signatures; production refuses dev
+sign-in, mock payments and Clerk development keys. Type check, lint and the 35 unit tests pass.
+
+Fix before launch, most urgent first:
+
+- [ ] **P1 — Upgrade Next.js 16.3.6 → 16.4.3 or later.** `npm audit` reports critical advisories
+      for this version, including unauthenticated remote code execution in the image optimization
+      API ([GHSA-2464-fhr4-w9xw](https://github.com/advisories/GHSA-2464-fhr4-w9xw)), plus a Server
+      Actions denial of service, SSRF in image optimization and cache-poisoning issues. The staging
+      site on Render is public, so do this now. Also bump `eslint-config-next` to the same version.
+- [ ] **P1 — Other vulnerable dependencies:** `zod` < 4.6.6 (memory exhaustion, high),
+      `nodemailer` ≤ 10.1.3 (address parsing, moderate), and transitive `source-map-js`, `fast-uri`.
+      `npm audit fix`, then re-run tests.
+- [ ] **P1 — Rotate the Render database password.** The connection URL was shared in a chat; the
+      external address accepts connections from anywhere. After rotating, update `DATABASE_URL` in
+      Render and delete `~/.render_db_url` on the Pi. Consider restricting the database's external
+      access to known IPs.
+- [ ] **P2 — Visitor IP can be spoofed, weakening rate limits.** `src/lib/request.ts` trusts the
+      *first* `X-Forwarded-For` entry, which the visitor can set themselves (Render and Cloudflare
+      append to it). Use `CF-Connecting-IP` when behind Cloudflare, or the entry added by the trusted
+      proxy (the right-most one), so sign-in and form limits can't be bypassed.
+- [ ] **P2 — Open redirect in `safeNext`** (`src/lib/auth/password-login.ts`, and the same check in
+      `src/app/checkout/[id]/actions.ts`). `/\evil.example` passes (`startsWith("/")`, not `//`),
+      and browsers treat it as `//evil.example`. Also reject a backslash in the second character, or
+      parse with `new URL(next, APP_URL)` and require the same origin.
+- [ ] **P2 — Security headers for the public site.** Only admin pages get `X-Frame-Options`,
+      `noindex` and no-cache. Add site-wide `Strict-Transport-Security`, `X-Content-Type-Options:
+      nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: SAMEORIGIN`
+      (or CSP `frame-ancestors`) in `next.config.ts` `headers()` or a Cloudflare rule. A full
+      Content-Security-Policy must allow Clerk, Turnstile, Stripe/PayPal and Constant Contact.
+- [ ] **P2 — Staging test tools are public.** With `PAYMENT_PROVIDER=mock`, anyone with the Render
+      address can complete fake checkouts, which create receipts, active memberships and emails
+      (when email is on). Fine for testing; clear that data before launch (see the Clerk-only
+      section) and don't share the staging address publicly.
+- [ ] **P3 — Mock checkout takes its success URL from the form** instead of the stored checkout
+      session; read it from the session (goes away with the real Stripe adapter).
+- [ ] **P3 — Directory CSV export isn't written to the activity log** (the subscriber export is).
+- [ ] **P3 — `RateLimitBucket` rows are never cleaned up**; add a periodic delete of expired rows
+      (or delete on read) so the table doesn't grow forever.
+
+## Placeholders and stubs in the code
+
+| Where | What | Replace with |
+|---|---|---|
+| `src/lib/payments/provider.ts` | Stripe provider throws "connected at go-live" | Stripe adapter (Payments section) |
+| `/checkout/[id]`, Admin → Memberships test tools | Mock checkout and simulated renewals (mock provider only) | Stripe / PayPal; tools disappear automatically |
+| `src/lib/prayer/sources/` | Masjidi source listed but `available: false` | Masjidi adapter once they give API access |
+| `MAIL_TRANSPORT=off` (Render) | Emails are logged, not sent | Real email provider (Hosting section) |
+| `STORAGE_DRIVER=local` (Render) | Uploads wiped on each deploy | Cloudflare R2 |
+| `AUTH_PROVIDER=dev` code path | Test sign-in, sign-in links, set-password | Remove after launch (Clerk-only section) |
+| Seed data (`prisma/seed.ts`) | Fake directory listings, `@bmcc.local` accounts, sample events, announcements, a sample membership and payments | Delete from the live database; real content in admin |
+| About Us / New BMCC / events | "Placeholder" photo slots | Real photos in Admin → Media library |
+| `messages/dari.json`, `urdu.json`, `pashto.json`, `spanish.json` | Machine-generated translations | Vetted translations (GO_LIVE.md) |
+| `ORG_EIN` | Blank, so not printed on receipts | Confirmed EIN in Admin → Settings |
+| Theme preview (`THEME_PREVIEW=1`) | Theme picker for comparing designs | Leave unset in production |
+
+Content placeholders (food pantry hours, prayer schedule, membership policy text, logo) are tracked
+in [GO_LIVE.md](GO_LIVE.md) under "Content from BMCC".
+
 ## Sign-in: Clerk only (no credentials stored by BMCC)
 
 Clerk owns identity (passwords, email codes, Google sign-in, sessions). BMCC's `User` table stays as
