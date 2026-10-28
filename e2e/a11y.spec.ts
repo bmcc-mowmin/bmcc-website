@@ -5,9 +5,9 @@ import { roleState } from "./helpers";
 // Accessibility (axe, WCAG 2.1 A/AA) on every page, plus the phone layout: no sideways scrolling at
 // 375 px and the menu works with the keyboard.
 
-const PUBLIC = ["/", "/about", "/services", "/assistance", "/funeral-services", "/prayer-times", "/events", "/events/community-dinner", "/community", "/community/submit", "/donate", "/membership", "/new-bmcc", "/login", "/search?q=nikah", "/subscribe/confirm", "/unsubscribe", "/no-such-page"];
+const PUBLIC = ["/", "/about", "/services", "/assistance", "/funeral-services", "/prayer-times", "/events", "/events/community-dinner", "/community", "/community/submit", "/donate", "/membership", "/new-bmcc", "/report-a-problem", "/login", "/search?q=nikah", "/subscribe/confirm", "/unsubscribe", "/no-such-page"];
 const MEMBER = ["/account", "/account/household", "/account/giving", "/account/events"];
-const ADMIN = ["/admin", "/admin/prayer-times", "/admin/events", "/admin/announcements", "/admin/directory", "/admin/memberships", "/admin/donations", "/admin/new-bmcc", "/admin/subscribers", "/admin/messages", "/admin/content", "/admin/media", "/admin/settings", "/admin/users", "/admin/activity"];
+const ADMIN = ["/admin", "/admin/prayer-times", "/admin/events", "/admin/announcements", "/admin/directory", "/admin/memberships", "/admin/donations", "/admin/new-bmcc", "/admin/subscribers", "/admin/messages", "/admin/content", "/admin/media", "/admin/settings", "/admin/users", "/admin/bugs", "/admin/bugs/owners", "/admin/activity"];
 
 async function violations(page: Page) {
   const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();

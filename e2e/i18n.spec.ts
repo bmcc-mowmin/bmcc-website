@@ -6,11 +6,11 @@ import { roleState } from "./helpers";
 // or page title containing English words. Content people enter (directory listings, announcements)
 // is wrapped in <bdi>/dir="auto" and skipped.
 
-const PAGES = ["/", "/about", "/services", "/assistance", "/funeral-services", "/prayer-times", "/events", "/events/friday-jumuah", "/community", "/community/submit", "/donate", "/membership", "/subscribe/confirm", "/unsubscribe", "/no-such-page", "/login", "/login/link", "/search", "/search?q=nikah", "/events/community-dinner", "/new-bmcc"];
+const PAGES = ["/", "/about", "/services", "/assistance", "/funeral-services", "/prayer-times", "/events", "/events/friday-jumuah", "/community", "/community/submit", "/donate", "/membership", "/subscribe/confirm", "/unsubscribe", "/no-such-page", "/login", "/login/link", "/search", "/search?q=nikah", "/events/community-dinner", "/new-bmcc", "/report-a-problem"];
 // Signed in as the seeded member.
 const MEMBER_PAGES = ["/account", "/account/household", "/account/giving", "/account/events", "/events/community-dinner"];
 // Words that are the same in every language: names, brands, prayer names, units.
-const ALLOWED = /^(TEST01|BMCC|Brentwood|Muslim|Community|Center|Lone|Tree|Way|CA|AM|PM|Google|Maps|iCal|Stripe|Zelle|PayPal|Jumu['’]?ah|Fajr|Dhuhr|Asr|Maghrib|Isha|Adhan|Iqamah|Hikmah|ISNA|Hanafi|English|US|Dari|Urdu|Pashtu|Spanish|USD|PDF|env)$/i;
+const ALLOWED = /^(TEST01|BMCC|Brentwood|Muslim|Community|Center|Lone|Tree|Way|CA|AM|PM|Google|Maps|iCal|Stripe|Zelle|PayPal|Jumu['’]?ah|Fajr|Dhuhr|Asr|Maghrib|Isha|Adhan|Iqamah|Hikmah|ISNA|Hanafi|English|US|Dari|Urdu|Pashtu|Spanish|USD|PDF|JPG|PNG|WebP|MB|env)$/i;
 
 async function englishOnPage(page: Page) {
   const texts = await page.evaluate(() => {

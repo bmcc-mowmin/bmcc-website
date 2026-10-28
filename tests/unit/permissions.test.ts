@@ -34,5 +34,14 @@ test("roles combine, everyone with a role gets the dashboard, no role = no acces
   assert.ok(can(both, "prayer") && can(both, "donations"));
   assert.ok(can(["TREASURER"], "dashboard"));
   assert.ok(!isStaff([]) && !can([], "dashboard"));
-  assert.deepEqual(navFor(["PRAYER_MANAGER"]).map((n) => n.section), ["dashboard", "prayer"]);
+  assert.deepEqual(navFor(["PRAYER_MANAGER"]).map((n) => n.section), ["dashboard", "prayer", "bugs"]);
+});
+
+test("every admin can see bugs; only super admins triage", () => {
+  for (const role of ["CONTENT_EDITOR", "PRAYER_MANAGER", "MEMBERSHIP_COORDINATOR", "TREASURER"]) {
+    assert.ok(can([role], "bugs"), role);
+    assert.ok(!can([role], "bugs_triage"), role);
+  }
+  assert.ok(can(["SUPER_ADMIN"], "bugs_triage"));
+  assert.ok(!can([], "bugs"));
 });

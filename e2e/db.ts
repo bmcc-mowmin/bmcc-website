@@ -17,6 +17,7 @@ export const countListings = async (name: string) =>
 // Removes anything earlier test runs created (all test data is named or addressed "E2E…"/"e2e-…").
 export async function cleanTestData() {
   await sql(`DELETE FROM "DirectoryListing" WHERE name LIKE 'E2E%'`);
+  await sql(`DELETE FROM "BugReport" WHERE title LIKE 'E2E%'`);
   await sql(`DELETE FROM "Announcement" WHERE text->>'en' LIKE 'E2E%'`);
   await sql(`DELETE FROM "Event" WHERE slug LIKE 'e2e-%'`);
   await sql(`UPDATE "User" SET "adminRoles" = '{}', disabled = true WHERE email LIKE 'e2e-%@example.com'`);

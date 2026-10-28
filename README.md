@@ -230,6 +230,47 @@ and Arabic-script spelling variants (ي/ی, ك/ک, short vowels, Persian digits)
   file itself) with a description in each language for screen readers, then choose which photo shows
   in each place: the logo and the four About Us photos. A photo in use can't be deleted.
 
+## Bug reports
+
+Anyone can report a problem with the website at **/report-a-problem** — linked as “Report a problem”
+at the bottom of every page, which also records the page they were on. The form (5 languages) asks
+what went wrong, the type of problem, the page, what happened, steps to see it, what they expected,
+how much it affects them, up to 3 screenshots or PDFs (5 MB each, 10 MB in all; checked by their
+content, not their name), and optionally a name and email. Device details (browser, screen size,
+site language) and the signed-in account are captured automatically. Spam protection: honeypot,
+timer and 5 reports per hour per connection.
+
+**Admin → Bugs** is the ticket system:
+
+| Status | Meaning | Who sets it |
+|---|---|---|
+| Needs triage | New report, nobody has looked yet | (automatic) |
+| Triaged | Area, priority and owner set | Super admin — automatic once priority + owner are saved |
+| In progress | The owner is working on it | Owner or super admin |
+| Waiting for reporter | Needs more information from the reporter | Owner or super admin |
+| Fixed — check it | Fix is live; check it and close | Owner or super admin |
+| Closed / Won't fix / Can't reproduce / Duplicate | Done | Super admin (owners may also set Can't reproduce) |
+
+- **Triage** (super admins): the **area** is guessed from the page (Prayer times, Events, Donations
+  and payments, Membership, Directory, Sign-in and account, Text/translations/photos, Admin, Other);
+  the **priority** is suggested from the reporter's answers; the **owner** defaults to the area's owner
+  (Admin → Bugs → Area owners). Priorities set the due date: **P1** critical — 1 day, **P2** high —
+  3 days, **P3** normal — 14 days, **P4** low — none. Overdue bugs are flagged in the list.
+- **Every admin** sees the Bugs section, gets their own **Mine** tab, can comment on any bug and can
+  move the bugs they own through the statuses above. The dashboard shows untriaged bugs (super
+  admins) or your open bugs (everyone else).
+- **Timeline:** every report keeps its history — comments, replies to the reporter and each change
+  (with who and when); changes are also in the activity log.
+- **Emails:** super admins get each new report; the owner is emailed when a bug is assigned; the
+  reporter gets a reference number (BUG-0001), any reply written to them, and — when ticked — a note
+  when it's fixed, closed or needs their input, in the language they used. Their replies go to the
+  office inbox.
+- **Duplicates** are closed with a link to the original; **Delete** (super admins) removes spam and
+  its files for good.
+- **Privacy:** attachments are private — served only to signed-in admins at `/admin/bugs/files/…`,
+  never cached, PDFs downloaded rather than opened. Reporters are asked not to include passwords or
+  card numbers.
+
 ## Admin portal
 
 `/admin` (production: `ADMIN_HOST`, e.g. admin.brmcc.org — `/admin` on the main site redirects there,

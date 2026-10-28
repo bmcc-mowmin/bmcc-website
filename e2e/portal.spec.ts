@@ -38,7 +38,7 @@ test.describe("roles", () => {
     await page.goto("/admin");
     await expect(page.getByText("Donations this month")).toBeVisible();
     await expect(page.getByText("Upcoming events")).toHaveCount(0);
-    await expect(sidebar(page).getByRole("link")).toHaveText(["Dashboard", "Donations", "New BMCC project"]);
+    await expect(sidebar(page).getByRole("link")).toHaveText(["Dashboard", "Donations", "New BMCC project", "Bugs"]);
     await context.close();
   });
 });

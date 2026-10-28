@@ -5,7 +5,7 @@ export const ADMIN_ROLES = ["SUPER_ADMIN", "CONTENT_EDITOR", "PRAYER_MANAGER", "
 export type AdminRole = (typeof ADMIN_ROLES)[number];
 
 export const ROLE_INFO: Record<AdminRole, { label: string; description: string }> = {
-  SUPER_ADMIN: { label: "Super admin", description: "Everything, including admin users, settings and the activity log." },
+  SUPER_ADMIN: { label: "Super admin", description: "Everything, including admin users, settings, the activity log and triaging bug reports." },
   CONTENT_EDITOR: { label: "Content editor", description: "Events, announcements, the New BMCC project page, site text, media, subscribers and messages." },
   PRAYER_MANAGER: { label: "Prayer times manager", description: "Prayer times, Iqamah rules, Jumu'ah and the monthly timetable." },
   MEMBERSHIP_COORDINATOR: { label: "Membership coordinator", description: "Members and households, the directory approval queue, messages." },
@@ -27,7 +27,9 @@ export type Section =
   | "media"
   | "settings"
   | "users"
-  | "activity";
+  | "activity"
+  | "bugs"
+  | "bugs_triage";
 
 // Roles (besides SUPER_ADMIN) allowed in each section. [] = super admins only.
 const ACCESS: Record<Section, AdminRole[]> = {
@@ -46,6 +48,10 @@ const ACCESS: Record<Section, AdminRole[]> = {
   settings: [],
   users: [],
   activity: [],
+  // Every admin can see bug reports and work on the ones assigned to them; triage (priority, area,
+  // owner, closing as duplicate/won't fix) and the area owners are super-admin only.
+  bugs: ["CONTENT_EDITOR", "PRAYER_MANAGER", "MEMBERSHIP_COORDINATOR", "TREASURER"],
+  bugs_triage: [],
 };
 
 export function isStaff(roles: readonly string[]) {
@@ -73,6 +79,7 @@ export const NAV: { section: Section; href: string; label: string; built: boolea
   { section: "media", href: "/admin/media", label: "Media library", built: true },
   { section: "settings", href: "/admin/settings", label: "Settings", built: true },
   { section: "users", href: "/admin/users", label: "Admin users", built: true },
+  { section: "bugs", href: "/admin/bugs", label: "Bugs", built: true },
   { section: "activity", href: "/admin/activity", label: "Activity log", built: true },
 ];
 

@@ -47,6 +47,10 @@ model User {
   auditLogs        AuditLog[]
   authTokens       AuthToken[]
   subscriptions    Subscription[]
+  bugsReported     BugReport[]        @relation("BugReporter")
+  bugsAssigned     BugReport[]        @relation("BugAssignee")
+  bugEvents        BugEvent[]
+  bugAreas         BugAreaOwner[]
 }
 
 // One-time links, e.g. an admin invite's "set your password" link. Only a hash is stored.
@@ -483,6 +487,107 @@ model ContactMessage {
   status    MessageStatus @default(NEW)
   createdAt DateTime      @default(now())
   handledAt DateTime?
+}
+
+// ─── Bug reports ────────────────────────────────────────────────────────────
+// Filed with the public "Report a problem" form, then triaged in Admin → Bugs.
+// Workflow: NEW (needs triage) → TRIAGED → IN_PROGRESS → FIXED (awaiting check) → CLOSED;
+// NEED_INFO waits on the reporter; WONT_FIX, DUPLICATE and CANNOT_REPRODUCE are closing outcomes.
+
+enum BugStatus {
+  NEW
+  TRIAGED
+  IN_PROGRESS
+  NEED_INFO
+  FIXED
+  CLOSED
+  WONT_FIX
+  DUPLICATE
+  CANNOT_REPRODUCE
+}
+
+enum BugPriority {
+  P1
+  P2
+  P3
+  P4
+}
+
+model BugReport {
+  id            String       @id @default(cuid())
+  // Shown as BUG-0001.
+  number        Int          @unique @default(autoincrement())
+  title         String
+  description   String
+  steps         String?
+  expected      String?
+  pageUrl       String?
+  // What the reporter picked (lib/bugs CATEGORIES / IMPACTS).
+  category      String
+  impact        String
+  // Set at triage (lib/bugs AREAS); guessed from the page on arrival.
+  area          String?
+  status        BugStatus    @default(NEW)
+  priority      BugPriority?
+  dueAt         DateTime?
+  reporterName  String?
+  reporterEmail String?
+  reporterId    String?
+  reporter      User?        @relation("BugReporter", fields: [reporterId], references: [id], onDelete: SetNull)
+  assigneeId    String?
+  assignee      User?        @relation("BugAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  duplicateOfId String?
+  duplicateOf   BugReport?   @relation("BugDuplicate", fields: [duplicateOfId], references: [id], onDelete: SetNull)
+  duplicates    BugReport[]  @relation("BugDuplicate")
+  // Captured automatically with the report.
+  userAgent     String?
+  language      String?
+  viewport      String?
+  triagedAt     DateTime?
+  resolvedAt    DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  attachments BugAttachment[]
+  events      BugEvent[]
+
+  @@index([status, createdAt])
+  @@index([assigneeId, status])
+}
+
+// Screenshots and files sent with a report. Private: served only to staff (/admin/bugs/files/…).
+model BugAttachment {
+  id          String    @id @default(cuid())
+  bugId       String
+  bug         BugReport @relation(fields: [bugId], references: [id], onDelete: Cascade)
+  storageKey  String    @unique
+  filename    String
+  contentType String
+  sizeBytes   Int
+  createdAt   DateTime  @default(now())
+}
+
+// The ticket's timeline: comments, replies to the reporter and every change.
+model BugEvent {
+  id        String    @id @default(cuid())
+  bugId     String
+  bug       BugReport @relation(fields: [bugId], references: [id], onDelete: Cascade)
+  actorId   String?
+  actor     User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  // "created" | "note" | "reply" | "status" | "priority" | "area" | "assignee" | "duplicate"
+  kind      String
+  body      String?
+  data      Json?
+  createdAt DateTime  @default(now())
+
+  @@index([bugId, createdAt])
+}
+
+// Default owner for each area, suggested when a report is triaged.
+model BugAreaOwner {
+  area    String  @id
+  ownerId String?
+  owner   User?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
 }
 
 // ─── Operations ─────────────────────────────────────────────────────────────

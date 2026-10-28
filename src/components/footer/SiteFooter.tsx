@@ -3,6 +3,7 @@ import { getI18n } from "@/lib/i18n/server";
 import { getOrg } from "@/lib/org";
 import { logoUrl } from "@/lib/media";
 import { routes } from "@/lib/routes";
+import { ReportLink } from "./ReportLink";
 import styles from "./Footer.module.css";
 
 export async function SiteFooter() {
@@ -61,7 +62,11 @@ export async function SiteFooter() {
           </address>
         </div>
       </div>
-      <div className={styles.rights}>{t.footer_rights}</div>
+      <div className={styles.rights}>
+        {t.footer_rights}
+        <span aria-hidden> · </span>
+        <ReportLink />
+      </div>
     </footer>
   );
 }

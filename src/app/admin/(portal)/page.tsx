@@ -63,6 +63,16 @@ export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
     stats.push({ section: "subscribers", value: String(confirmed), label: "Confirmed mailing-list subscribers" });
   }
 
+  if (can(roles, "bugs")) {
+    if (can(roles, "bugs_triage")) {
+      const untriaged = await db.bugReport.count({ where: { status: "NEW" } });
+      stats.push({ section: "bugs", value: String(untriaged), label: "Bug reports waiting for triage", alert: untriaged > 0 });
+    } else {
+      const mine = await db.bugReport.count({ where: { assigneeId: user.id, status: { in: ["TRIAGED", "IN_PROGRESS", "NEED_INFO"] } } });
+      stats.push({ section: "bugs", value: String(mine), label: "Open bugs assigned to you", alert: mine > 0 });
+    }
+  }
+
   const activity = can(roles, "activity")
     ? await db.auditLog.findMany({ orderBy: { createdAt: "desc" }, take: 8, include: { actor: { select: { email: true, name: true } } } })
     : [];

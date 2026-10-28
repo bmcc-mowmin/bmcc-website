@@ -54,6 +54,13 @@ build phase lands. Tick them off in the pull request that prepares the launch.
 - [ ] Decide who gets which role (Super admin, Content editor, Prayer times manager, Membership
       coordinator, Treasurer).
 
+## Bug reports
+
+- [ ] Decide who triages new reports (all super admins get the alert email) and set an owner for each
+      area in Admin → Bugs → Area owners.
+- [ ] Decide how long to keep closed reports and their screenshots (they may contain personal
+      details); delete old ones in Admin → Bugs until an automatic clean-up is added.
+
 ## Prayer times from Masjidi
 
 - [ ] Ask Masjidi (support@masjidi.app) for API or data-feed access to BMCC's times. When they
