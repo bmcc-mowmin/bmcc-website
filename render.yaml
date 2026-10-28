@@ -84,6 +84,8 @@ services:
         value: info@brmcc.org
       - key: CONTACT_INBOX # where contact-form messages and new-listing alerts go
         value: info@brmcc.org
+      - key: BUG_INBOX # every new bug report + a copy of each email sent to bug reporters (also editable in Admin → Settings)
+        value: it_support@brmcc.org
 
       # ── Payments ───────────────────────────────────────────────────────────
       - key: PAYMENT_PROVIDER
