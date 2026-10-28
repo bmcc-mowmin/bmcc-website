@@ -21,7 +21,7 @@ Requirements: **Node 24** (`.nvmrc`) and Docker (Docker Desktop, Colima or OrbSt
 
 ```bash
 npm install
-npm run setup        # creates .env from .env.example and generates local secrets/passwords
+npm run setup        # creates .env with local defaults and generates local secrets/passwords
 npm run db:up        # starts Postgres + Mailpit in Docker
 npm run db:deploy    # applies database migrations
 npm run db:seed      # loads sample data (refuses to run when APP_ENV=production)
@@ -257,7 +257,8 @@ times. Adding a provider = one adapter in `src/lib/prayer/sources/`.
 ## Settings
 
 Everything that differs between local and production is an environment variable —
-see [`.env.example`](.env.example) for the full, commented list. Nothing secret is committed.
+see [`render.yaml`](render.yaml) for the full, commented list (and `src/lib/env.ts` for defaults).
+No env files are committed; hosted settings are entered in Render's dashboard.
 Key switches: `APP_ENV`, `AUTH_PROVIDER` (dev → clerk), `PAYMENT_PROVIDER` (mock → stripe),
 `MAIL_TRANSPORT` (smtp/Mailpit → provider), `STORAGE_DRIVER` (local → s3).
 
@@ -306,6 +307,16 @@ an environment variable, so the same image runs anywhere containers run (Render,
 DigitalOcean App Platform, AWS App Runner/ECS, a VPS with Docker…). [GO_LIVE.md](GO_LIVE.md) lists
 what BMCC must decide or supply first.
 
+### Render (branch `render`)
+
+`render.yaml` is a Render Blueprint: Render → **New → Blueprint** → this repo, branch `render`.
+It creates the Docker web service (`bmcc-website`, health check `/api/health`, migrations applied on
+every start) and Postgres 17 (`bmcc-db`, private network only). Render asks once for every value marked
+`sync: false` (Clerk, SMTP, R2 storage, Stripe…); change them later under the service's **Environment**
+tab. Values whose names start with `NEXT_PUBLIC_` (and `SERVER_ACTIONS_ALLOWED_ORIGINS`) are read at
+**build** time, so changing them needs a redeploy, not just a restart. The Blueprint starts as
+`APP_ENV=staging` with the test checkout; switch the items marked GO-LIVE at launch.
+
 ### 1. Put the code on GitHub
 
 Create a **private** repository and push this folder (`.env`, uploads, test sessions and local data
@@ -325,7 +336,7 @@ Docker build. Keep `main` protected so only changes with a green run are deploye
 
 ### 3. Production settings
 
-Start from `.env.example`; anything not listed keeps its default. Never commit these.
+Start from [`render.yaml`](render.yaml); anything not listed keeps its default. Never commit these.
 
 ```
 APP_ENV=production

@@ -1,5 +1,6 @@
 # Production image. Build: docker build -t bmcc-website .
-# Runtime settings come from environment variables (see .env.example); none are baked in.
+# Runtime settings come from environment variables (see render.yaml for the full list); no secrets are baked in.
+# Render passes the service's environment variables as build args; only the public ones below are read at build time.
 
 FROM node:24-alpine AS base
 WORKDIR /app
@@ -21,6 +22,15 @@ RUN npm ci --omit=dev
 
 # ── Build ──────────────────────────────────────────────────────────────────────
 FROM base AS builder
+# Public values compiled into the browser bundle / Next config. Never put secrets here.
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY \
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL \
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL \
+    NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL \
+    NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL \
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY \
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY \
+    SERVER_ACTIONS_ALLOWED_ORIGINS
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Placeholders so env validation passes at build time; real values are supplied at runtime.
