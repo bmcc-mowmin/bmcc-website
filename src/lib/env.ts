@@ -66,6 +66,13 @@ const schema = z
     S3_SECRET_ACCESS_KEY: optional,
     S3_PUBLIC_URL: optional,
 
+    // Which visitor address rate limits count (src/lib/security/client-ip.ts). Behind Cloudflare
+    // (including Render, whose edge is Cloudflare): CLIENT_IP_HEADER=cf-connecting-ip.
+    CLIENT_IP_HEADER: z
+      .string()
+      .optional()
+      .transform((v) => (v ? v.trim().toLowerCase() : undefined)),
+    TRUSTED_PROXY_HOPS: z.coerce.number().int().min(1).max(10).default(1),
     RATE_LIMIT_WINDOW_SEC: z.coerce.number().int().positive().default(600),
     RATE_LIMIT_MAX: z.coerce.number().int().positive().default(5),
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: optional,

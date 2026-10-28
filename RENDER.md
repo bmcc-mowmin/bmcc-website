@@ -54,6 +54,7 @@ MAIL_TRANSPORT=off
 PAYMENT_PROVIDER=mock
 STORAGE_DRIVER=local
 NEXT_TELEMETRY_DISABLED=1
+CLIENT_IP_HEADER=cf-connecting-ip
 DATABASE_URL=
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
@@ -64,6 +65,8 @@ CLERK_SECRET_KEY=
 - `APP_URL` = the service's real address (shown at the top of its page). If it differs, fix it and redeploy.
 - Do **not** set `NODE_ENV`: the build needs the development tools that `npm ci` installs.
 - `HOSTNAME=0.0.0.0` makes the server listen on Render's network; Render sets `PORT` itself.
+- `CLIENT_IP_HEADER=cf-connecting-ip`: Render's edge is Cloudflare, which sets this header to the visitor's
+  real address (visitors can't fake it). Rate limits count per visitor using it.
 
 What the staging values mean:
 

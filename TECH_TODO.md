@@ -18,7 +18,7 @@ Fix before launch, most urgent first:
 - [x] **P1 — Upgrade Next.js 16.3.6 → 16.4.3.** Done Oct 27: `next` and `eslint-config-next`
       16.4.3, which fixes the critical advisories (unauthenticated remote code execution in the image
       optimization API, [GHSA-2464-fhr4-w9xw](https://github.com/advisories/GHSA-2464-fhr4-w9xw), and
-      others). Type check, lint, 35 unit tests, production build and 30 of 31 browser tests (excluding
+      others). Type check, lint, the unit tests, production build and 30 of 31 browser tests (excluding
       those that need Mailpit) pass; the remaining failure is a test bug, below.
 - [x] **P1 — Other vulnerable dependencies.** Done Oct 27: `zod` ^4.6.7, `nodemailer` ^10.2.1 and
       the transitive `source-map-js` and `fast-uri` updated; `npm audit` reports 0 vulnerabilities.
@@ -26,28 +26,37 @@ Fix before launch, most urgent first:
       external address accepts connections from anywhere. After rotating, update `DATABASE_URL` in
       Render and delete `~/.render_db_url` on the Pi. Consider restricting the database's external
       access to known IPs.
-- [ ] **P2 — Visitor IP can be spoofed, weakening rate limits.** `src/lib/request.ts` trusts the
-      *first* `X-Forwarded-For` entry, which the visitor can set themselves (Render and Cloudflare
-      append to it). Use `CF-Connecting-IP` when behind Cloudflare, or the entry added by the trusted
-      proxy (the right-most one), so sign-in and form limits can't be bypassed.
-- [ ] **P2 — Open redirect in `safeNext`** (`src/lib/auth/password-login.ts`, and the same check in
-      `src/app/checkout/[id]/actions.ts`). `/\evil.example` passes (`startsWith("/")`, not `//`),
-      and browsers treat it as `//evil.example`. Also reject a backslash in the second character, or
-      parse with `new URL(next, APP_URL)` and require the same origin.
-- [ ] **P2 — Security headers for the public site.** Only admin pages get `X-Frame-Options`,
-      `noindex` and no-cache. Add site-wide `Strict-Transport-Security`, `X-Content-Type-Options:
-      nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: SAMEORIGIN`
-      (or CSP `frame-ancestors`) in `next.config.ts` `headers()` or a Cloudflare rule. A full
-      Content-Security-Policy must allow Clerk, Turnstile, Stripe/PayPal and Constant Contact.
+- [x] **P2 — Visitor IP could be spoofed, weakening rate limits.** Done Oct 27:
+      `src/lib/security/client-ip.ts` reads a trusted single-address header when
+      `CLIENT_IP_HEADER` is set (`cf-connecting-ip` on Render, whose edge is Cloudflare), otherwise
+      the `X-Forwarded-For` entry added by the trusted proxy (`TRUSTED_PROXY_HOPS`, default 1 =
+      right-most), never the visitor-supplied first entry. Unit tested.
+      - [ ] Add `CLIENT_IP_HEADER=cf-connecting-ip` in Render's Environment tab and redeploy.
+      - [ ] Once brmcc.org is proxied through BMCC's own Cloudflare, confirm the header still carries
+            the visitor's address (e.g. trip the sign-in limit from one phone and check another
+            device can still sign in).
+- [x] **P2 — Open redirect in `safeNext`.** Done Oct 27: `src/lib/security/safe-path.ts` rejects
+      backslashes and control characters and requires the parsed URL to stay on this site; used by
+      sign-in, sign-up, sign-in links and the test checkout. Unit tested, and checked in a browser
+      (`/admin/login?next=/\evil.example` lands on `/admin`).
+- [x] **P2 — Security headers for the public site.** Done Oct 27 in `next.config.ts`:
+      `Strict-Transport-Security: max-age=86400`, `X-Content-Type-Options: nosniff`,
+      `Referrer-Policy: strict-origin-when-cross-origin`, `Content-Security-Policy: frame-ancestors
+      'self'`, `Permissions-Policy` (camera, microphone, geolocation off). Admin pages keep their
+      stricter `X-Frame-Options: DENY` and `no-referrer`.
+      - [ ] After launch is stable, raise HSTS to `max-age=31536000`.
+      - [ ] Later: a full Content-Security-Policy (scripts, frames, connections) that allows Clerk,
+            Turnstile, Stripe/PayPal and Constant Contact; start in report-only mode.
 - [ ] **P2 — Staging test tools are public.** With `PAYMENT_PROVIDER=mock`, anyone with the Render
       address can complete fake checkouts, which create receipts, active memberships and emails
       (when email is on). Fine for testing; clear that data before launch (see the Clerk-only
       section) and don't share the staging address publicly.
-- [ ] **P3 — Mock checkout takes its success URL from the form** instead of the stored checkout
-      session; read it from the session (goes away with the real Stripe adapter).
-- [ ] **P3 — Directory CSV export isn't written to the activity log** (the subscriber export is).
-- [ ] **P3 — `RateLimitBucket` rows are never cleaned up**; add a periodic delete of expired rows
-      (or delete on read) so the table doesn't grow forever.
+- [x] **P3 — Mock checkout took its return address from the form.** Resolved Oct 27 without a
+      database change: the address now goes through `safeNext`, so it can only be a page on this
+      site. (Goes away entirely with the real Stripe adapter.) Test donation verified end to end.
+- [x] **P3 — Directory CSV export wasn't in the activity log.** Done Oct 27.
+- ~~P3 — `RateLimitBucket` rows are never cleaned up~~ — incorrect finding: `rateLimit()` already
+  deletes windows older than 24 hours on about 2% of calls.
 
 Test suite:
 

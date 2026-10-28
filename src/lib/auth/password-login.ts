@@ -35,7 +35,5 @@ export async function passwordLogin(emailRaw: string, password: string): Promise
   return { ok: true, userId: user.id, adminRoles: user.adminRoles };
 }
 
-// Only same-site paths, never "//evil.example" or absolute URLs.
-export function safeNext(next: unknown, fallback: string) {
-  return typeof next === "string" && next.startsWith("/") && !next.startsWith("//") ? next : fallback;
-}
+// Same-site redirect targets only (kept here for existing imports).
+export { safeNext } from "@/lib/security/safe-path";

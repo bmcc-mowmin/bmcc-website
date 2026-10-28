@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { can } from "@/lib/auth/permissions";
 import { toCsv } from "@/lib/directory/csv";
+import { audit } from "@/lib/audit";
 
 // CSV export of every listing (all statuses), in the same columns the import accepts.
 export async function GET() {
@@ -13,6 +14,7 @@ export async function GET() {
     header,
     rows.map((r) => [r.name, r.listingType.toLowerCase(), r.parentCategory, r.category, r.tags.join("; "), r.description, r.author, r.phone, r.email, r.website, r.address, r.city, r.state, r.zip, r.googleMapUrl, r.status.toLowerCase(), r.submitterEmail, r.createdAt.toISOString().slice(0, 10)]),
   );
+  await audit(user.id, "export", "DirectoryListing", "all", { count: rows.length });
   const date = new Date().toISOString().slice(0, 10);
   return new Response(csv, {
     headers: {

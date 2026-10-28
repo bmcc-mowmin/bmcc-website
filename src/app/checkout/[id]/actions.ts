@@ -6,12 +6,12 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { isMockPayments } from "@/lib/payments/provider";
 import { handlePaymentEvent } from "@/lib/payments/events";
+import { safeNext } from "@/lib/security/safe-path";
 
 // The mock checkout's buttons. Each one produces exactly the event Stripe's webhook would.
 export type MockCheckoutState = { error?: string } | undefined;
 
 const id = (prefix: string) => `${prefix}_${randomBytes(9).toString("base64url")}`;
-const relative = (url: unknown, fallback: string) => (typeof url === "string" && url.startsWith("/") && !url.startsWith("//") ? url : fallback);
 
 function addInterval(from: Date, interval: "MONTHLY" | "YEARLY") {
   const d = new Date(from);
@@ -57,12 +57,12 @@ export async function mockPay(_prev: MockCheckoutState, form: FormData): Promise
     },
     "mock",
   );
-  redirect(relative(form.get("success"), "/").replace("{CHECKOUT_ID}", session.id));
+  redirect(safeNext(String(form.get("success") ?? "").replace("{CHECKOUT_ID}", session.id), "/"));
 }
 
 export async function mockCancel(form: FormData) {
   const checkoutId = String(form.get("checkoutId"));
   const session = await openSession(checkoutId);
   if (session) await db.checkoutSession.update({ where: { id: session.id }, data: { status: "CANCELED" } });
-  redirect(relative(form.get("cancel"), "/").replace("{CHECKOUT_ID}", checkoutId));
+  redirect(safeNext(String(form.get("cancel") ?? "").replace("{CHECKOUT_ID}", encodeURIComponent(checkoutId)), "/"));
 }
