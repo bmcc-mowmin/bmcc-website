@@ -20,7 +20,9 @@ function addInterval(from: Date, interval: "MONTHLY" | "YEARLY") {
 }
 
 async function openSession(checkoutId: string) {
-  if (!isMockPayments()) throw new Error("Mock checkout is disabled.");
+  // Test checkout switched off (PAYMENT_PROVIDER=live), e.g. a tab left open from before: treat it
+  // like an expired checkout — the page says to go back and start again.
+  if (!isMockPayments()) return null;
   const s = await db.checkoutSession.findUnique({ where: { id: checkoutId } });
   if (!s || s.provider !== "mock" || s.status !== "OPEN" || s.expiresAt < new Date()) return null;
   return s;
