@@ -127,6 +127,9 @@ dues to the application's email. Setup steps: [RENDER.md → Payments](RENDER.md
 - [x] Per-type method setting and buttons on Donate, Membership, "Complete payment" and My account.
 - [x] Unit tests for the settings and the Stripe/PayPal → event mapping (`tests/unit/payments.test.ts`);
       mock checkout flows re-tested in a browser.
+- [x] PayPal sandbox plans created Oct 28 (`npm run paypal:setup`; ids are in Render). PayPal accepted
+      a per-subscription price ($100/month) and a one-time order in the shapes the code sends.
+      Run it again against the live account before launch.
 - [ ] End-to-end sandbox test of every path, with Stripe test keys and a PayPal sandbox buyer:
       one-time and monthly donation, monthly and yearly dues, cancel on the provider's page,
       "Stop this monthly gift", admin membership cancel, a renewal (Stripe test clock / PayPal
