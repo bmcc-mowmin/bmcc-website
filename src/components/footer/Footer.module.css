@@ -56,6 +56,10 @@
 .links a:hover {
   color: var(--white);
 }
+.rights a {
+  color: inherit;
+  text-decoration: underline;
+}
 .rights {
   border-top: 1px solid var(--footer-rule, #1c2c40);
   text-align: center;

@@ -23,9 +23,9 @@ test("each role sees only its sections", () => {
   assert.ok(!can(["TREASURER"], "memberships"));
 });
 
-test("users, settings and the activity log are super-admin only", () => {
+test("users, settings, privacy requests and the activity log are super-admin only", () => {
   for (const role of ["CONTENT_EDITOR", "PRAYER_MANAGER", "MEMBERSHIP_COORDINATOR", "TREASURER"]) {
-    for (const section of ["users", "settings", "activity"] as const) assert.ok(!can([role], section), `${role} → ${section}`);
+    for (const section of ["users", "settings", "privacy", "activity"] as const) assert.ok(!can([role], section), `${role} → ${section}`);
   }
 });
 

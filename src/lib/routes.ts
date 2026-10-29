@@ -15,6 +15,7 @@ export const routes = {
   memberLogin: "/login", // Clerk's sign-in in production (same address)
   account: "/account",
   search: "/search",
+  privacy: "/privacy",
   hikmahSchool: "https://hikmahschool.com/",
 } as const;
 

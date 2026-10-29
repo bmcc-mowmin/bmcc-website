@@ -5,7 +5,7 @@ export const ADMIN_ROLES = ["SUPER_ADMIN", "CONTENT_EDITOR", "PRAYER_MANAGER", "
 export type AdminRole = (typeof ADMIN_ROLES)[number];
 
 export const ROLE_INFO: Record<AdminRole, { label: string; description: string }> = {
-  SUPER_ADMIN: { label: "Super admin", description: "Everything, including admin users, settings and the activity log." },
+  SUPER_ADMIN: { label: "Super admin", description: "Everything, including admin users, settings, privacy requests and the activity log." },
   CONTENT_EDITOR: { label: "Content editor", description: "Events, announcements, the New BMCC project page, site text, media, subscribers and messages." },
   PRAYER_MANAGER: { label: "Prayer times manager", description: "Prayer times, Iqamah rules, Jumu'ah and the monthly timetable." },
   MEMBERSHIP_COORDINATOR: { label: "Membership coordinator", description: "Members and households, the directory approval queue, messages." },
@@ -27,6 +27,7 @@ export type Section =
   | "media"
   | "settings"
   | "users"
+  | "privacy"
   | "activity";
 
 // Roles (besides SUPER_ADMIN) allowed in each section. [] = super admins only.
@@ -45,6 +46,7 @@ const ACCESS: Record<Section, AdminRole[]> = {
   media: ["CONTENT_EDITOR"],
   settings: [],
   users: [],
+  privacy: [],
   activity: [],
 };
 
@@ -73,6 +75,7 @@ export const NAV: { section: Section; href: string; label: string; built: boolea
   { section: "media", href: "/admin/media", label: "Media library", built: true },
   { section: "settings", href: "/admin/settings", label: "Settings", built: true },
   { section: "users", href: "/admin/users", label: "Admin users", built: true },
+  { section: "privacy", href: "/admin/privacy", label: "Privacy requests", built: true },
   { section: "activity", href: "/admin/activity", label: "Activity log", built: true },
 ];
 

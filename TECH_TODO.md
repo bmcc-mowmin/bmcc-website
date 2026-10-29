@@ -160,10 +160,33 @@ can't activate embedded sign-up forms.
       developer-portal app with the **Authorization Code** OAuth flow (the server keeps the secret
       and a refresh token); on confirmation, add the contact to the list.
 
+## Privacy (personal data)
+
+CCPA most likely doesn't apply to BMCC (a standalone 501(c)(3)); CalOPPA's privacy-policy rule is
+unclear for nonprofit sites, so the site has a policy anyway. Board / attorney to confirm.
+
+- [x] Draft privacy policy at `/privacy` (footer link, 5 languages for the title/link; text in
+      English). Shows a "Draft — not yet in effect" banner outside production. Oct 28.
+- [x] Admin → **Privacy requests** (Super admins): look up an email, preview, confirm by retyping
+      it. Deletes the account, household members, RSVPs, mailing-list entry, contact messages and
+      the Clerk account; cancels active subscriptions at Stripe/PayPal first; keeps payments as
+      "Deleted donor" (amount, fund, date, receipt number); clears household contact details and
+      activity-log details that mention the email; logs only a hash of the email. Staff must lose
+      admin access first. `src/lib/privacy/erase.ts`. Tested end to end on a local copy. Oct 28.
+- [ ] Board / attorney review of the policy; set the effective date; confirm the retention periods
+      (proposed: payments 7 years, lapsed memberships 7 years, contact messages 2 years) and who
+      handles privacy requests.
+- [ ] Retention clean-up job: purge (or anonymize) records past those periods — not built yet.
+- [ ] "Download my data" (access request) — a JSON/CSV export of a person's records; not built yet.
+- [ ] Data minimization: collect household birth dates only if the Funeral Services Benefit needs them.
+
 ## Hosting (Render) — temporary settings to replace before launch
 
-- [ ] Email: `MAIL_TRANSPORT=off` → `smtp`, `resend` or `postmark`; verify brmcc.org (SPF, DKIM,
-      DMARC) with the provider. Receipts, contact replies and admin invites need it.
+- [ ] Email with **Resend** (decided Oct 28): create the account, add brmcc.org under Domains and add
+      the DNS records it shows (SPF, DKIM; plus a DMARC record) in Cloudflare; once verified set
+      `MAIL_TRANSPORT=resend`, `MAIL_PROVIDER_API_KEY=re_…`, `MAIL_FROM=BMCC <no-reply@brmcc.org>`,
+      `MAIL_REPLY_TO`, `CONTACT_INBOX`. See RENDER.md → Email. Receipts, confirmations, contact
+      replies and admin invites need it.
       While it's off: payment success pages say the receipt is in My account → Giving & receipts
       (fixed Oct 28 — they only say "emailed" when a receipt was really sent, and `receiptSentAt` is
       set only then). Other messages still assume email works: the mailing-list "check your inbox",

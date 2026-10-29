@@ -1,0 +1,32 @@
+.draft {
+  background: #fff7e6;
+  border: 1px solid #f0c36d;
+  color: #5c3d00;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 0 0 24px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.draft ul {
+  margin: 6px 0 0;
+  padding-inline-start: 20px;
+}
+.body {
+  line-height: 1.7;
+  color: var(--ink);
+}
+.body h2 {
+  font-size: 20px;
+  margin: 32px 0 8px;
+}
+.body ul {
+  padding-inline-start: 22px;
+}
+.body li {
+  margin: 4px 0;
+}
+.meta {
+  color: var(--muted);
+  font-size: 14px;
+}

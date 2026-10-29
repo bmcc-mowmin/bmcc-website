@@ -61,7 +61,9 @@ export async function SiteFooter() {
           </address>
         </div>
       </div>
-      <div className={styles.rights}>{t.footer_rights}</div>
+      <div className={styles.rights}>
+        {t.footer_rights} · <Link href={routes.privacy}>{t.footer_privacy}</Link>
+      </div>
     </footer>
   );
 }

@@ -103,6 +103,24 @@ Then sign up at `/admin/login?mode=sign-up` with that email.
 Values whose names start with `NEXT_PUBLIC_`, and `SERVER_ACTIONS_ALLOWED_ORIGINS`, are compiled in
 when the site is built. After changing them, use **Manual Deploy → Deploy latest commit**, not just a restart.
 
+## Email: Resend
+
+Until this is set, `MAIL_TRANSPORT=off`: nothing is sent and each skipped email is logged.
+
+1. Sign up at resend.com (a BMCC address), **Domains → Add domain** `brmcc.org`.
+2. Add the DNS records Resend shows (SPF and DKIM) in Cloudflare (**DNS only**, grey cloud), plus a
+   DMARC record if brmcc.org has none, e.g. `_dmarc` TXT `v=DMARC1; p=none; rua=mailto:info@brmcc.org`.
+   Wait for Resend to show the domain as verified.
+3. **API Keys → Create** (sending access) and set:
+   ```
+   MAIL_TRANSPORT=resend
+   MAIL_PROVIDER_API_KEY=re_…
+   MAIL_FROM=BMCC <no-reply@brmcc.org>
+   MAIL_REPLY_TO=info@brmcc.org
+   CONTACT_INBOX=info@brmcc.org
+   ```
+Before the domain is verified, Resend only delivers to the account owner's own address.
+
 ## Payments: Stripe and PayPal
 
 Card and PayPal details are entered on Stripe's or PayPal's own page; this site never sees them.
