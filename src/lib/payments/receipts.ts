@@ -45,11 +45,12 @@ export function receiptText(p: ReceiptPayment, org: Org) {
   return lines.filter((l, i) => l !== "" || lines[i - 1] !== "").join("\n").trim();
 }
 
-export async function emailReceipt(p: ReceiptPayment) {
+// Resolves true when the receipt email was actually sent (false while MAIL_TRANSPORT=off).
+export async function emailReceipt(p: ReceiptPayment): Promise<boolean> {
   const text = receiptText(p, await getOrg());
   const thanks =
     p.kind === "DUES" ? "Thank you — your membership dues were received." : "JazakAllah Khair — thank you for your generous gift to BMCC.";
-  await sendMail({
+  return sendMail({
     to: p.donorEmail,
     subject: `Your BMCC receipt ${p.receiptNumber}`,
     text: `${thanks}\n\n${text}\n\nKeep this email for your records.`,

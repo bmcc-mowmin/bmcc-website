@@ -164,6 +164,10 @@ can't activate embedded sign-up forms.
 
 - [ ] Email: `MAIL_TRANSPORT=off` → `smtp`, `resend` or `postmark`; verify brmcc.org (SPF, DKIM,
       DMARC) with the provider. Receipts, contact replies and admin invites need it.
+      While it's off: payment success pages say the receipt is in My account → Giving & receipts
+      (fixed Oct 28 — they only say "emailed" when a receipt was really sent, and `receiptSentAt` is
+      set only then). Other messages still assume email works: the mailing-list "check your inbox",
+      the contact form's acknowledgement, sign-in links (dev login) and admin invites.
 - [ ] Files: `STORAGE_DRIVER=local` (wiped on every deploy) → `s3` with a Cloudflare R2 bucket;
       re-upload photos.
 - [ ] Upgrade the free web instance (sleeps when idle) and the free database (expires after 30 days,

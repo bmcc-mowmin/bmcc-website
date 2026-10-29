@@ -34,15 +34,16 @@ async function viaHttp(url: string, headers: Record<string, string>, body: unkno
   if (!res.ok) throw new Error(`Email provider error ${res.status}: ${await res.text()}`);
 }
 
-export async function sendMail(mail: Mail) {
+// Resolves true when the email was handed to the provider, false when sending is off.
+export async function sendMail(mail: Mail): Promise<boolean> {
   const replyTo = mail.replyTo ?? env.MAIL_REPLY_TO;
   switch (env.MAIL_TRANSPORT) {
     case "off":
       console.info(`[mail off] skipped "${mail.subject}" to ${mail.to.replace(/^(.).*@/, "$1***@")}`);
-      return;
+      return false;
     case "smtp":
       await smtpTransport().sendMail({ from: env.MAIL_FROM, to: mail.to, subject: mail.subject, text: mail.text, html: mail.html, replyTo, headers: mail.headers });
-      return;
+      return true;
     case "resend":
       await viaHttp("https://api.resend.com/emails", { Authorization: `Bearer ${env.MAIL_PROVIDER_API_KEY}` }, {
         from: env.MAIL_FROM,
@@ -53,7 +54,7 @@ export async function sendMail(mail: Mail) {
         reply_to: replyTo,
         headers: mail.headers,
       });
-      return;
+      return true;
     case "postmark":
       await viaHttp("https://api.postmarkapp.com/email", { "X-Postmark-Server-Token": env.MAIL_PROVIDER_API_KEY! }, {
         From: env.MAIL_FROM,
@@ -65,7 +66,7 @@ export async function sendMail(mail: Mail) {
         Headers: Object.entries(mail.headers ?? {}).map(([Name, Value]) => ({ Name, Value })),
         MessageStream: "outbound",
       });
-      return;
+      return true;
   }
 }
 

@@ -53,8 +53,8 @@ async function recordPayment(tx: Tx, data: Omit<Prisma.PaymentUncheckedCreateInp
   const paidAt = (data.paidAt as Date) ?? new Date();
   const payment = await tx.payment.create({ data: { ...data, paidAt, status: "SUCCEEDED", receiptNumber: await nextReceiptNumber(tx, paidAt) } });
   after.push(async () => {
-    await emailReceipt(payment);
-    await db.payment.update({ where: { id: payment.id }, data: { receiptSentAt: new Date() } });
+    // receiptSentAt only when an email really went out (not while email is switched off).
+    if (await emailReceipt(payment)) await db.payment.update({ where: { id: payment.id }, data: { receiptSentAt: new Date() } });
   });
   return payment;
 }

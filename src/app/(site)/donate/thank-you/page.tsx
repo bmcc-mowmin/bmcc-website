@@ -47,7 +47,12 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/donate/
         </div>
         <h1 className={styles.resultH}>{t.donate_thanks_heading}</h1>
         <p className={styles.resultP}>{line}</p>
-        {(payment?.donorEmail ?? session.email) && <p className={styles.resultP}>{t.donate_receipt_sent.replace("{email}", maskEmail(payment?.donorEmail ?? session.email ?? ""))}</p>}
+        {/* Say it was emailed only if it really was; otherwise point to My account → Giving. */}
+        {payment?.receiptSentAt ? (
+          <p className={styles.resultP}>{t.donate_receipt_sent.replace("{email}", maskEmail(payment.donorEmail))}</p>
+        ) : (
+          <p className={styles.resultP}>{t.receipt_in_account}</p>
+        )}
         {payment?.receiptNumber && (
           <p className={styles.resultMeta}>
             {t.receipt_number}: <strong>{payment.receiptNumber}</strong>

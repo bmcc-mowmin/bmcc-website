@@ -63,6 +63,8 @@ export default async function MembershipComplete({ searchParams }: PageProps<"/m
     );
   }
 
+  // Say emails went out only if the receipt for this checkout was really emailed.
+  const emailed = !!(await db.payment.findFirst({ where: { providerCheckoutId: session.id, receiptSentAt: { not: null } }, select: { id: true } }));
   const starts = m.benefitEligibleFrom
     ? new Intl.DateTimeFormat(intlLocale(lang), { dateStyle: "long", timeZone: "America/Los_Angeles" }).format(m.benefitEligibleFrom)
     : "";
@@ -72,7 +74,7 @@ export default async function MembershipComplete({ searchParams }: PageProps<"/m
         ✓
       </div>
       <h1 className={styles.resultH}>{t.m_paid_heading}</h1>
-      <p className={styles.resultP}>{t.m_paid_paragraph.replace("{email}", maskEmail(m.household.email))}</p>
+      <p className={styles.resultP}>{emailed ? t.m_paid_paragraph.replace("{email}", maskEmail(m.household.email)) : t.m_paid_paragraph_account}</p>
       {starts && <p className={styles.resultP}>{t.m_benefit_starts.replace("{date}", starts)}</p>}
       <p className={styles.resultMeta}>
         {t.reference_id} <strong>{m.referenceId}</strong>
