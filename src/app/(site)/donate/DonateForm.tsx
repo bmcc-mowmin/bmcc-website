@@ -6,10 +6,21 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 import { HoneypotFields } from "@/components/forms/HoneypotFields";
 import type { MessageKey } from "@/lib/i18n/dictionary";
 import { DEFAULT_AMOUNT, FUNDS, MAX_DONATION, MIN_DONATION, PRESET_AMOUNTS, type FundId } from "@/lib/payments/catalog";
+import { PayButtons } from "@/components/payments/PayButtons";
+import type { PaymentMethod } from "@/lib/payments/methods";
 import { startDonation, type DonateState } from "./actions";
 import styles from "./donate.module.css";
 
-export function DonateForm({ defaultFrequency, initialFund }: { defaultFrequency: "monthly" | "one-time"; initialFund: FundId }) {
+export function DonateForm({
+  defaultFrequency,
+  initialFund,
+  methods,
+}: {
+  defaultFrequency: "monthly" | "one-time";
+  initialFund: FundId;
+  // Payment methods offered for one-time and monthly gifts (from PAYMENT_METHODS).
+  methods: { once: PaymentMethod[]; monthly: PaymentMethod[] };
+}) {
   const { t } = useI18n();
   const [fund, setFund] = useState<FundId>(initialFund);
   const [frequency, setFrequency] = useState(defaultFrequency);
@@ -20,6 +31,7 @@ export function DonateForm({ defaultFrequency, initialFund }: { defaultFrequency
   const chosen = custom ? Number(custom) : amount;
   const valid = !!chosen && chosen >= MIN_DONATION && chosen <= MAX_DONATION;
   const monthly = frequency === "monthly";
+  const offered = monthly ? methods.monthly : methods.once;
   const fundName = t[FUNDS.find((f) => f.id === fund)!.nameKey as MessageKey];
   const label = `${t.donate_button_prefix} $${chosen && Number.isFinite(chosen) ? chosen.toLocaleString("en-US") : "—"} ${monthly ? t.donate_suffix_monthly : t.donate_suffix_once} ${t.donate_button_to} ${fundName}`;
 
@@ -104,9 +116,15 @@ export function DonateForm({ defaultFrequency, initialFund }: { defaultFrequency
           {state.error}
         </p>
       )}
-      <button type="submit" disabled={!valid || pending} className={styles.donateButton}>
-        {label} →
-      </button>
+      {offered.length > 1 ? (
+        <>
+          <p className={styles.paySummary}>{label}</p>
+          <p className={styles.label}>{t.pay_choose}</p>
+          <PayButtons methods={offered} disabled={!valid || pending} className={styles.donateButton} label={(m) => (m === "paypal" ? t.pay_with_paypal : `${t.pay_by_card} →`)} />
+        </>
+      ) : (
+        <PayButtons methods={offered} disabled={!valid || pending} className={styles.donateButton} label={() => `${label} →`} />
+      )}
       <p className={styles.note}>{t.donate_receipts_note}</p>
     </form>
   );

@@ -4,11 +4,10 @@ import { randomBytes } from "node:crypto";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { isMockPayments } from "@/lib/payments/provider";
+import { afterCheckoutUrl, isMockPayments } from "@/lib/payments/provider";
 import { handlePaymentEvent } from "@/lib/payments/events";
-import { safeNext } from "@/lib/security/safe-path";
 
-// The mock checkout's buttons. Each one produces exactly the event Stripe's webhook would.
+// The mock checkout's buttons. Each one produces exactly the event a provider's webhook would.
 export type MockCheckoutState = { error?: string } | undefined;
 
 const id = (prefix: string) => `${prefix}_${randomBytes(9).toString("base64url")}`;
@@ -57,12 +56,13 @@ export async function mockPay(_prev: MockCheckoutState, form: FormData): Promise
     },
     "mock",
   );
-  redirect(safeNext(String(form.get("success") ?? "").replace("{CHECKOUT_ID}", session.id), "/"));
+  redirect(afterCheckoutUrl(session, "success"));
 }
 
 export async function mockCancel(form: FormData) {
   const checkoutId = String(form.get("checkoutId"));
   const session = await openSession(checkoutId);
   if (session) await db.checkoutSession.update({ where: { id: session.id }, data: { status: "CANCELED" } });
-  redirect(safeNext(String(form.get("cancel") ?? "").replace("{CHECKOUT_ID}", encodeURIComponent(checkoutId)), "/"));
+  const row = session ?? (await db.checkoutSession.findUnique({ where: { id: checkoutId } }));
+  redirect(row ? afterCheckoutUrl(row, "cancel") : "/");
 }

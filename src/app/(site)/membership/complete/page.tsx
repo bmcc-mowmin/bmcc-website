@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import { getI18n } from "@/lib/i18n/server";
 import { intlLocale } from "@/lib/i18n/config";
 import { routes } from "@/lib/routes";
+import { PayButtons } from "@/components/payments/PayButtons";
+import { methodsFor } from "@/lib/payments/provider";
 import { resumeDuesPayment } from "../actions";
 import styles from "../membership.module.css";
 
@@ -17,7 +19,7 @@ const maskEmail = (e: string) => e.replace(/^(.)[^@]*/, "$1***");
 
 // Where checkout returns to — paid (welcome + benefit start date) or not (offer to finish paying).
 export default async function MembershipComplete({ searchParams }: PageProps<"/membership/complete">) {
-  const [{ t, lang }, { checkout }] = await Promise.all([getI18n(), searchParams]);
+  const [{ t, lang }, { checkout, pending, payment_failed }] = await Promise.all([getI18n(), searchParams]);
   const session =
     typeof checkout === "string"
       ? await db.checkoutSession.findUnique({ where: { id: checkout }, include: { membership: { include: { household: true } } } })
@@ -25,22 +27,37 @@ export default async function MembershipComplete({ searchParams }: PageProps<"/m
   const m = session?.membership;
   if (!session || session.kind !== "DUES" || !m) redirect(routes.membership);
 
+  // Back from Stripe/PayPal, paid but not confirmed yet: the webhook finishes it.
+  if (m.status === "PENDING_PAYMENT" && pending && session.status === "OPEN") {
+    return (
+      <section className={styles.result}>
+        <div className={`${styles.check} ${styles.warn}`} aria-hidden>
+          …
+        </div>
+        <h1 className={styles.resultH}>{t.pay_processing_heading}</h1>
+        <p className={styles.resultP}>{t.pay_processing_text}</p>
+        <p className={styles.resultMeta}>
+          {t.reference_id} <strong>{m.referenceId}</strong>
+        </p>
+      </section>
+    );
+  }
+
   if (m.status === "PENDING_PAYMENT") {
+    const methods = methodsFor("dues");
     return (
       <section className={styles.result}>
         <div className={`${styles.check} ${styles.warn}`} aria-hidden>
           !
         </div>
         <h1 className={styles.resultH}>{t.m_unpaid_heading}</h1>
-        <p className={styles.resultP}>{t.m_unpaid_text}</p>
+        <p className={styles.resultP}>{payment_failed ? t.pay_failed : t.m_unpaid_text}</p>
         <p className={styles.resultMeta}>
           {t.reference_id} <strong>{m.referenceId}</strong>
         </p>
         <form action={resumeDuesPayment}>
           <input type="hidden" name="checkoutId" value={session.id} />
-          <button type="submit" className="btn btn-primary">
-            {t.m_complete_payment} →
-          </button>
+          <PayButtons methods={methods} className="btn btn-primary" label={(x) => (methods.length < 2 ? `${t.m_complete_payment} →` : x === "paypal" ? t.pay_with_paypal : `${t.pay_by_card} →`)} />
         </form>
       </section>
     );

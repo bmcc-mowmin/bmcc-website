@@ -8,6 +8,8 @@ import { masjidClock } from "@/lib/prayer/schedule";
 import { routes } from "@/lib/routes";
 import type { MessageKey } from "@/lib/i18n/dictionary";
 import { payPendingDues } from "./actions";
+import { PayButtons } from "@/components/payments/PayButtons";
+import { methodsFor } from "@/lib/payments/provider";
 import { formatDate } from "./format";
 import styles from "./account.module.css";
 
@@ -23,6 +25,7 @@ export default async function AccountOverview() {
   const { t, lang } = await getI18n();
   const [memberships, { timeZone }] = await Promise.all([getMyMemberships(user), masjidClock()]);
   const date = (d: Date) => formatDate(d, lang, timeZone);
+  const duesMethods = methodsFor("dues");
 
   if (memberships.length === 0) {
     return (
@@ -55,9 +58,7 @@ export default async function AccountOverview() {
                 <p>{t.acct_pending_note}</p>
                 <form action={payPendingDues}>
                   <input type="hidden" name="membershipId" value={m.id} />
-                  <button type="submit" className="btn btn-primary">
-                    {t.acct_pay_now}
-                  </button>
+                  <PayButtons methods={duesMethods} className="btn btn-primary" label={(x) => (duesMethods.length < 2 ? t.acct_pay_now : x === "paypal" ? t.pay_with_paypal : t.pay_by_card)} />
                 </form>
               </div>
             )}

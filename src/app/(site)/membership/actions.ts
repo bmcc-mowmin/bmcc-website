@@ -10,6 +10,8 @@ import { checkHoneypot } from "@/lib/security/honeypot";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { clientIp } from "@/lib/request";
 import { startDuesCheckout } from "@/lib/membership/checkout";
+import { CheckoutStartFailed, offeredMethod } from "@/lib/payments/provider";
+import { getCurrentUser } from "@/lib/auth";
 
 export type MembershipState = { errors: Record<string, string>; values: Record<string, string>; message?: string } | undefined;
 
@@ -95,6 +97,9 @@ export async function applyForMembership(_prev: MembershipState, form: FormData)
     return { errors, values, message: t.form_error_generic };
   }
   const p = primary.data;
+  // The payment button they pressed must be one offered for dues (checked before anything is saved).
+  const method = offeredMethod("dues", form.get("method"));
+  if (!method) return { errors: {}, values, message: t.pay_method_unavailable };
 
   const membership = await db.$transaction(async (tx) => {
     const household = await tx.household.create({
@@ -126,7 +131,20 @@ export async function applyForMembership(_prev: MembershipState, form: FormData)
     });
   });
 
-  redirect(await startDuesCheckout(membership.id, p.plan, p.email, p.fullName, lang));
+  const user = await getCurrentUser();
+  redirect(await duesCheckoutOrRetry({ membershipId: membership.id, plan: p.plan, email: p.email, name: p.fullName, lang, userId: user?.id }, method));
+}
+
+// The provider's page, or — if it couldn't be started — the "complete your payment" page for this
+// application (it's saved; the person tries again from there, without re-applying).
+async function duesCheckoutOrRetry(m: Parameters<typeof startDuesCheckout>[0], method: unknown) {
+  try {
+    return await startDuesCheckout(m, method);
+  } catch (e) {
+    if (!(e instanceof CheckoutStartFailed)) throw e;
+    console.error("Starting a dues checkout failed", e.cause);
+    return `/membership/complete?checkout=${encodeURIComponent(e.checkoutId)}&payment_failed=1`;
+  }
 }
 
 // "Complete payment" for an application whose checkout was canceled.
@@ -138,5 +156,8 @@ export async function resumeDuesPayment(form: FormData) {
   });
   const m = old?.membership;
   if (!m || m.status !== "PENDING_PAYMENT") redirect("/membership");
-  redirect(await startDuesCheckout(m.id, m.plan, m.household.email, m.household.members[0]?.fullName ?? "", lang));
+  const method = offeredMethod("dues", form.get("method"));
+  if (!method) redirect(`/membership/complete?checkout=${encodeURIComponent(old!.id)}`);
+  const user = await getCurrentUser();
+  redirect(await duesCheckoutOrRetry({ membershipId: m.id, plan: m.plan, email: m.household.email, name: m.household.members[0]?.fullName ?? "", lang, userId: user?.id }, method));
 }

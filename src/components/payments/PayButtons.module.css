@@ -1,0 +1,14 @@
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* PayPal's brand button colours (gold, dark text). Two classes so it wins over the page's button style. */
+.group .paypal,
+.group .paypal:hover {
+  background: #ffc439;
+  color: #111827;
+}
+.group .paypal:hover {
+  filter: brightness(0.96);
+}

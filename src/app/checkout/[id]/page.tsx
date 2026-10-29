@@ -8,10 +8,10 @@ import styles from "./checkout.module.css";
 
 export const metadata: Metadata = { title: "Test checkout", robots: { index: false } };
 
-// Stand-in for Stripe Checkout while PAYMENT_PROVIDER=mock. Doesn't exist otherwise.
-export default async function MockCheckoutPage({ params, searchParams }: PageProps<"/checkout/[id]">) {
+// Stand-in for Stripe / PayPal while PAYMENT_PROVIDER=mock. Doesn't exist otherwise.
+export default async function MockCheckoutPage({ params }: PageProps<"/checkout/[id]">) {
   if (!isMockPayments()) notFound();
-  const [{ id }, query] = await Promise.all([params, searchParams]);
+  const { id } = await params;
   const session = await db.checkoutSession.findUnique({
     where: { id },
     include: { membership: { include: { household: { include: { members: { where: { relationship: "SELF" } } } } } } },
@@ -24,12 +24,11 @@ export default async function MockCheckoutPage({ params, searchParams }: PagePro
       ? `BMCC membership dues (${session.frequency === "YEARLY" ? "yearly" : "monthly"})`
       : `Donation — ${isFund(session.fund) ? FUND_LABELS[session.fund] : "General"}${session.frequency === "MONTHLY" ? " (monthly)" : ""}`;
   const household = session.membership?.household;
-  const str = (v: unknown, fallback: string) => (typeof v === "string" ? v : fallback);
 
   return (
     <main className={styles.page} lang="en" dir="ltr">
       <div className={styles.banner} role="note">
-        TEST MODE — no money moves. In production this step is Stripe Checkout.
+        TEST MODE — no money moves. In production this step is Stripe or PayPal.
       </div>
       <div className={styles.card}>
         <div className={styles.org}>Brentwood Muslim Community Center</div>
@@ -46,8 +45,6 @@ export default async function MockCheckoutPage({ params, searchParams }: PagePro
             amount={`${usd(session.amountCents)}${recurring}`}
             email={session.email ?? household?.email ?? ""}
             name={session.name ?? household?.members[0]?.fullName ?? ""}
-            success={str(query.success, "/")}
-            cancel={str(query.cancel, "/")}
           />
         )}
       </div>

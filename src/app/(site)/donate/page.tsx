@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getI18n } from "@/lib/i18n/server";
 import { routes } from "@/lib/routes";
 import { DEFAULT_FUND, isFund } from "@/lib/payments/catalog";
+import { methodsFor } from "@/lib/payments/provider";
 import { DonateForm } from "./DonateForm";
 import styles from "./donate.module.css";
 
@@ -27,11 +28,11 @@ export default async function DonatePage({ searchParams }: PageProps<"/donate">)
       </div>
       {params.canceled && (
         <p role="status" className={styles.canceled}>
-          {t.donate_canceled}
+          {params.payment_failed ? t.pay_failed : t.donate_canceled}
         </p>
       )}
       <div className={styles.grid}>
-        <DonateForm defaultFrequency={frequency} initialFund={fund} />
+        <DonateForm defaultFrequency={frequency} initialFund={fund} methods={{ once: methodsFor("donation"), monthly: methodsFor("donation_monthly") }} />
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>{t.donate_join_title}</h2>
           <p className={styles.cardSub}>

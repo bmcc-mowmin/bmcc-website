@@ -8,8 +8,8 @@ import { emailReceipt, nextReceiptNumber } from "./receipts";
 import { DUES, usd } from "./catalog";
 import type { PaymentEvent } from "./types";
 
-// THE place where money events change our records — for every provider (mock now, Stripe at
-// go-live via its webhook). Each event id is processed once, even if the provider sends it twice.
+// THE place where money events change our records — for every provider (mock, Stripe, PayPal;
+// from return pages and webhooks). Each event id is processed once, even if the provider sends it twice.
 // Emails are sent after the database work and never make an event fail.
 
 type Tx = Prisma.TransactionClient;
@@ -62,8 +62,11 @@ async function recordPayment(tx: Tx, data: Omit<Prisma.PaymentUncheckedCreateInp
 async function checkoutCompleted(tx: Tx, e: Extract<PaymentEvent, { type: "checkout.completed" }>, provider: string, after: (() => Promise<void>)[]) {
   const checkout = await tx.checkoutSession.findUnique({ where: { id: e.checkoutId } });
   if (!checkout || checkout.status === "COMPLETED") return;
-  await tx.checkoutSession.update({ where: { id: checkout.id }, data: { status: "COMPLETED", completedAt: e.paidAt, email: e.email, name: e.name } });
-  const userId = await userIdFor(tx, e.email, e.name);
+  await tx.checkoutSession.update({ where: { id: checkout.id }, data: { status: "COMPLETED", completedAt: e.paidAt, email: checkout.email ?? e.email, name: checkout.name ?? e.name } });
+  // Whose account the payment belongs to: the signed-in person who started the checkout; for dues,
+  // the email on the membership application; otherwise the email they paid with. (A PayPal or card
+  // account can use a different email from the one the person signs in with.)
+  const userId = checkout.userId ?? (await userIdFor(tx, checkout.kind === "DUES" && checkout.email ? checkout.email : e.email, checkout.name ?? e.name));
 
   if (e.providerSubscriptionId) {
     await tx.subscription.create({
@@ -127,6 +130,8 @@ async function checkoutCompleted(tx: Tx, e: Extract<PaymentEvent, { type: "check
 async function invoicePaid(tx: Tx, e: Extract<PaymentEvent, { type: "invoice.paid" }>, provider: string, after: (() => Promise<void>)[]) {
   const sub = await tx.subscription.findUnique({ where: { providerSubscriptionId: e.providerSubscriptionId } });
   if (!sub) return;
+  // Already recorded (e.g. the first payment, recorded with the checkout).
+  if (await tx.payment.findUnique({ where: { providerPaymentId: e.providerPaymentId } })) return;
   await tx.subscription.update({ where: { id: sub.id }, data: { status: "ACTIVE", currentPeriodEnd: e.currentPeriodEnd } });
   await recordPayment(
     tx,

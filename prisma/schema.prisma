@@ -362,7 +362,7 @@ model Payment {
   user                   User?            @relation(fields: [userId], references: [id])
   membershipId           String?
   membership             Membership?      @relation(fields: [membershipId], references: [id])
-  provider               String // "mock" | "stripe"
+  provider               String // "mock" | "stripe" | "paypal"
   providerCheckoutId     String?
   providerPaymentId      String?          @unique
   providerSubscriptionId String?
@@ -394,7 +394,8 @@ enum SubscriptionStatus {
 }
 
 // A checkout started on the site (donation or membership dues). With PAYMENT_PROVIDER=mock this is
-// the whole checkout; with Stripe it mirrors the Stripe Checkout Session.
+// the whole checkout; otherwise it mirrors the provider's checkout (`provider` = "stripe" | "paypal";
+// `providerSessionId` = the Stripe Checkout Session, PayPal order or PayPal subscription id).
 model CheckoutSession {
   id                String           @id @default(cuid())
   provider          String // "mock" | "stripe"
@@ -408,7 +409,14 @@ model CheckoutSession {
   membership        Membership?      @relation(fields: [membershipId], references: [id])
   email             String?
   name              String?
+  // The signed-in person who started it: their payment is linked to them even if they pay with a
+  // PayPal or card account under another email.
+  userId            String?
   lang              String           @default("en")
+  // Where the person goes afterwards (same-site paths; "{CHECKOUT_ID}" is filled in). Stored here,
+  // never taken from the browser.
+  successUrl        String?
+  cancelUrl         String?
   status            CheckoutStatus   @default(OPEN)
   createdAt         DateTime         @default(now())
   completedAt       DateTime?

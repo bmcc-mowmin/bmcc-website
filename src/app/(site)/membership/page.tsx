@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getI18n } from "@/lib/i18n/server";
+import { methodsFor } from "@/lib/payments/provider";
 import { MembershipForm } from "./MembershipForm";
 import styles from "./membership.module.css";
 
@@ -23,7 +24,7 @@ export default async function MembershipPage() {
         </div>
       </section>
       <div className={styles.wrap}>
-        <MembershipForm />
+        <MembershipForm methods={methodsFor("dues")} />
       </div>
     </>
   );

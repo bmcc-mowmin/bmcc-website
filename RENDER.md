@@ -74,7 +74,7 @@ What the staging values mean:
 |---|---|---|
 | `APP_ENV` | `staging` | Clerk development keys and the test checkout are allowed |
 | `MAIL_TRANSPORT` | `off` | No email is sent; each skipped email is logged |
-| `PAYMENT_PROVIDER` | `mock` | Clearly labelled test checkout, no real money |
+| `PAYMENT_PROVIDER` | `mock` | Clearly labelled test checkout, no real money (`live` = Stripe / PayPal; see Payments) |
 | `STORAGE_DRIVER` | `local` | Uploaded photos/PDFs are on the service's disk and **wiped on every deploy or restart** |
 
 ## 4. Deploy and check
@@ -103,13 +103,54 @@ Then sign up at `/admin/login?mode=sign-up` with that email.
 Values whose names start with `NEXT_PUBLIC_`, and `SERVER_ACTIONS_ALLOWED_ORIGINS`, are compiled in
 when the site is built. After changing them, use **Manual Deploy → Deploy latest commit**, not just a restart.
 
+## Payments: Stripe and PayPal
+
+Card and PayPal details are entered on Stripe's or PayPal's own page; this site never sees them.
+`PAYMENT_PROVIDER=live` turns the real providers on, and `PAYMENT_METHODS` chooses which are offered
+for each payment type — the Donate and Membership pages show one button per method, main one first:
+
+```
+PAYMENT_PROVIDER=live
+PAYMENT_METHODS=donation:stripe,paypal;donation_monthly:stripe;dues:stripe,paypal
+```
+
+Types: `donation` (one-time gift), `donation_monthly`, `dues` (membership, monthly or yearly).
+Methods: `stripe`, `paypal`. Use test/sandbox credentials while `APP_ENV=staging`.
+
+**Stripe** (Developers → API keys, test mode on Render):
+1. Add `STRIPE_SECRET_KEY=sk_test_…`. No products or prices need creating.
+2. Developers → Webhooks → **Add endpoint** `https://<site>/api/webhooks/stripe` with events
+   `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.paid`,
+   `invoice.payment_failed`, `customer.subscription.deleted`. Copy its signing secret into
+   `STRIPE_WEBHOOK_SECRET=whsec_…`. (Without it, payments still record when people return from
+   Stripe, but renewals, failed renewals and cancellations made in Stripe don't.)
+
+**PayPal** (developer.paypal.com → Apps & Credentials, Sandbox):
+1. Add `PAYPAL_ENV=sandbox`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`.
+2. If PayPal takes monthly gifts or dues, create the subscription plans once (from any checkout of
+   this branch, e.g. the Pi) and add the two printed settings:
+   ```
+   PAYPAL_ENV=sandbox PAYPAL_CLIENT_ID=… PAYPAL_CLIENT_SECRET=… npm run paypal:setup
+   # → PAYPAL_PLAN_MONTHLY=P-…  PAYPAL_PLAN_YEARLY=P-…
+   ```
+3. Your app → **Webhooks → Add webhook** `https://<site>/api/webhooks/paypal` with events
+   `PAYMENT.CAPTURE.COMPLETED`, `BILLING.SUBSCRIPTION.ACTIVATED`, `PAYMENT.SALE.COMPLETED`,
+   `BILLING.SUBSCRIPTION.PAYMENT.FAILED`, `BILLING.SUBSCRIPTION.SUSPENDED`,
+   `BILLING.SUBSCRIPTION.CANCELLED`, `BILLING.SUBSCRIPTION.EXPIRED`. Put its Webhook ID in
+   `PAYPAL_WEBHOOK_ID`.
+4. Test with a sandbox **personal** account (Testing Tools → Sandbox Accounts).
+
+These settings are read at runtime: save them and Render restarts the service (no rebuild needed).
+The app refuses to start if a method in `PAYMENT_METHODS` is missing its credentials, and in
+production it requires live keys (`sk_live_`, `PAYPAL_ENV=live`) and both webhook secrets.
+
 ## Before launch (GO-LIVE)
 
 | Area | Change to | Also set |
 |---|---|---|
 | Environment | `APP_ENV=production`, `APP_URL=https://brmcc.org` | `ADMIN_HOST=admin.brmcc.org`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` (`openssl rand -base64 32`) |
 | Sign-in | Clerk production keys (`pk_live_` / `sk_live_`) | `CLERK_WEBHOOK_SECRET` |
-| Payments | `PAYMENT_PROVIDER=stripe` (after the Stripe adapter is built) | `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MEMBERSHIP_MONTHLY`, `STRIPE_PRICE_MEMBERSHIP_YEARLY` |
+| Payments | `PAYMENT_PROVIDER=live` with live Stripe/PayPal credentials (see Payments below) | `STRIPE_SECRET_KEY` (`sk_live_`), `STRIPE_WEBHOOK_SECRET`, `PAYPAL_ENV=live`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `PAYPAL_PLAN_MONTHLY`, `PAYPAL_PLAN_YEARLY` |
 | Email | `MAIL_TRANSPORT=smtp` (or `resend` / `postmark`) | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD` (or `MAIL_PROVIDER_API_KEY`); `MAIL_FROM`, `MAIL_REPLY_TO`, `CONTACT_INBOX` |
 | Files | `STORAGE_DRIVER=s3` (Cloudflare R2) | `S3_ENDPOINT` (`https://<account-id>.r2.cloudflarestorage.com`), `S3_REGION=auto`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, optional `S3_PUBLIC_URL` |
 | Spam protection | Cloudflare Turnstile (optional) | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |

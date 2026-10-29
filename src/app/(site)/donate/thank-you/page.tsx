@@ -17,8 +17,22 @@ export async function generateMetadata(): Promise<Metadata> {
 const maskEmail = (e: string) => e.replace(/^(.)[^@]*/, "$1***");
 
 export default async function ThankYouPage({ searchParams }: PageProps<"/donate/thank-you">) {
-  const [{ t }, { checkout }] = await Promise.all([getI18n(), searchParams]);
+  const [{ t }, { checkout, pending }] = await Promise.all([getI18n(), searchParams]);
   const session = typeof checkout === "string" ? await db.checkoutSession.findUnique({ where: { id: checkout } }) : null;
+  // Back from Stripe/PayPal, approved but not confirmed yet: the webhook finishes it.
+  if (session && session.kind === "DONATION" && session.status === "OPEN" && pending) {
+    return (
+      <section className="container section-y">
+        <div className={styles.result}>
+          <div className={styles.check} aria-hidden>
+            …
+          </div>
+          <h1 className={styles.resultH}>{t.pay_processing_heading}</h1>
+          <p className={styles.resultP}>{t.pay_processing_text}</p>
+        </div>
+      </section>
+    );
+  }
   if (!session || session.kind !== "DONATION" || session.status !== "COMPLETED") redirect(routes.donate);
   const payment = await db.payment.findFirst({ where: { providerCheckoutId: session.id } });
   const fundKey = FUNDS.find((f) => f.id === session.fund)?.nameKey;
@@ -33,7 +47,7 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/donate/
         </div>
         <h1 className={styles.resultH}>{t.donate_thanks_heading}</h1>
         <p className={styles.resultP}>{line}</p>
-        {session.email && <p className={styles.resultP}>{t.donate_receipt_sent.replace("{email}", maskEmail(session.email))}</p>}
+        {(payment?.donorEmail ?? session.email) && <p className={styles.resultP}>{t.donate_receipt_sent.replace("{email}", maskEmail(payment?.donorEmail ?? session.email ?? ""))}</p>}
         {payment?.receiptNumber && (
           <p className={styles.resultMeta}>
             {t.receipt_number}: <strong>{payment.receiptNumber}</strong>

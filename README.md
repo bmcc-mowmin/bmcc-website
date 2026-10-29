@@ -144,8 +144,10 @@ rate limit (`RATE_LIMIT_MAX` per `RATE_LIMIT_WINDOW_SEC` per visitor IP).
 
 **Payments** go through one provider interface (`src/lib/payments`). `PAYMENT_PROVIDER=mock` (local)
 sends visitors to a clearly-labelled **test checkout** at `/checkout/<id>` — no card details, no money —
-with *Pay*, *Simulate a declined card* and *Cancel*. `stripe` (go-live) swaps in Stripe Checkout and
-its webhook. Both produce the same provider-neutral events, handled in **one place**
+with *Pay*, *Simulate a declined card* and *Cancel*. `live` sends them to **Stripe Checkout** or
+**PayPal** (hosted pages; `PAYMENT_METHODS` picks which are offered per payment type, one button each —
+see [RENDER.md → Payments](RENDER.md#payments-stripe-and-paypal)). Every provider produces the same
+provider-neutral events, from its return page and its webhook, handled in **one place**
 (`src/lib/payments/events.ts`): each event is applied exactly once and all-or-nothing, then receipts
 are emailed (numbered `BMCC-YYYY-000001` from a database sequence).
 

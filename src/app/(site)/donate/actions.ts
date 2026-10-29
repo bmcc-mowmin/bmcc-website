@@ -6,7 +6,8 @@ import { getDictionary } from "@/lib/i18n/dictionary";
 import { checkHoneypot } from "@/lib/security/honeypot";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { clientIp } from "@/lib/request";
-import { paymentProvider } from "@/lib/payments/provider";
+import { MethodNotOffered, startCheckout } from "@/lib/payments/provider";
+import { getCurrentUser } from "@/lib/auth";
 import { FUND_LABELS, isFund, MAX_DONATION, MIN_DONATION, usd } from "@/lib/payments/catalog";
 
 export type DonateState = { error?: string } | undefined;
@@ -25,15 +26,30 @@ export async function startDonation(_prev: DonateState, form: FormData): Promise
   if (dollars > MAX_DONATION) return { error: t.donate_max_error };
   const amountCents = Math.round(dollars * 100);
 
-  const { url } = await paymentProvider().createCheckout({
-    kind: "DONATION",
-    amountCents,
-    interval: monthly ? "MONTH" : null,
-    fund,
-    description: `${monthly ? "Monthly donation" : "Donation"} — ${FUND_LABELS[fund]} (${usd(amountCents)}${monthly ? "/month" : ""})`,
-    lang,
-    successUrl: "/donate/thank-you?checkout={CHECKOUT_ID}",
-    cancelUrl: `/donate?canceled=1&fund=${fund}`,
-  });
+  // Signed in: the gift is linked to their account, and the provider's page starts with their email.
+  const user = await getCurrentUser();
+  let url: string;
+  try {
+    url = await startCheckout(
+      {
+        kind: "DONATION",
+        amountCents,
+        interval: monthly ? "MONTH" : null,
+        fund,
+        description: `${monthly ? "Monthly donation" : "Donation"} — ${FUND_LABELS[fund]} (${usd(amountCents)}${monthly ? "/month" : ""})`,
+        lang,
+        email: user?.email,
+        name: user?.name ?? undefined,
+        userId: user?.id,
+        successUrl: "/donate/thank-you?checkout={CHECKOUT_ID}",
+        cancelUrl: `/donate?canceled=1&fund=${fund}`,
+      },
+      form.get("method"),
+    );
+  } catch (e) {
+    if (e instanceof MethodNotOffered) return { error: t.pay_method_unavailable };
+    console.error("Starting a donation checkout failed", e);
+    return { error: t.pay_error };
+  }
   redirect(url);
 }

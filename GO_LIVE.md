@@ -3,18 +3,17 @@
 Everything that must be done or supplied before the site goes live. Items are added as each
 build phase lands. Tick them off in the pull request that prepares the launch.
 
-## Payments (Stripe)
+## Payments (Stripe and PayPal)
 
-- [ ] Create BMCC's Stripe account (501(c)(3) nonprofit), verify the organization and bank account.
-- [ ] Create the membership Products/Prices ($100/month, $1,000/year) and set
-      `STRIPE_PRICE_MEMBERSHIP_MONTHLY` / `STRIPE_PRICE_MEMBERSHIP_YEARLY`.
-- [ ] Set `PAYMENT_PROVIDER=stripe`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
-- [ ] Implement the Stripe adapter in `src/lib/payments/provider.ts` (Checkout Sessions for donations
-      and dues; subscriptions for monthly) and the webhook route that maps Stripe events to the
-      provider-neutral events in `src/lib/payments/types.ts` — everything else already works with them.
-- [ ] Register the webhook endpoint in Stripe and set `STRIPE_WEBHOOK_SECRET`.
-- [ ] Run one real low-value donation and one membership signup end to end, then refund them.
-- [ ] Decide whether Zelle / PayPal / Zakat al-Fitr per-person tiers will be offered (Gap Analysis).
+- [ ] Stripe account (501(c)(3) nonprofit) verified with BMCC's EIN and bank account; check whether the
+      nonprofit fee discount applies (needs 80%+ of volume as tax-deductible donations).
+- [ ] PayPal Business account with confirmed-charity status and the bank account linked.
+- [ ] Decide which methods each payment type offers (`PAYMENT_METHODS`, see RENDER.md → Payments).
+- [ ] Live credentials: `STRIPE_SECRET_KEY=sk_live_…`, `PAYPAL_ENV=live`, live `PAYPAL_CLIENT_ID` /
+      `PAYPAL_CLIENT_SECRET`; run `npm run paypal:setup` against the live account for the plan ids.
+- [ ] Register both live webhooks and set `STRIPE_WEBHOOK_SECRET` and `PAYPAL_WEBHOOK_ID`.
+- [ ] Run one real low-value donation through each provider and one membership signup end to end, then refund them.
+- [ ] Decide whether Zelle / Zakat al-Fitr per-person tiers will be offered (Gap Analysis).
 
 ## Tax receipts
 

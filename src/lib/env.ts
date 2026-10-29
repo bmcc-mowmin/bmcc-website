@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { DEFAULT_PAYMENT_METHODS, methodsInUse, parsePaymentMethods } from "@/lib/payments/methods";
 
 // All settings come from environment variables and are validated once at startup.
 // Anything that differs between local and production is a setting here, never a code change.
@@ -38,12 +39,21 @@ const schema = z
     MAIL_REPLY_TO: optional,
     CONTACT_INBOX: z.string().default("info@brmcc.org"),
 
-    PAYMENT_PROVIDER: z.enum(["mock", "stripe"]).default("mock"),
+    // mock = the site's own test checkout (no money). live = real providers, chosen per payment
+    // type by PAYMENT_METHODS (src/lib/payments/methods.ts). "stripe" is accepted as an old name for live.
+    PAYMENT_PROVIDER: z.preprocess((v) => (v === "stripe" ? "live" : v), z.enum(["mock", "live"]).default("mock")),
+    PAYMENT_METHODS: z.string().default(DEFAULT_PAYMENT_METHODS),
+    // Stripe hosted Checkout. Prices are created per checkout, so no Stripe products need setting up.
     STRIPE_SECRET_KEY: optional,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: optional,
     STRIPE_WEBHOOK_SECRET: optional,
-    STRIPE_PRICE_MEMBERSHIP_MONTHLY: optional,
-    STRIPE_PRICE_MEMBERSHIP_YEARLY: optional,
+    // PayPal (Orders for one-time gifts, Subscriptions for monthly gifts and dues).
+    PAYPAL_ENV: z.enum(["sandbox", "live"]).default("sandbox"),
+    PAYPAL_CLIENT_ID: optional,
+    PAYPAL_CLIENT_SECRET: optional,
+    PAYPAL_WEBHOOK_ID: optional,
+    // Subscription plans, created once with `npm run paypal:setup` (prices are set per subscription).
+    PAYPAL_PLAN_MONTHLY: optional,
+    PAYPAL_PLAN_YEARLY: optional,
     DEFAULT_DONATION_FREQUENCY: z.enum(["one-time", "monthly"]).default("monthly"),
 
     ORG_LEGAL_NAME: z.string().default("Brentwood Muslim Community Center"),
@@ -99,11 +109,27 @@ const schema = z
     }
     if (e.PAYMENT_PROVIDER === "mock" && e.APP_ENV === "production")
       ctx.addIssue({ code: "custom", path: ["PAYMENT_PROVIDER"], message: "mock payments are not allowed in production" });
-    if (e.PAYMENT_PROVIDER === "stripe") {
-      need("STRIPE_SECRET_KEY", "when PAYMENT_PROVIDER=stripe");
-      need("STRIPE_WEBHOOK_SECRET", "when PAYMENT_PROVIDER=stripe");
-      need("STRIPE_PRICE_MEMBERSHIP_MONTHLY", "when PAYMENT_PROVIDER=stripe");
-      need("STRIPE_PRICE_MEMBERSHIP_YEARLY", "when PAYMENT_PROVIDER=stripe");
+    const methods = parsePaymentMethods(e.PAYMENT_METHODS);
+    if (!methods.ok) {
+      for (const m of methods.errors) ctx.addIssue({ code: "custom", path: ["PAYMENT_METHODS"], message: m });
+    } else if (e.PAYMENT_PROVIDER === "live") {
+      const used = methodsInUse(methods.map);
+      if (used.has("stripe")) {
+        need("STRIPE_SECRET_KEY", "when Stripe is in PAYMENT_METHODS");
+        // Renewals and failed payments arrive only by webhook.
+        if (e.APP_ENV === "production") need("STRIPE_WEBHOOK_SECRET", "in production when Stripe is in PAYMENT_METHODS");
+        if (e.APP_ENV === "production" && e.STRIPE_SECRET_KEY?.startsWith("sk_test_"))
+          ctx.addIssue({ code: "custom", path: ["STRIPE_SECRET_KEY"], message: "use a live Stripe key (sk_live_) in production" });
+      }
+      if (used.has("paypal")) {
+        need("PAYPAL_CLIENT_ID", "when PayPal is in PAYMENT_METHODS");
+        need("PAYPAL_CLIENT_SECRET", "when PayPal is in PAYMENT_METHODS");
+        if (e.APP_ENV === "production") need("PAYPAL_WEBHOOK_ID", "in production when PayPal is in PAYMENT_METHODS");
+        if (e.APP_ENV === "production" && e.PAYPAL_ENV !== "live")
+          ctx.addIssue({ code: "custom", path: ["PAYPAL_ENV"], message: "use PAYPAL_ENV=live in production" });
+        if (methods.map.donation_monthly.includes("paypal") || methods.map.dues.includes("paypal")) need("PAYPAL_PLAN_MONTHLY", "when PayPal takes monthly payments (npm run paypal:setup)");
+        if (methods.map.dues.includes("paypal")) need("PAYPAL_PLAN_YEARLY", "when PayPal takes yearly dues (npm run paypal:setup)");
+      }
     }
     if (e.MAIL_TRANSPORT === "resend" || e.MAIL_TRANSPORT === "postmark") need("MAIL_PROVIDER_API_KEY", `when MAIL_TRANSPORT=${e.MAIL_TRANSPORT}`);
     if (e.STORAGE_DRIVER === "s3") {

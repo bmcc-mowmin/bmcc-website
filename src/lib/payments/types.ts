@@ -1,5 +1,8 @@
-// The payment-provider boundary. Everything outside src/lib/payments talks only to these types,
-// so switching PAYMENT_PROVIDER from "mock" to "stripe" needs no other code changes.
+// The payment-provider boundary. Everything outside src/lib/payments talks only to these types.
+// Providers: "mock" (the site's own test checkout), "stripe" and "paypal" (hosted pages — card and
+// PayPal details are entered on the provider's site, never on ours).
+
+export type ProviderId = "mock" | "stripe" | "paypal";
 
 export type CheckoutRequest = {
   kind: "DONATION" | "DUES";
@@ -7,22 +10,30 @@ export type CheckoutRequest = {
   interval: "MONTH" | "YEAR" | null; // null = one-time
   fund?: string;
   membershipId?: string;
+  // Pre-filled on the provider's page when known (membership form, signed-in person).
   email?: string;
   name?: string;
+  // The signed-in person, if any: the payment is linked to them whatever email they pay with.
+  userId?: string;
   description: string; // shown on the checkout page / card statement
   lang: string;
-  successUrl: string; // "{CHECKOUT_ID}" is replaced with our checkout id
+  successUrl: string; // same-site path; "{CHECKOUT_ID}" is replaced with our checkout id
   cancelUrl: string;
 };
 
+// What a provider gets after our CheckoutSession row is created.
+export type StartedCheckout = CheckoutRequest & { checkoutId: string };
+
 export interface PaymentProvider {
-  id: "mock" | "stripe";
-  createCheckout(req: CheckoutRequest): Promise<{ checkoutId: string; url: string }>;
+  id: ProviderId;
+  // Returns the address to send the person to (the provider's hosted page).
+  createCheckout(req: StartedCheckout): Promise<{ url: string; providerSessionId: string }>;
   cancelSubscription(providerSubscriptionId: string): Promise<void>;
 }
 
-// Provider-neutral events. The Stripe webhook maps Stripe's events to these; the mock checkout and
-// the admin "simulate" buttons produce them directly. src/lib/payments/events.ts handles them.
+// Provider-neutral events. Webhooks and return pages map provider events to these; the mock
+// checkout and the admin "simulate" buttons produce them directly. src/lib/payments/events.ts
+// handles them, each eventId once.
 export type PaymentEvent =
   | {
       type: "checkout.completed";

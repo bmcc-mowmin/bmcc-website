@@ -13,7 +13,7 @@ import { getSettings } from "@/lib/settings";
 import { getDictionary } from "@/lib/i18n/dictionary";
 import { fieldErrors } from "@/lib/directory/listing";
 import { startDuesCheckout } from "@/lib/membership/checkout";
-import { paymentProvider } from "@/lib/payments/provider";
+import { CheckoutStartFailed, offeredMethod, providerById } from "@/lib/payments/provider";
 import { handlePaymentEvent } from "@/lib/payments/events";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { escapeHtml, layoutHtml, sendMail } from "@/lib/mail";
@@ -26,7 +26,17 @@ export async function payPendingDues(form: FormData) {
   const membership = (await getMyMemberships(user)).find((m) => m.id === form.get("membershipId") && m.status === "PENDING_PAYMENT");
   if (!membership) redirect("/account");
   const self = membership.household.members.find((p) => p.relationship === "SELF");
-  redirect(await startDuesCheckout(membership.id, membership.plan, membership.household.email, self?.fullName ?? user.name ?? "", await getLang()));
+  const method = offeredMethod("dues", form.get("method"));
+  if (!method) redirect("/account");
+  let url: string;
+  try {
+    url = await startDuesCheckout({ membershipId: membership.id, plan: membership.plan, email: membership.household.email, name: self?.fullName ?? user.name ?? "", lang: await getLang(), userId: user.id }, method);
+  } catch (e) {
+    if (!(e instanceof CheckoutStartFailed)) throw e;
+    console.error("Starting a dues checkout failed", e.cause);
+    url = `/membership/complete?checkout=${encodeURIComponent(e.checkoutId)}&payment_failed=1`;
+  }
+  redirect(url);
 }
 
 // Stop a monthly donation. (Membership dues are changed with the office: the benefit depends on them.)
@@ -34,8 +44,8 @@ export async function cancelMonthlyGift(form: FormData) {
   const user = await requireMember("/account/giving");
   const gift = (await getMyRecurringGifts(user)).find((s) => s.id === form.get("subscriptionId"));
   if (!gift) redirect("/account/giving");
-  await paymentProvider().cancelSubscription(gift.providerSubscriptionId);
-  // With Stripe the webhook reports the same cancellation; handling it twice changes nothing.
+  await providerById(gift.provider).cancelSubscription(gift.providerSubscriptionId);
+  // The provider's webhook reports the same cancellation; handling it twice changes nothing.
   await handlePaymentEvent({ type: "subscription.canceled", eventId: `member_cancel_${gift.id}`, providerSubscriptionId: gift.providerSubscriptionId, canceledAt: new Date() }, gift.provider);
   await audit(user.id, "cancel_recurring_gift", "Subscription", gift.id);
   revalidatePath("/account/giving");

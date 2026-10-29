@@ -5,12 +5,15 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 import { HoneypotFields } from "@/components/forms/HoneypotFields";
 import type { MessageKey } from "@/lib/i18n/dictionary";
 import { routes } from "@/lib/routes";
+import { PayButtons } from "@/components/payments/PayButtons";
+import type { PaymentMethod } from "@/lib/payments/methods";
 import { applyForMembership, type MembershipState } from "./actions";
 import styles from "./membership.module.css";
 
 const REL = ["SPOUSE", "CHILD", "PARENT", "SIBLING", "OTHER"] as const;
 
-export function MembershipForm() {
+// `methods`: payment methods offered for dues (from PAYMENT_METHODS), main one first.
+export function MembershipForm({ methods }: { methods: PaymentMethod[] }) {
   const { t } = useI18n();
   const [state, action, pending] = useActionState<MembershipState, FormData>(applyForMembership, undefined);
   const values = state?.values ?? {};
@@ -187,9 +190,12 @@ export function MembershipForm() {
         )}
       </section>
 
-      <button type="submit" disabled={pending} className={styles.submit}>
-        {pending ? t.f_sending : t.submit_application}
-      </button>
+      <PayButtons
+        methods={methods}
+        disabled={pending}
+        className={styles.submit}
+        label={(m) => (pending ? t.f_sending : methods.length < 2 ? t.submit_application : m === "paypal" ? t.m_submit_paypal : t.m_submit_card)}
+      />
       <p className={styles.note}>{t.m_payment_note}</p>
       <p className={styles.note}>{t.confirm_note}</p>
       </Fragment>

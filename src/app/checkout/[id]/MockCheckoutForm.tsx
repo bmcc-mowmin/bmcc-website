@@ -4,13 +4,12 @@ import { useActionState } from "react";
 import { mockCancel, mockPay, type MockCheckoutState } from "./actions";
 import styles from "./checkout.module.css";
 
-export function MockCheckoutForm(props: { checkoutId: string; amount: string; email: string; name: string; success: string; cancel: string }) {
+export function MockCheckoutForm(props: { checkoutId: string; amount: string; email: string; name: string }) {
   const [state, action, pending] = useActionState<MockCheckoutState, FormData>(mockPay, undefined);
   return (
     <>
       <form action={action} className={styles.form}>
         <input type="hidden" name="checkoutId" value={props.checkoutId} />
-        <input type="hidden" name="success" value={props.success} />
         {state?.error && (
           <p role="alert" className={styles.error}>
             {state.error}
@@ -25,8 +24,8 @@ export function MockCheckoutForm(props: { checkoutId: string; amount: string; em
         </label>
         <input id="co-email" name="email" type="email" defaultValue={props.email} autoComplete="email" required className={styles.input} />
         <div className={styles.cardBox}>
-          <strong>Card</strong> — not collected in test mode. In production this page is Stripe Checkout, where the card is
-          entered on Stripe&apos;s own secure page.
+          <strong>Card</strong> — not collected in test mode. In production this step is Stripe or PayPal, where payment
+          details are entered on their own secure page.
         </div>
         <button type="submit" name="outcome" value="pay" disabled={pending} className={styles.pay}>
           {pending ? "Processing…" : `Pay ${props.amount} (test)`}
@@ -37,7 +36,6 @@ export function MockCheckoutForm(props: { checkoutId: string; amount: string; em
       </form>
       <form action={mockCancel}>
         <input type="hidden" name="checkoutId" value={props.checkoutId} />
-        <input type="hidden" name="cancel" value={props.cancel} />
         <button type="submit" className={styles.cancel}>
           ← Cancel and go back
         </button>

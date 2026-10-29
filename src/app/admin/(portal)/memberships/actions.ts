@@ -8,7 +8,7 @@ import { requireSection, type CurrentUser } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { done, fail, text } from "@/lib/admin/forms";
 import { handlePaymentEvent } from "@/lib/payments/events";
-import { isMockPayments, paymentProvider } from "@/lib/payments/provider";
+import { isMockPayments, providerById } from "@/lib/payments/provider";
 import type { ActionResult } from "@/components/admin/ActionForm";
 
 const RELATIONSHIPS = ["SELF", "SPOUSE", "CHILD", "PARENT", "SIBLING", "OTHER"] as const;
@@ -83,7 +83,7 @@ export async function cancelMembership(_prev: ActionResult, form: FormData): Pro
   if (!m) return fail("Not found.");
   const sub = m.providerSubscriptionId ? await db.subscription.findUnique({ where: { providerSubscriptionId: m.providerSubscriptionId } }) : null;
   if (sub && sub.status !== "CANCELED") {
-    await paymentProvider().cancelSubscription(sub.providerSubscriptionId);
+    await providerById(sub.provider).cancelSubscription(sub.providerSubscriptionId);
     await handlePaymentEvent({ type: "subscription.canceled", eventId: `admin_cancel_${randomBytes(6).toString("hex")}`, providerSubscriptionId: sub.providerSubscriptionId, canceledAt: new Date() }, sub.provider);
   } else {
     await db.membership.update({ where: { id }, data: { status: "CANCELLED" } });

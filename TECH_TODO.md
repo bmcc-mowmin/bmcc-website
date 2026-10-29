@@ -113,17 +113,29 @@ existing member, donor or invited admin.
 
 ## Payments
 
-- [ ] Stripe adapter in `src/lib/payments/provider.ts`: Checkout Sessions (one-time donation =
-      payment mode; monthly donation and dues = subscription mode) with the site's payment reference
-      in metadata; cancel the subscription from "Stop this monthly gift" and membership cancel.
-- [ ] Stripe webhook route `/api/webhooks/stripe` (verify signature): `checkout.session.completed`,
-      `invoice.paid`, `invoice.payment_failed`, `customer.subscription.deleted` → the provider-neutral
-      events in `src/lib/payments/types.ts`.
-- [ ] PayPal one-time donations: JS SDK button on Donate, server-side create + capture order,
-      webhook `/api/webhooks/paypal` (`PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.REFUNDED`).
-      New settings `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`.
-- [ ] Let the Donate page offer both providers (today one `PAYMENT_PROVIDER` is used for everything).
-- [ ] Later: PayPal monthly giving (Subscriptions API).
+How it works (Oct 28): hosted checkout only — card and PayPal details are entered on Stripe's or
+PayPal's own page, never on ours (PCI SAQ A). `PAYMENT_METHODS` picks the providers per payment type
+(`donation`, `donation_monthly`, `dues`); the Donate and Membership pages show one button per method.
+Name and email come back from the provider; a signed-in person's payment is linked to their account,
+dues to the application's email. Setup steps: [RENDER.md → Payments](RENDER.md#payments-stripe-and-paypal).
+
+- [x] Stripe: hosted Checkout Sessions (inline prices, no Stripe products needed), return page,
+      webhook `/api/webhooks/stripe` (signature checked), cancel subscriptions. `src/lib/payments/stripe.ts`.
+- [x] PayPal: one-time via Orders (captured on return), monthly gifts and dues via Subscriptions
+      (`npm run paypal:setup` creates the plans), webhook `/api/webhooks/paypal` (verified with
+      PayPal), cancel subscriptions. `src/lib/payments/paypal.ts`, `paypal-webhook.ts`.
+- [x] Per-type method setting and buttons on Donate, Membership, "Complete payment" and My account.
+- [x] Unit tests for the settings and the Stripe/PayPal → event mapping (`tests/unit/payments.test.ts`);
+      mock checkout flows re-tested in a browser.
+- [ ] End-to-end sandbox test of every path, with Stripe test keys and a PayPal sandbox buyer:
+      one-time and monthly donation, monthly and yearly dues, cancel on the provider's page,
+      "Stop this monthly gift", admin membership cancel, a renewal (Stripe test clock / PayPal
+      sandbox), and both webhooks.
+- [ ] Refunds: Stripe `charge.refunded` and PayPal `PAYMENT.CAPTURE.REFUNDED` / `PAYMENT.SALE.REFUNDED`
+      aren't handled yet — mark the payment REFUNDED (the receipts/giving pages already show refunds).
+- [ ] Later: move the per-type method choice into Admin → Settings (database), with
+      `PAYMENT_METHODS` as the default.
+- [ ] Browser tests for the live providers (the e2e suite covers the mock checkout only).
 
 ## Mailing list: Constant Contact
 
