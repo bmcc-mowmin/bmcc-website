@@ -142,11 +142,23 @@ dues to the application's email. Setup steps: [RENDER.md → Payments](RENDER.md
 
 ## Mailing list: Constant Contact
 
-- [ ] Load Constant Contact's Universal Code once in `src/app/(site)/layout.tsx` (`next/script`).
-- [ ] Replace the forms in the re-subscribe bar and the "Stay Connected" band with the Inline Code.
-- [ ] Retire the site's own sign-up flow (confirmation emails, `/subscribe`, `/unsubscribe`); keep
-      Admin → Subscribers read-only as history; import confirmed subscribers into Constant Contact.
-- [ ] If a Content-Security-Policy is added, allow Constant Contact and Google reCAPTCHA.
+Decision (Oct 28): **launch with the site's own sign-up** (double opt-in, honeypot, rate limits);
+add Constant Contact after launch. The Constant Contact account in use is a free trial, which
+can't activate embedded sign-up forms.
+
+- [ ] For launch: turn email on (see Hosting) — confirmation and welcome emails need it.
+- [ ] Until Constant Contact is connected: before each newsletter, Admin → Subscribers →
+      *Export confirmed (CSV)* and import into the newsletter tool (the CSV has each person's
+      unsubscribe link).
+- [ ] After launch, on a paid Constant Contact plan (or BMCC's existing paid account), either:
+    - **Embedded form:** Sign-up Forms → Inline, Confirmed Opt-In on; load the Universal Code once
+      in `src/app/(site)/layout.tsx` (`next/script`), put the Inline Code in the re-subscribe bar
+      and the "Stay Connected" band, retire the site's own sign-up flow, import confirmed
+      subscribers. Allow Constant Contact and Google reCAPTCHA if a CSP is added. No developer app
+      needed.
+    - **Or the site's own form → Constant Contact API** (keeps Turnstile and our spam checks): a
+      developer-portal app with the **Authorization Code** OAuth flow (the server keeps the secret
+      and a refresh token); on confirmation, add the contact to the list.
 
 ## Hosting (Render) — temporary settings to replace before launch
 
