@@ -44,7 +44,7 @@ export async function cancelMonthlyGift(form: FormData) {
   const user = await requireMember("/account/giving");
   const gift = (await getMyRecurringGifts(user)).find((s) => s.id === form.get("subscriptionId"));
   if (!gift) redirect("/account/giving");
-  await providerById(gift.provider).cancelSubscription(gift.providerSubscriptionId);
+  await providerById(gift.provider).cancelSubscription(gift.providerSubscriptionId, gift.providerAccount);
   // The provider's webhook reports the same cancellation; handling it twice changes nothing.
   await handlePaymentEvent({ type: "subscription.canceled", eventId: `member_cancel_${gift.id}`, providerSubscriptionId: gift.providerSubscriptionId, canceledAt: new Date() }, gift.provider);
   await audit(user.id, "cancel_recurring_gift", "Subscription", gift.id);

@@ -2,17 +2,31 @@ import "server-only";
 import Stripe from "stripe";
 import { env } from "@/lib/env";
 import { stripeBillingEvent, stripeSessionEvent } from "./mappers";
+import { DEFAULT_ACCOUNT, parseStripeAccountMap, stripeAccountFor, stripeKeyVar } from "./stripe-accounts";
 import type { PaymentEvent, PaymentProvider, StartedCheckout } from "./types";
 
 // Stripe hosted Checkout. The person enters card details on Stripe's page; we get the result from
-// the return page (/api/payments/stripe/return) and Stripe's webhook (/api/webhooks/stripe).
+// the return page (/api/payments/stripe/return) and Stripe's webhook (/api/webhooks/stripe[/<account>]).
+// Each payment goes to the Stripe account for its fund (STRIPE_ACCOUNT_MAP, stripe-accounts.ts).
 // Prices are created inline per checkout, so nothing needs setting up in the Stripe dashboard.
 
-let client: Stripe | null = null;
-export function stripe() {
-  if (!env.STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is not set");
-  client ??= new Stripe(env.STRIPE_SECRET_KEY, { appInfo: { name: "bmcc-website" } });
-  return client;
+// One client per Stripe account (STRIPE_ACCOUNT_MAP); "default" uses STRIPE_SECRET_KEY.
+const clients = new Map<string, Stripe>();
+export function stripe(account: string = DEFAULT_ACCOUNT) {
+  const key = process.env[stripeKeyVar(account)];
+  if (!key) throw new Error(`${stripeKeyVar(account)} is not set (Stripe account "${account}")`);
+  let c = clients.get(account);
+  if (!c) {
+    c = new Stripe(key, { appInfo: { name: "bmcc-website" } });
+    clients.set(account, c);
+  }
+  return c;
+}
+
+// The account a new payment goes to.
+export function accountForPayment(kind: "DONATION" | "DUES", fund?: string | null) {
+  const parsed = parseStripeAccountMap(env.STRIPE_ACCOUNT_MAP);
+  return stripeAccountFor(parsed.ok ? parsed.map : {}, kind, fund);
 }
 
 const abs = (path: string) => `${env.APP_URL}${path}`;
@@ -24,7 +38,8 @@ export const stripeProvider: PaymentProvider = {
   id: "stripe",
   async createCheckout(req: StartedCheckout) {
     const recurring = req.interval !== null;
-    const session = await stripe().checkout.sessions.create({
+    const account = accountForPayment(req.kind, req.fund);
+    const session = await stripe(account).checkout.sessions.create({
       mode: recurring ? "subscription" : "payment",
       client_reference_id: req.checkoutId,
       metadata: { checkoutId: req.checkoutId, kind: req.kind },
@@ -48,22 +63,23 @@ export const stripeProvider: PaymentProvider = {
       cancel_url: abs(`/api/payments/cancel?checkout=${encodeURIComponent(req.checkoutId)}`),
     });
     if (!session.url) throw new Error("Stripe returned no checkout URL");
-    return { url: session.url, providerSessionId: session.id };
+    return { url: session.url, providerSessionId: session.id, providerAccount: account };
   },
-  async cancelSubscription(providerSubscriptionId: string) {
-    await stripe().subscriptions.cancel(providerSubscriptionId);
+  async cancelSubscription(providerSubscriptionId: string, account?: string | null) {
+    await stripe(account ?? DEFAULT_ACCOUNT).subscriptions.cancel(providerSubscriptionId);
   },
 };
 
-// A finished Checkout Session → our "checkout.completed" event, or null while it isn't paid yet.
-export async function stripeCompletion(sessionId: string): Promise<{ checkoutId: string; event: PaymentEvent | null }> {
-  return stripeSessionEvent(await stripe().checkout.sessions.retrieve(sessionId, { expand: ["subscription"] }));
+// A finished Checkout Session (in the given account) → our "checkout.completed" event, or null
+// while it isn't paid yet.
+export async function stripeCompletion(sessionId: string, account: string = DEFAULT_ACCOUNT): Promise<{ checkoutId: string; event: PaymentEvent | null }> {
+  return stripeSessionEvent(await stripe(account).checkout.sessions.retrieve(sessionId, { expand: ["subscription"] }));
 }
 
-// Webhook events → our events. Returns null for events we don't act on.
-export async function stripeWebhookEvent(event: Stripe.Event): Promise<PaymentEvent | null> {
+// Webhook events (from the given account's endpoint) → our events. Null for events we don't act on.
+export async function stripeWebhookEvent(event: Stripe.Event, account: string = DEFAULT_ACCOUNT): Promise<PaymentEvent | null> {
   if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
-    return (await stripeCompletion(event.data.object.id)).event;
+    return (await stripeCompletion(event.data.object.id, account)).event;
   }
   return stripeBillingEvent(event);
 }

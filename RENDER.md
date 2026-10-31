@@ -135,13 +135,28 @@ PAYMENT_METHODS=donation:stripe,paypal;donation_monthly:stripe;dues:stripe,paypa
 Types: `donation` (one-time gift), `donation_monthly`, `dues` (membership, monthly or yearly).
 Methods: `stripe`, `paypal`. Use test/sandbox credentials while `APP_ENV=staging`.
 
-**Stripe** (Developers → API keys, test mode on Render):
-1. Add `STRIPE_SECRET_KEY=sk_test_…`. No products or prices need creating.
-2. Developers → Webhooks → **Add endpoint** `https://<site>/api/webhooks/stripe` with events
-   `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.paid`,
-   `invoice.payment_failed`, `customer.subscription.deleted`. Copy its signing secret into
-   `STRIPE_WEBHOOK_SECRET=whsec_…`. (Without it, payments still record when people return from
-   Stripe, but renewals, failed renewals and cancellations made in Stripe don't.)
+**Stripe** — BMCC uses a separate Stripe account per purpose. `STRIPE_ACCOUNT_MAP` says which account
+takes membership dues (`dues`) and each donation fund (`new-bmcc`, `masjid-membership`,
+`construct-run`, `sadaqah-zakat`, `zakat-fitr`); each account name then has its own key:
+
+```
+STRIPE_ACCOUNT_MAP=dues:operations;masjid-membership:operations;sadaqah-zakat:zakah;zakat-fitr:zakah;new-bmcc:construction;construct-run:building
+STRIPE_SECRET_KEY_OPERATIONS=sk_test_…
+STRIPE_SECRET_KEY_ZAKAH=sk_test_…
+STRIPE_SECRET_KEY_CONSTRUCTION=sk_test_…
+STRIPE_SECRET_KEY_BUILDING=sk_test_…
+```
+
+Anything not in the map uses `STRIPE_SECRET_KEY` (and with no map, that one key takes everything).
+Keys: each account's Developers → API keys (test mode on Render). No products or prices need creating.
+
+Webhooks — in **each** account, Developers → Webhooks → **Add endpoint**
+`https://<site>/api/webhooks/stripe/<account>` (e.g. `/api/webhooks/stripe/zakah`; the unmapped
+account uses `/api/webhooks/stripe`) with events `checkout.session.completed`,
+`checkout.session.async_payment_succeeded`, `invoice.paid`, `invoice.payment_failed`,
+`customer.subscription.deleted`. Put each signing secret in `STRIPE_WEBHOOK_SECRET_<ACCOUNT>`
+(e.g. `STRIPE_WEBHOOK_SECRET_ZAKAH=whsec_…`). Without them, payments still record when people return
+from Stripe, but renewals, failed renewals and cancellations made in Stripe don't.
 
 **PayPal** (developer.paypal.com → Apps & Credentials, Sandbox):
 1. Add `PAYPAL_ENV=sandbox`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`.
@@ -160,7 +175,20 @@ Methods: `stripe`, `paypal`. Use test/sandbox credentials while `APP_ENV=staging
 
 These settings are read at runtime: save them and Render restarts the service (no rebuild needed).
 The app refuses to start if a method in `PAYMENT_METHODS` is missing its credentials, and in
-production it requires live keys (`sk_live_`, `PAYPAL_ENV=live`) and both webhook secrets.
+production it requires live keys (`sk_live_`, `PAYPAL_ENV=live`) and every webhook secret.
+
+## Mailing list: Constant Contact
+
+From Constant Contact's Sign-up Forms → the form → Inline: the Universal Code's `_ctct_m` value and
+the Inline Code's `data-form-id`:
+
+```
+CONSTANT_CONTACT_ACCOUNT=<_ctct_m value>
+CONSTANT_CONTACT_FORM_ID=<data-form-id>
+```
+
+The "Stay Connected" band on Home then shows that form, and the re-subscribe bar's button scrolls to
+it. Read at runtime (restart, no rebuild). Blank = the site's own sign-up form.
 
 ## Before launch (GO-LIVE)
 
@@ -168,7 +196,7 @@ production it requires live keys (`sk_live_`, `PAYPAL_ENV=live`) and both webhoo
 |---|---|---|
 | Environment | `APP_ENV=production`, `APP_URL=https://brmcc.org` | `ADMIN_HOST=admin.brmcc.org`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` (`openssl rand -base64 32`) |
 | Sign-in | Clerk production keys (`pk_live_` / `sk_live_`) | `CLERK_WEBHOOK_SECRET` |
-| Payments | `PAYMENT_PROVIDER=live` with live Stripe/PayPal credentials (see Payments below) | `STRIPE_SECRET_KEY` (`sk_live_`), `STRIPE_WEBHOOK_SECRET`, `PAYPAL_ENV=live`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `PAYPAL_PLAN_MONTHLY`, `PAYPAL_PLAN_YEARLY` |
+| Payments | `PAYMENT_PROVIDER=live` with live Stripe/PayPal credentials (see Payments below) | each `STRIPE_SECRET_KEY_<ACCOUNT>` (`sk_live_`) and `STRIPE_WEBHOOK_SECRET_<ACCOUNT>`, `PAYPAL_ENV=live`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `PAYPAL_PLAN_MONTHLY`, `PAYPAL_PLAN_YEARLY` |
 | Email | `MAIL_TRANSPORT=smtp` (or `resend` / `postmark`) | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD` (or `MAIL_PROVIDER_API_KEY`); `MAIL_FROM`, `MAIL_REPLY_TO`, `CONTACT_INBOX` |
 | Files | `STORAGE_DRIVER=s3` (Cloudflare R2) | `S3_ENDPOINT` (`https://<account-id>.r2.cloudflarestorage.com`), `S3_REGION=auto`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, optional `S3_PUBLIC_URL` |
 | Spam protection | Cloudflare Turnstile (optional) | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |

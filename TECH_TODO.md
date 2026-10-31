@@ -75,7 +75,6 @@ Test suite:
 
 | Where | What | Replace with |
 |---|---|---|
-| `src/lib/payments/provider.ts` | Stripe provider throws "connected at go-live" | Stripe adapter (Payments section) |
 | `/checkout/[id]`, Admin → Memberships test tools | Mock checkout and simulated renewals (mock provider only) | Stripe / PayPal; tools disappear automatically |
 | `src/lib/prayer/sources/` | Masjidi source listed but `available: false` | Masjidi adapter once they give API access |
 | `MAIL_TRANSPORT=off` (Render) | Emails are logged, not sent | Real email provider (Hosting section) |
@@ -139,26 +138,36 @@ dues to the application's email. Setup steps: [RENDER.md → Payments](RENDER.md
 - [ ] Later: move the per-type method choice into Admin → Settings (database), with
       `PAYMENT_METHODS` as the default.
 - [ ] Browser tests for the live providers (the e2e suite covers the mock checkout only).
+- [x] **Stripe: one account per fund** (Oct 31). `STRIPE_ACCOUNT_MAP` sends dues and each donation fund to
+      one of BMCC's Stripe accounts (operations, zakah, construction, building, school), each with
+      `STRIPE_SECRET_KEY_<ACCOUNT>` and its own webhook `/api/webhooks/stripe/<account>`
+      (`STRIPE_WEBHOOK_SECRET_<ACCOUNT>`). The account is stored on each checkout, subscription and
+      payment (`providerAccount`, also in the donations CSV), so returns, renewals and cancellations
+      use the right account. `src/lib/payments/stripe-accounts.ts` (unit tested). Verified with the
+      five sandboxes: a Sadaqah/Zakat gift landed in Zakah, a monthly Construct & Run gift in
+      Building, monthly dues in Operations, and admin cancel cancelled it in Operations.
+      - [ ] The School account has no fund on the site yet — add a fund (e.g. school fees) and map it.
+      - [ ] Add the per-account webhooks in each Stripe account (RENDER.md).
+      - [ ] PayPal is still one account for everything; decide whether it should be split too.
+      - [ ] Live keys for all five accounts before launch.
 
 ## Mailing list: Constant Contact
 
-Decision (Oct 28): **launch with the site's own sign-up** (double opt-in, honeypot, rate limits);
-add Constant Contact after launch. The Constant Contact account in use is a free trial, which
-can't activate embedded sign-up forms.
+Done Oct 31: with `CONSTANT_CONTACT_ACCOUNT` (the Universal Code's `_ctct_m` value) and
+`CONSTANT_CONTACT_FORM_ID` (the Inline form's `data-form-id`) set, the "Stay Connected" band on Home
+shows Constant Contact's inline form (`src/components/mailing-list/ConstantContactForm.tsx`, script
+loaded only where the form is), and the re-subscribe bar's button scrolls to it. Sign-ups go straight
+to Constant Contact, which handles confirmation, reCAPTCHA and unsubscribes. Without the two settings
+the site's own form is used, as before. Checked in a browser (desktop, phone, in-site navigation).
 
-- [ ] For launch: turn email on (see Hosting) — confirmation and welcome emails need it.
-- [ ] Until Constant Contact is connected: before each newsletter, Admin → Subscribers →
-      *Export confirmed (CSV)* and import into the newsletter tool (the CSV has each person's
-      unsubscribe link).
-- [ ] After launch, on a paid Constant Contact plan (or BMCC's existing paid account), either:
-    - **Embedded form:** Sign-up Forms → Inline, Confirmed Opt-In on; load the Universal Code once
-      in `src/app/(site)/layout.tsx` (`next/script`), put the Inline Code in the re-subscribe bar
-      and the "Stay Connected" band, retire the site's own sign-up flow, import confirmed
-      subscribers. Allow Constant Contact and Google reCAPTCHA if a CSP is added. No developer app
-      needed.
-    - **Or the site's own form → Constant Contact API** (keeps Turnstile and our spam checks): a
-      developer-portal app with the **Authorization Code** OAuth flow (the server keeps the secret
-      and a refresh token); on confirmation, add the contact to the list.
+- [ ] In Constant Contact: confirm the form's list and that Confirmed Opt-In is on; the form's text
+      ("Please subscribe! … We'll send a confirmation link") is edited there, not in the site.
+- [ ] Import the site's existing confirmed subscribers (Admin → Subscribers → *Export confirmed
+      (CSV)*) into the Constant Contact list once, then stop using the site's list.
+- [ ] Then retire the site's own sign-up flow (`subscribe` action, confirmation emails, Subscribers
+      admin) — or keep it only as the fallback when the settings are blank.
+- [ ] The form's text is English only (Constant Contact form); add per-language forms if needed.
+- [ ] If a full CSP is added: allow `static.ctctcdn.com`, Constant Contact's form endpoints and Google reCAPTCHA.
 
 ## Privacy (personal data)
 

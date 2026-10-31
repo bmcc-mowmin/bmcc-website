@@ -72,6 +72,7 @@ async function checkoutCompleted(tx: Tx, e: Extract<PaymentEvent, { type: "check
     await tx.subscription.create({
       data: {
         provider,
+        providerAccount: checkout.providerAccount,
         providerSubscriptionId: e.providerSubscriptionId,
         providerCustomerId: e.providerCustomerId,
         kind: checkout.kind,
@@ -99,6 +100,7 @@ async function checkoutCompleted(tx: Tx, e: Extract<PaymentEvent, { type: "check
       userId,
       membershipId: checkout.membershipId,
       provider,
+      providerAccount: checkout.providerAccount,
       providerCheckoutId: checkout.id,
       providerPaymentId: e.providerPaymentId,
       providerSubscriptionId: e.providerSubscriptionId,
@@ -145,6 +147,7 @@ async function invoicePaid(tx: Tx, e: Extract<PaymentEvent, { type: "invoice.pai
       userId: sub.userId,
       membershipId: sub.membershipId,
       provider,
+      providerAccount: sub.providerAccount,
       providerPaymentId: e.providerPaymentId,
       providerSubscriptionId: sub.providerSubscriptionId,
       paidAt: e.paidAt,

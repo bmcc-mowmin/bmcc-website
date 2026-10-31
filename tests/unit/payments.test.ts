@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type Stripe from "stripe";
 import { parsePaymentMethods, paymentTypeFor, DEFAULT_PAYMENT_METHODS } from "../../src/lib/payments/methods";
+import { accountsInUse, parseStripeAccountMap, stripeAccountFor, stripeKeyVar, stripeWebhookVar } from "../../src/lib/payments/stripe-accounts";
 import { firstPaymentId, paypalOrderEvent, paypalSubscriptionStartEvent, stripeBillingEvent, stripeSessionEvent } from "../../src/lib/payments/mappers";
 
 // ── Settings ──────────────────────────────────────────────────────────────────
@@ -147,4 +148,43 @@ test("PayPal: an active subscription with its first payment starts the checkout"
 test("PayPal: an approved-but-not-active subscription waits for the webhook", () => {
   assert.equal(paypalSubscriptionStartEvent({ id: "I-SUB2", status: "APPROVED", custom_id: "chk_5", subscriber: { email_address: "m@example.com" } }).event, null);
   assert.equal(paypalSubscriptionStartEvent({ id: "I-SUB3", status: "ACTIVE", custom_id: "chk_6", subscriber: { email_address: "m@example.com" } }).event, null);
+});
+
+// ── Stripe accounts per fund ──────────────────────────────────────────────────
+
+
+const BMCC_MAP = "dues:operations;masjid-membership:operations;sadaqah-zakat:zakah;zakat-fitr:zakah;new-bmcc:construction;construct-run:building";
+
+test("Stripe accounts: dues and each fund go to their account", () => {
+  const r = parseStripeAccountMap(BMCC_MAP);
+  assert.ok(r.ok);
+  assert.equal(stripeAccountFor(r.map, "DUES"), "operations");
+  assert.equal(stripeAccountFor(r.map, "DONATION", "masjid-membership"), "operations");
+  assert.equal(stripeAccountFor(r.map, "DONATION", "sadaqah-zakat"), "zakah");
+  assert.equal(stripeAccountFor(r.map, "DONATION", "zakat-fitr"), "zakah");
+  assert.equal(stripeAccountFor(r.map, "DONATION", "new-bmcc"), "construction");
+  assert.equal(stripeAccountFor(r.map, "DONATION", "construct-run"), "building");
+  assert.deepEqual(accountsInUse(r.map).sort(), ["building", "construction", "operations", "zakah"]);
+});
+
+test("Stripe accounts: unmapped payments use the default account; no map = one account", () => {
+  const partial = parseStripeAccountMap("sadaqah-zakat:zakah");
+  assert.ok(partial.ok);
+  assert.equal(stripeAccountFor(partial.map, "DONATION", "new-bmcc"), "default");
+  assert.deepEqual(accountsInUse(partial.map).sort(), ["default", "zakah"]);
+  const withDefault = parseStripeAccountMap("default:operations;sadaqah-zakat:zakah");
+  assert.ok(withDefault.ok);
+  assert.equal(stripeAccountFor(withDefault.map, "DUES"), "operations");
+  const none = parseStripeAccountMap(undefined);
+  assert.ok(none.ok);
+  assert.deepEqual(accountsInUse(none.map), ["default"]);
+});
+
+test("Stripe accounts: bad keys and names are rejected; variable names per account", () => {
+  const r = parseStripeAccountMap("school-fees:school;dues:Bad Name");
+  assert.ok(!r.ok);
+  assert.match(r.errors.join(" | "), /unknown payment "school-fees"/);
+  assert.match(r.errors.join(" | "), /bad account name/);
+  assert.equal(stripeKeyVar("zakah"), "STRIPE_SECRET_KEY_ZAKAH");
+  assert.equal(stripeWebhookVar("default"), "STRIPE_WEBHOOK_SECRET");
 });

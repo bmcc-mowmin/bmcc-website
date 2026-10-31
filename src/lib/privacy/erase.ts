@@ -36,7 +36,7 @@ async function find(emailRaw: string) {
   const householdIds = households.map((h) => h.id);
   const [payments, subscriptions, checkouts, subscriber, messages, rsvps, submittedListings, listingsWithEmail, otherHouseholds] = await Promise.all([
     db.payment.count({ where: { OR: [...mine, { donorEmail: email }] } }),
-    db.subscription.findMany({ where: { OR: [...mine, { email }] }, select: { id: true, provider: true, providerSubscriptionId: true, status: true, kind: true } }),
+    db.subscription.findMany({ where: { OR: [...mine, { email }] }, select: { id: true, provider: true, providerAccount: true, providerSubscriptionId: true, status: true, kind: true } }),
     db.checkoutSession.count({ where: { OR: [...mine, { email }] } }),
     db.subscriber.findUnique({ where: { email }, select: { id: true } }),
     db.contactMessage.count({ where: { email } }),
@@ -109,7 +109,7 @@ export async function erasePerson(emailRaw: string, admin: { id: string }): Prom
   // 1. Stop recurring charges at the provider before anything is anonymized.
   for (const s of f.subscriptions.filter((x) => x.status !== "CANCELED")) {
     try {
-      await providerById(s.provider).cancelSubscription(s.providerSubscriptionId);
+      await providerById(s.provider).cancelSubscription(s.providerSubscriptionId, s.providerAccount);
     } catch (e) {
       console.error("erase: cancelling subscription failed", s.id, e);
       return { ok: false, message: `Couldn't cancel a ${s.kind === "DUES" ? "dues" : "monthly gift"} subscription at ${s.provider}. Nothing was erased; cancel it in the ${s.provider} dashboard, then try again.` };

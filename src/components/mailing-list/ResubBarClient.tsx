@@ -4,9 +4,9 @@ import { useState } from "react";
 import { SubscribeForm } from "./SubscribeForm";
 import styles from "./mailing-list.module.css";
 
-type Props = { storageKey: string; closeLabel: string; title: string; body: string; placeholder: string; button: string; done: string };
+type Props = { storageKey: string; closeLabel: string; title: string; body: string; placeholder: string; button: string; done: string; signUpHref?: string };
 
-export function ResubBarClient({ storageKey, closeLabel, title, body, placeholder, button, done }: Props) {
+export function ResubBarClient({ storageKey, closeLabel, title, body, placeholder, button, done, signUpHref }: Props) {
   const [dismissed, setDismissed] = useState(false);
   if (dismissed) return null;
 
@@ -29,7 +29,13 @@ export function ResubBarClient({ storageKey, closeLabel, title, body, placeholde
           </p>
           <p className={styles.resubBody}>{body}</p>
         </div>
-        <SubscribeForm source="resub_bar" placeholder={placeholder} button={button} done={done} />
+        {signUpHref ? (
+          <a href={signUpHref} className={styles.resubLink}>
+            {button} →
+          </a>
+        ) : (
+          <SubscribeForm source="resub_bar" placeholder={placeholder} button={button} done={done} />
+        )}
         <button type="button" onClick={dismiss} aria-label={closeLabel} className={styles.dismiss}>
           ×
         </button>

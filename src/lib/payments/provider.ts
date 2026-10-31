@@ -84,8 +84,8 @@ export async function startCheckout(req: CheckoutRequest, method: unknown): Prom
     },
   });
   try {
-    const { url, providerSessionId } = await providerById(chosen).createCheckout({ ...req, checkoutId: row.id });
-    await db.checkoutSession.update({ where: { id: row.id }, data: { providerSessionId } });
+    const { url, providerSessionId, providerAccount } = await providerById(chosen).createCheckout({ ...req, checkoutId: row.id });
+    await db.checkoutSession.update({ where: { id: row.id }, data: { providerSessionId, providerAccount } });
     return url;
   } catch (e) {
     await db.checkoutSession.update({ where: { id: row.id }, data: { status: "CANCELED" } }).catch(() => {});

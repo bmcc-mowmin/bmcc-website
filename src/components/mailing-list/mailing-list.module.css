@@ -212,3 +212,25 @@
   color: var(--ink);
   overflow-wrap: anywhere;
 }
+
+/* Constant Contact's form in the "Stay Connected" band (its widget brings its own styles). */
+.ctct {
+  flex: 1 1 320px;
+  max-width: 480px;
+  min-width: 0;
+}
+/* The re-subscribe bar's button when sign-up goes through Constant Contact. */
+.resubLink {
+  flex-shrink: 0;
+  background: var(--primary);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 14.5px;
+  padding: 11px 20px;
+  border-radius: var(--r-sm, 8px);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.resubLink:hover {
+  background: var(--primary-hover);
+}

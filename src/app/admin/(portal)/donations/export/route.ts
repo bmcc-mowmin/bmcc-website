@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const rows = await db.payment.findMany({ where: paymentWhere(filters, timeZone), orderBy: { paidAt: "asc" } });
   const day = new Intl.DateTimeFormat("en-CA", { timeZone });
   const csv = toCsv(
-    ["date", "receipt number", "name", "email", "type", "fund", "frequency", "amount (USD)", "provider", "provider payment id"],
+    ["date", "receipt number", "name", "email", "type", "fund", "frequency", "amount (USD)", "provider", "account", "provider payment id"],
     rows.map((p) => [
       p.paidAt ? day.format(p.paidAt) : "",
       p.receiptNumber,
@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
       p.frequency.toLowerCase().replace("_", "-"),
       (p.amountCents / 100).toFixed(2),
       p.provider,
+      p.providerAccount ?? "",
       p.providerPaymentId,
     ]),
   );

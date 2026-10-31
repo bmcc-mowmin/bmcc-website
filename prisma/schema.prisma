@@ -363,6 +363,8 @@ model Payment {
   membershipId           String?
   membership             Membership?      @relation(fields: [membershipId], references: [id])
   provider               String // "mock" | "stripe" | "paypal"
+  // Which of BMCC's Stripe accounts took it (STRIPE_ACCOUNT_MAP), e.g. "operations"; null otherwise.
+  providerAccount        String?
   providerCheckoutId     String?
   providerPaymentId      String?          @unique
   providerSubscriptionId String?
@@ -398,7 +400,9 @@ enum SubscriptionStatus {
 // `providerSessionId` = the Stripe Checkout Session, PayPal order or PayPal subscription id).
 model CheckoutSession {
   id                String           @id @default(cuid())
-  provider          String // "mock" | "stripe"
+  provider          String // "mock" | "stripe" | "paypal"
+  // The Stripe account the checkout was created in (STRIPE_ACCOUNT_MAP); null for mock/PayPal.
+  providerAccount   String?
   providerSessionId String?          @unique
   kind              PaymentKind
   fund              String?
@@ -427,6 +431,8 @@ model CheckoutSession {
 model Subscription {
   id                     String               @id @default(cuid())
   provider               String
+  // The Stripe account it lives in (for cancelling); null for mock/PayPal.
+  providerAccount        String?
   providerSubscriptionId String               @unique
   providerCustomerId     String?
   kind                   PaymentKind

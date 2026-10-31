@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { DEFAULT_PAYMENT_METHODS, methodsInUse, parsePaymentMethods } from "@/lib/payments/methods";
+import { accountsInUse, parseStripeAccountMap, stripeKeyVar, stripeWebhookVar } from "@/lib/payments/stripe-accounts";
 
 // All settings come from environment variables and are validated once at startup.
 // Anything that differs between local and production is a setting here, never a code change.
@@ -46,6 +47,10 @@ const schema = z
     // Stripe hosted Checkout. Prices are created per checkout, so no Stripe products need setting up.
     STRIPE_SECRET_KEY: optional,
     STRIPE_WEBHOOK_SECRET: optional,
+    // Separate Stripe accounts per purpose (src/lib/payments/stripe-accounts.ts), e.g.
+    // "dues:operations;sadaqah-zakat:zakah;new-bmcc:construction", with STRIPE_SECRET_KEY_<ACCOUNT>
+    // and STRIPE_WEBHOOK_SECRET_<ACCOUNT> per account. Unmapped payments use STRIPE_SECRET_KEY.
+    STRIPE_ACCOUNT_MAP: optional,
     // PayPal (Orders for one-time gifts, Subscriptions for monthly gifts and dues).
     PAYPAL_ENV: z.enum(["sandbox", "live"]).default("sandbox"),
     PAYPAL_CLIENT_ID: optional,
@@ -89,6 +94,10 @@ const schema = z
     TURNSTILE_SECRET_KEY: optional,
 
     GOOGLE_MAPS_EMBED_API_KEY: optional,
+    // Constant Contact sign-up form (both values are public, from the form's Universal and Inline
+    // code). When set, it replaces the site's own mailing-list form.
+    CONSTANT_CONTACT_ACCOUNT: optional,
+    CONSTANT_CONTACT_FORM_ID: optional,
     SHOW_RESUB_BAR_SITEWIDE: bool,
   })
   .superRefine((e, ctx) => {
@@ -115,11 +124,21 @@ const schema = z
     } else if (e.PAYMENT_PROVIDER === "live") {
       const used = methodsInUse(methods.map);
       if (used.has("stripe")) {
-        need("STRIPE_SECRET_KEY", "when Stripe is in PAYMENT_METHODS");
-        // Renewals and failed payments arrive only by webhook.
-        if (e.APP_ENV === "production") need("STRIPE_WEBHOOK_SECRET", "in production when Stripe is in PAYMENT_METHODS");
-        if (e.APP_ENV === "production" && e.STRIPE_SECRET_KEY?.startsWith("sk_test_"))
-          ctx.addIssue({ code: "custom", path: ["STRIPE_SECRET_KEY"], message: "use a live Stripe key (sk_live_) in production" });
+        // One Stripe account per purpose (STRIPE_ACCOUNT_MAP); each account reachable by some
+        // payment needs its key. Keys live in variables named per account, read here directly.
+        const accounts = parseStripeAccountMap(e.STRIPE_ACCOUNT_MAP);
+        if (!accounts.ok) for (const m of accounts.errors) ctx.addIssue({ code: "custom", path: ["STRIPE_ACCOUNT_MAP"], message: m });
+        else
+          for (const account of accountsInUse(accounts.map)) {
+            const keyVar = stripeKeyVar(account);
+            const key = process.env[keyVar];
+            if (!key) ctx.addIssue({ code: "custom", path: [keyVar], message: `required for Stripe account "${account}"` });
+            // Renewals and failed payments arrive only by webhook.
+            if (e.APP_ENV === "production" && !process.env[stripeWebhookVar(account)])
+              ctx.addIssue({ code: "custom", path: [stripeWebhookVar(account)], message: `required in production for Stripe account "${account}"` });
+            if (e.APP_ENV === "production" && key?.startsWith("sk_test_"))
+              ctx.addIssue({ code: "custom", path: [keyVar], message: "use a live Stripe key (sk_live_) in production" });
+          }
       }
       if (used.has("paypal")) {
         need("PAYPAL_CLIENT_ID", "when PayPal is in PAYMENT_METHODS");

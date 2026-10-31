@@ -83,7 +83,7 @@ export async function cancelMembership(_prev: ActionResult, form: FormData): Pro
   if (!m) return fail("Not found.");
   const sub = m.providerSubscriptionId ? await db.subscription.findUnique({ where: { providerSubscriptionId: m.providerSubscriptionId } }) : null;
   if (sub && sub.status !== "CANCELED") {
-    await providerById(sub.provider).cancelSubscription(sub.providerSubscriptionId);
+    await providerById(sub.provider).cancelSubscription(sub.providerSubscriptionId, sub.providerAccount);
     await handlePaymentEvent({ type: "subscription.canceled", eventId: `admin_cancel_${randomBytes(6).toString("hex")}`, providerSubscriptionId: sub.providerSubscriptionId, canceledAt: new Date() }, sub.provider);
   } else {
     await db.membership.update({ where: { id }, data: { status: "CANCELLED" } });

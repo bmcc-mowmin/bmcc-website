@@ -22,7 +22,7 @@ export async function completeOnReturn(checkoutId: string | null, provider: "str
   let event: PaymentEvent | null;
   try {
     if (provider === "stripe") {
-      event = (await stripeCompletion(session.providerSessionId)).event;
+      event = (await stripeCompletion(session.providerSessionId, session.providerAccount ?? undefined)).event;
     } else if (session.frequency === "ONE_TIME") {
       event = (await paypalCaptureOrder(session.providerSessionId)).event;
     } else {

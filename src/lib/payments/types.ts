@@ -27,8 +27,9 @@ export type StartedCheckout = CheckoutRequest & { checkoutId: string };
 export interface PaymentProvider {
   id: ProviderId;
   // Returns the address to send the person to (the provider's hosted page).
-  createCheckout(req: StartedCheckout): Promise<{ url: string; providerSessionId: string }>;
-  cancelSubscription(providerSubscriptionId: string): Promise<void>;
+  // providerAccount: which of BMCC's Stripe accounts it was created in (Stripe only).
+  createCheckout(req: StartedCheckout): Promise<{ url: string; providerSessionId: string; providerAccount?: string }>;
+  cancelSubscription(providerSubscriptionId: string, providerAccount?: string | null): Promise<void>;
 }
 
 // Provider-neutral events. Webhooks and return pages map provider events to these; the mock
